@@ -2,9 +2,9 @@
 the electron bookkeeping but leaves it out of the drawing; `over` puts reactants above a step's
 arrow, the first step's too (spec.py, layout.py, scripts/validate.py notes)."""
 
-from functools import lru_cache
 from pathlib import Path
 
+import layouts
 import yaml
 from validate import notes
 
@@ -23,9 +23,8 @@ DEPROTONATE = [{"from": "lp(6)", "to": "between(6,5)"}, {"from": "bond(4-5)", "t
 REPROTONATE = [{"from": "lp(4)", "to": "between(4,5)"}, {"from": "bond(5-6)", "to": "atom(6)"}]
 
 
-@lru_cache(maxsize=None)
 def nitration():
-    return build_scheme(load_spec(EX / "m4" / "m4_nitration_x1.0.yaml"), EX, "nitration")
+    return layouts.scheme(layouts.example("m4_nitration_x1.0"))
 
 
 def drawn(lay):

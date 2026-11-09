@@ -98,23 +98,46 @@ CDXML_SPECS = ["examples/m1/m1_smiles_x1.0.yaml", "examples/m1/m1_charges_x1.0.y
                "examples/m6/m6_enamine_cycle_x1.0.yaml"]
 
 
+_SPEC_BY_NAME = {Path(s).stem: s for s in SPECS}
+_CDXML_SPEC_BY_NAME = {Path(s).stem: s for s in CDXML_SPECS}
+
+
 def spec_svg(path: Path) -> str:
     """The same layout function as scripts/render.py."""
     return to_svg(render_spec(path))[0]
 
 
-def cases() -> dict[str, str]:
-    """name -> SVG text for every gallery case. The ChemDraw-reference cases need
+def case_names() -> list[str]:
+    """Every gallery case's name, without rendering. The ChemDraw-reference cases need
     reference_renders/ (local only, not in the public repo); without it they are left out."""
-    out = {ref: render_reference(ref).svg for ref in REFERENCES if (mr.REF_DIR / f"{ref}.svg").exists()}
-    for s in SPECS:
-        out[Path(s).stem] = spec_svg(mr.REPO / s)
-    return out
+    return ([ref for ref in REFERENCES if (mr.REF_DIR / f"{ref}.svg").exists()]
+            + [Path(s).stem for s in SPECS])
+
+
+def case_svg(name: str) -> str:
+    """The SVG text of one gallery case."""
+    if name in REFERENCES:
+        return render_reference(name).svg
+    return spec_svg(mr.REPO / _SPEC_BY_NAME[name])
+
+
+def cases() -> dict[str, str]:
+    """name -> SVG text for every gallery case."""
+    return {name: case_svg(name) for name in case_names()}
+
+
+def cdxml_case_names() -> list[str]:
+    return [Path(s).stem for s in CDXML_SPECS]
+
+
+def cdxml_case(name: str) -> str:
+    """The CDXML text (render.py --cdxml) of one CDXML case."""
+    return spec_cdxml(mr.REPO / _CDXML_SPEC_BY_NAME[name], warn=lambda m: None)
 
 
 def cdxml_cases() -> dict[str, str]:
-    """name -> CDXML text (render.py --cdxml) for every CDXML case."""
-    return {Path(s).stem: spec_cdxml(mr.REPO / s, warn=lambda m: None) for s in CDXML_SPECS}
+    """name -> CDXML text for every CDXML case."""
+    return {name: cdxml_case(name) for name in cdxml_case_names()}
 
 
 def canonical(text: str) -> bytes:

@@ -1,13 +1,13 @@
 """M4: resonance steps, several sequences and wrapped rows (spec.py, electrons.py, layout.py,
 arrows.resonance_arrow, brackets; style-spec.md §3.4, §4.3)."""
 
-from functools import lru_cache
 from pathlib import Path
 
 import pytest
 import yaml
 from pydantic import ValidationError
 from rdkit import Chem
+import layouts
 from validate import validate
 
 from chem_svg_cdxml.arrows import resonance_arrow
@@ -30,9 +30,8 @@ def spec(steps, species=None, **kw):
     return Spec.model_validate({"species": species or SPECIES, "steps": steps, **kw})
 
 
-@lru_cache(maxsize=None)
 def scheme(stem):
-    return build_scheme(load_spec(EX / stem[:2] / f"{stem}.yaml"), EX, stem)
+    return layouts.scheme(layouts.example(stem))
 
 
 # ---------------------------------------------------------------- schema
@@ -93,8 +92,8 @@ def test_resonance_after_a_step_with_by_products(tmp_path):
 
 def test_phenol_h_abstraction_by_x():
     path = REPO / "tests" / "specs" / "phenol_x_abstraction.yaml"
-    assert validate(path) == []
-    lay = build_scheme(load_spec(path), path.parent, "phenol")
+    assert layouts.problems(path) == []
+    lay = layouts.scheme(path)
     texts = {n: "".join(r.text for r in lay.species[n].group.leaves() if isinstance(r, TextRun)) for n in ("xrad", "hx")}
     assert texts == {"xrad": "X", "hx": "HX"}
     assert lay.species["hx"].group.ink_bbox()[0] > lay.resonance[0].bar_x[1]
@@ -205,4 +204,4 @@ def test_a_step_after_a_bracket_reaches_into_it():
 @pytest.mark.parametrize("stem", ["m4_nitration_x1.0", "m4_nitration_x0.8", "m4_nitration_x0.6",
                                   "m4_resonance_x1.0", "m4_wrap_x1.0", "m4_perkin_x1.0"])
 def test_m4_examples_validate(stem):
-    assert validate(EX / stem[:2] / f"{stem}.yaml") == []
+    assert layouts.problems(layouts.example(stem)) == []

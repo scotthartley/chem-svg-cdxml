@@ -1,12 +1,13 @@
 """Mechanism layout (draw_mol dots, mechanism.py arrows, style-spec.md §4.2) and checks."""
 
+import copy
 import math
 from dataclasses import replace
-from functools import lru_cache
 from pathlib import Path
 
 import pytest
-from validate import validate
+import layouts
+from validate import checked_layout
 
 from chem_svg_cdxml import chem
 from chem_svg_cdxml.draw_mol import Drawer
@@ -19,7 +20,7 @@ from chem_svg_cdxml.mechanism import (ARC_HANDLES, FARTHER, MISS_DEG, TANGENT_CL
                                     tangent_barb_stable, tangent_clear)
 from chem_svg_cdxml.preset import load_preset
 from chem_svg_cdxml.scene import Circle
-from chem_svg_cdxml.spec import Spec, load_spec
+from chem_svg_cdxml.spec import Spec
 from chem_svg_cdxml.svg_writer import to_svg
 
 EX = Path(__file__).resolve().parents[1] / "examples"
@@ -27,9 +28,8 @@ M3 = sorted(p.stem for p in (EX / "m3").glob("m3_*.yaml"))
 P = load_preset("acs1996")
 
 
-@lru_cache(maxsize=None)
 def scheme(stem):
-    return build_scheme(load_spec(EX / stem[:2] / f"{stem}.yaml"), EX, stem)
+    return layouts.scheme(layouts.example(stem))
 
 
 def sides(smiles, tails=None, flip_h=False):
@@ -41,7 +41,7 @@ def sides(smiles, tails=None, flip_h=False):
 
 @pytest.mark.parametrize("stem", M3)
 def test_examples_validate(stem):
-    assert validate(EX / stem[:2] / f"{stem}.yaml") == []
+    assert layouts.problems(layouts.example(stem)) == []
 
 
 def test_lone_pair_sides_like_chemdraw():
@@ -332,7 +332,7 @@ def test_target_atoms_keep_their_lone_pairs_in_place():
         plain = Drawer(p.mol, lay.preset, show_lone_pairs={i}).dot_sets()[i]
         assert [(d.side, d.dots) for d in p.drawer.dot_sets()[i] if d.kind == "pair"] == \
                [(d.side, d.dots) for d in plain if d.kind == "pair"]
-    assert validate(EX / "m3" / "m3_carbonyl_addition_x1.0.yaml") == []  # no head touches them
+    assert layouts.problems(layouts.example("m3_carbonyl_addition_x1.0")) == []  # no head touches them
 
 
 def test_fishhooks_meet_where_the_bond_forms():
@@ -438,13 +438,15 @@ def test_two_fishhooks_from_a_ring_double_bond(bow, tmp_path):
     past the double bond's inner line; on the same side as its partner (bow: left), its tail
     slides along the bond toward atom 3. Either way nothing crosses."""
     import yaml
-    data = yaml.safe_load(PHENOL.read_text())
     if bow:
+        data = yaml.safe_load(PHENOL.read_text())
         data["overrides"] = {"arrows": [{"step": 2, "index": 2, "bow": bow}]}
-    path = tmp_path / "phenol.yaml"
-    path.write_text(yaml.safe_dump(data))
-    assert validate(path) == []
-    lay = build_scheme(load_spec(path), PHENOL.parent, "phenol")
+        path = tmp_path / "phenol.yaml"
+        path.write_text(yaml.safe_dump(data))
+        problems, _, lay = checked_layout(path)
+    else:
+        problems, lay = layouts.problems(PHENOL), layouts.scheme(PHENOL)
+    assert problems == []
     one, two = (a for a in lay.curved if a.step == 2 and a.index in (1, 2))
     sp = lay.species["phenoxy"]
     c3, c4 = (next(add(a.p, sp.offset) for a in sp.mol.atoms if a.map == m) for m in (3, 4))
@@ -462,7 +464,7 @@ FISCHER = Path(__file__).parent / "specs" / "fischer_over_x1.0.yaml"
 
 
 def _fischer():
-    return build_scheme(load_spec(FISCHER), FISCHER.parent, FISCHER.stem)
+    return layouts.scheme(FISCHER)
 
 
 def _arrow(lay, step, index=0):
@@ -477,7 +479,7 @@ def _reaches(lay, a) -> float:
 
 
 def test_fischer_validates():
-    assert validate(FISCHER) == []
+    assert layouts.problems(FISCHER) == []
 
 
 def test_flat_arc_reaches_a_carbonyl_carbon_from_the_side():
@@ -497,10 +499,7 @@ def test_flat_arc_reaches_a_carbonyl_carbon_from_the_side():
 
 def test_passing_near_an_arrows_tail_is_not_a_crossing():
     """The arrow's box is as tall as its head along the whole shaft; the check uses the real lines."""
-    import yaml
-    raw = yaml.safe_load(FISCHER.read_text())
-    raw["overrides"] = {"arrows": [{"step": 4, "index": 0, "shape": "arc"}]}  # the arc is what passes near the tail
-    lay = build_scheme(Spec.model_validate(raw), FISCHER.parent, FISCHER.stem)
+    lay = layouts.overridden(FISCHER, layouts.arrow_overrides({"step": 4, "index": 0, "shape": "arc"}))  # the arc passes near the tail
     a = _arrow(lay, 4)
     st = next(s for s in lay.steps if s.n == 4)
     pl = a.polyline()
@@ -517,7 +516,7 @@ def test_arrow_from_a_reagent_over_the_arrow_may_cross_it():
 
 
 def test_arrow_within_the_substrate_may_not_cross_its_reaction_arrow():
-    lay = _fischer()
+    lay = copy.deepcopy(_fischer())  # shifts an arrow: not the shared layout
     a = _arrow(lay, 5)  # no reagent over step 5
     st = next(s for s in lay.steps if s.n == 5)
     mid = a.polyline()[len(a.polyline()) // 2]
@@ -602,11 +601,8 @@ def test_fishhooks_that_meet_share_a_side_c_or_s(stem, shapes):
 
 
 def _with_override(stem, **o):
-    import yaml
-    path = EX / stem[:2] / f"{stem}.yaml"
-    raw = yaml.safe_load(path.read_text())
-    raw.setdefault("overrides", {})["arrows"] = [{"step": 1, "index": 0, **o}]
-    return build_scheme(Spec.model_validate(raw), path.parent, stem)
+    """The example with an override on step 1's first arrow (shared: built once per session)."""
+    return layouts.overridden(layouts.example(stem), layouts.arrow_overrides({"step": 1, "index": 0, **o}))
 
 
 def test_shape_override_forces_either_way():
@@ -623,8 +619,9 @@ def test_shape_tangent_rules_out_curvature():
 
 def test_shape_tangent_without_a_curve_says_so(monkeypatch):
     monkeypatch.setattr("chem_svg_cdxml.mechanism.TANGENT_MIN_RADIUS", 1e6)
-    with pytest.raises(ValueError, match="shape tangent"):
-        _with_override("m3_sn2_x1.0", shape="tangent")
+    with pytest.raises(ValueError, match="shape tangent"):  # the uncached build: the shared one predates the patch
+        layouts.overridden.__wrapped__(layouts.example("m3_sn2_x1.0"),
+                                       layouts.arrow_overrides({"step": 1, "index": 0, "shape": "tangent"}))
 
 
 def test_bow_steers_a_tangent_arrow_to_the_side_it_leaves_toward():

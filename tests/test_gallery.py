@@ -1,4 +1,5 @@
 """Regression gallery: current renders vs the user-approved PNGs in tests/gallery/.
+Cases are parametrized by name and rendered inside the test, so collection stays cheap.
 
 A failure writes the new render and a diff image to build/gallery/ (a CDXML case: the new
 file). Show them to the user;
@@ -6,26 +7,24 @@ only after approval run `scripts/gallery.py --update` (CLAUDE.md).
 """
 
 import pytest
-from gallery import GALLERY, alpha, canonical, cases, cdxml_cases, png
+from gallery import GALLERY, alpha, canonical, case_names, case_svg, cdxml_case, cdxml_case_names, png
 
 from chem_svg_cdxml import fontmetrics
 
 pytestmark = pytest.mark.skipif(not fontmetrics.SYSTEM_HELVETICA.exists(),
                                 reason="gallery was rendered with system Helvetica")
 
-CASES = cases()
-CDXML_CASES = cdxml_cases()
 MAX_DIFFERING = 1e-4  # fraction of pixels whose alpha changes by more than 0.25
 
 
-@pytest.mark.parametrize("name", sorted(CASES))
+@pytest.mark.parametrize("name", sorted(case_names()))
 def test_matches_approved_render(name):
     import numpy as np
     from PIL import Image
 
     approved = GALLERY / f"{name}.png"
     assert approved.exists(), f"no approved render {approved.name}"
-    new = png(CASES[name])
+    new = png(case_svg(name))
     a, b = alpha(approved.read_bytes()), alpha(new)
     resized = a.shape != b.shape  # canvas changed: compare on the larger canvas
     shape = (max(a.shape[0], b.shape[0]), max(a.shape[1], b.shape[1]))
@@ -41,11 +40,11 @@ def test_matches_approved_render(name):
                     f"see build/gallery/{name}_diff.png (approved blue, new red)")
 
 
-@pytest.mark.parametrize("name", sorted(CDXML_CASES))
+@pytest.mark.parametrize("name", sorted(cdxml_case_names()))
 def test_cdxml_matches_approved(name):
     approved = GALLERY / "cdxml" / f"{name}.cdxml"
     assert approved.exists(), f"no approved CDXML {approved.name}"
-    new = CDXML_CASES[name]
+    new = cdxml_case(name)
     if canonical(approved.read_text()) != canonical(new):
         out = GALLERY.parents[1] / "build" / "gallery"
         out.mkdir(parents=True, exist_ok=True)

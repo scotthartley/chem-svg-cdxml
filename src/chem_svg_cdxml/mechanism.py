@@ -90,6 +90,7 @@ from __future__ import annotations
 import itertools
 import math
 from dataclasses import dataclass, field
+from functools import lru_cache
 
 from .geometry import (Point, add, angle_deg, cubic_point, dot, length, mul, perp, point_box_dist, ray_box_exit,
                        rotate, seg_point_dist, segment_box_dist, segment_distance, segments_cross, shift_box, sub, unit)
@@ -275,6 +276,9 @@ def species_parts(group: Group) -> Parts:
 
 def _seg_box(a, b) -> tuple:
     return (min(a[0], b[0]), min(a[1], b[1]), max(a[0], b[0]), max(a[1], b[1]))
+
+
+_BOX_EPS = 1e-6  # slack on box-gap pruning, so float noise in the exact test never decides a pair
 
 
 def _box_gap(p: tuple, q: tuple) -> float:
@@ -965,9 +969,20 @@ def curve_shape(p0: Point, c1: Point, c2: Point, p3: Point, n: int = SAMPLES) ->
         if prev is not None and v > 1e-9:
             turn += angle_deg(prev, d1)
         prev = d1 if v > 1e-9 else prev
-    segs = _segments(pts)  # a curve turning less than a half circle can't cross itself
-    loops = turn > 180.0 and any(segments_cross(*segs[i], *segs[j]) for i in range(len(segs)) for j in range(i + 2, len(segs)))
+    loops = turn > 180.0 and _self_crossing(_segments(pts))  # turning less than a half circle, it can't
     return (1 / tight if tight else math.inf), turn, energy * length(sub(p3, p0)), loops
+
+
+def _self_crossing(segs: list[tuple]) -> bool:
+    """Whether two non-adjacent segments of a polyline cross. Segments whose boxes are apart
+    (by more than float noise) can't, so only overlapping boxes reach segments_cross."""
+    boxes = [_seg_box(a, b) for a, b in segs]
+    for i in range(len(segs)):
+        bi = boxes[i]
+        for j in range(i + 2, len(segs)):
+            if _box_gap(bi, boxes[j]) <= _BOX_EPS and segments_cross(*segs[i], *segs[j]):
+                return True
+    return False
 
 
 def apex(p0: Point, c1: Point, c2: Point, p3: Point, n: int = 24) -> float:
@@ -975,6 +990,7 @@ def apex(p0: Point, c1: Point, c2: Point, p3: Point, n: int = 24) -> float:
     return max(seg_point_dist(cubic_point(p0, c1, c2, p3, k / n), p0, p3) for k in range(n + 1))
 
 
+@lru_cache(maxsize=4096)  # pure; the arrow search asks the same hooks again
 def excursion_controls(tail: Point, d: Point, end: Point, t1: Point, reach: float) -> tuple[Point, Point]:
     """Controls of an excursion: a hook that leaves `tail` along unit d and reaches `end` along
     unit t1 with equal handles (a circular arc's ratio), scaled by bisection so the curve's
@@ -1018,9 +1034,16 @@ def tangent_clear(arrow: MechArrow, parts: dict[str, Parts], preset: Preset) -> 
 def stroke_clear(arrow: MechArrow, parts: dict[str, Parts], preset: Preset) -> bool:
     """Whether the stroke stays margin_width from every bond and reaction arrow line."""
     limit = preset.lengths.margin_width + preset.curved_arrow.stroke_width / 2
-    stroke = _segments(arrow.polyline())
-    return not any(segment_distance(p, q, c, d) < limit + hw
-                   for pt in parts.values() for c, d, hw, _ in pt.bonds for p, q in stroke)
+    pts = arrow.polyline()
+    stroke = [(p, q, _seg_box(p, q)) for p, q in _segments(pts)]
+    whole = (min(x[0] for x in pts), min(x[1] for x in pts), max(x[0] for x in pts), max(x[1] for x in pts))
+    for pt in parts.values():  # boxes farther apart than the limit can't hold a closer pair
+        for c, d, hw, _ in pt.bonds:
+            lim, box = limit + hw, _seg_box(c, d)
+            if _box_gap(whole, box) < lim + _BOX_EPS and any(
+                    _box_gap(b, box) < lim + _BOX_EPS and segment_distance(p, q, c, d) < lim for p, q, b in stroke):
+                return False
+    return True
 
 
 def stroke_shown(arrow: MechArrow) -> float:

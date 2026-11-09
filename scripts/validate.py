@@ -28,7 +28,7 @@ from chem_svg_cdxml.cycle import build_cycle, check_cycle
 from chem_svg_cdxml.electrons import StepCheck, check_spec
 from chem_svg_cdxml.geometry_checks import (check_labels, check_lewis, check_line_end_dots, check_mechanism,
                                           check_scheme)
-from chem_svg_cdxml.layout import build_scheme, m1_drawers
+from chem_svg_cdxml.layout import SchemeLayout, build_scheme, m1_drawers
 from chem_svg_cdxml.spec import ResonanceStep, Spec, load_spec
 
 
@@ -38,32 +38,39 @@ def validate(path: Path) -> list[str]:
 
 def checked(path: Path) -> tuple[list[str], list[StepCheck]]:
     """(problems, the electron checks of the steps with arrows)."""
+    problems, checks, _ = checked_layout(path)
+    return problems, checks
+
+
+def checked_layout(path: Path) -> tuple[list[str], list[StepCheck], SchemeLayout | None]:
+    """checked(), plus the scheme layout it built (None for a cycle, species only, or when the
+    layout failed), so a caller that wants both builds it once."""
     try:
         spec = load_spec(path)
     except ValidationError as e:
-        return [f"schema: {err['loc']}: {err['msg']}" for err in e.errors()], []
+        return [f"schema: {err['loc']}: {err['msg']}" for err in e.errors()], [], None
     except (OSError, ValueError) as e:
-        return [f"schema: {e}"], []
+        return [f"schema: {e}"], [], None
     if spec.cycle is not None:
         try:
             lay = build_cycle(spec, path.parent, path.stem)
         except (ValueError, NotImplementedError, RuntimeError, FileNotFoundError) as e:
-            return [f"chemistry/layout: {e}"], []
-        return [f"geometry: {p}" for p in check_cycle(lay)], []
+            return [f"chemistry/layout: {e}"], [], None
+        return [f"geometry: {p}" for p in check_cycle(lay)], [], None
     try:
         if not spec.steps:
             return [f"geometry: {p}" for d in m1_drawers(spec, path.parent)
                     for p in check_labels(d.mol.name, d.draw(d.mol.name), d.mol) + check_lewis(d.mol.name, d)
-                    + check_line_end_dots(d.mol.name, d)], []
+                    + check_line_end_dots(d.mol.name, d)], [], None
         checks = check_spec(spec, path.parent)
         electrons = [f"electrons: {p}" for c in checks for p in c.problems]
     except (ValueError, NotImplementedError, RuntimeError, FileNotFoundError) as e:
-        return [f"chemistry: {e}"], []
+        return [f"chemistry: {e}"], [], None
     try:
         lay = build_scheme(spec, path.parent, path.stem)
     except (ValueError, NotImplementedError, RuntimeError, FileNotFoundError) as e:
-        return electrons + [f"chemistry/layout: {e}"], checks
-    return electrons + [f"geometry: {p}" for p in check_scheme(lay) + check_mechanism(lay)], checks
+        return electrons + [f"chemistry/layout: {e}"], checks, None
+    return electrons + [f"geometry: {p}" for p in check_scheme(lay) + check_mechanism(lay)], checks, lay
 
 
 def notes(spec: Spec) -> list[str]:

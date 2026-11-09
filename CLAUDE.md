@@ -105,4 +105,7 @@ they disagree, `style-spec.md` (the ChemDraw references) wins.
 - The regression gallery is `tests/test_gallery.py` (part of `uv run pytest`), with CDXML text snapshots in `tests/gallery/cdxml/`. `scripts/gallery.py` reports which cases
   differ; `--review DIR` writes the new or changed renders for the user to look at. `--update` rewrites
   `tests/gallery/`; run it only after the user approves the new images.
+- `uv run pytest` runs in parallel (pytest-xdist, `-n auto` in pyproject.toml); `-n0` runs serially (pdb, profiling).
+  Tests that need an example's or test spec's layout or validation take it from `tests/layouts.py` (built once per
+  worker and shared; a test that changes a layout works on a `copy.deepcopy`).
 - uv commands (including `uv run pytest`) run inside the sandbox; `~/.cache/uv` and `~/.local/share/uv` are allowed.

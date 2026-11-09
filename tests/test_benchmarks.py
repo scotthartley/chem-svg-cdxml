@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 import yaml
-from validate import validate
+import layouts
 
 ROOT = Path(__file__).resolve().parents[1]
 PROMPTS = yaml.safe_load((ROOT / "examples" / "benchmarks" / "prompts.yaml").read_text())
@@ -24,4 +24,4 @@ def test_prompts_are_complete():
 def test_reference_validates(bench, ref):
     path = ROOT / ref
     assert path.exists(), ref
-    assert validate(path) == []
+    assert layouts.problems(path) == []
