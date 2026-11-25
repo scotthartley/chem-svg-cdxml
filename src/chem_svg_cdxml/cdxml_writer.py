@@ -487,7 +487,11 @@ class _Writer:
                 etree.SubElement(frag, "n", {**attrs, "NodeType": "ExternalConnectionPoint",
                                              "ExternalConnectionType": "Wavy", "ExternalConnectionNum": str(wavy)})
                 continue
-            if a.element != "C":
+            if a.generic:  # a spec labels: symbol: ChemDraw's GenericNickname, no Element (equilibrium_x1.0's
+                # "A"; other symbols and a generic label with H, HX, unmeasured: style-spec.md §13, Open 37)
+                attrs["NodeType"] = "GenericNickname"
+                attrs["GenericNickname"] = a.element
+            elif a.element != "C":
                 attrs["Element"] = str(_PT.GetAtomicNumber(a.element))
             lab = d.labels.get(a.idx)
             if lab is not None:

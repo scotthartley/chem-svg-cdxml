@@ -28,7 +28,7 @@ from chem_svg_cdxml.preset import load_preset
 from chem_svg_cdxml.spec import load_spec
 
 from cdxml_helpers import (
-    ABBREV_REFS, CHARGE_TOL, PARSER, SPECS, STYLE_ATTRS, TOL, _canonical, _check_structure, _text, _xy, _xy4,
+    ABBREV_REFS, CHARGE_TOL, DTD_PATH, PARSER, SPECS, STYLE_ATTRS, TOL, _canonical, _check_structure, _text, _xy, _xy4,
     dtd_errors, exported, needs_dtd, needs_refs, reference_export, reference_pairs,
 )
 
@@ -253,3 +253,40 @@ def test_vertical_bond_label_is_left_justified():
     alanine = root.find("page").findall("fragment")[2]
     oh = [t for t in alanine.iter("t") if _text(t) == "OH"]
     assert len(oh) == 1 and oh[0].get("LabelJustification") == "Left"
+
+
+GENERIC_SPEC = """preset: acs1996
+labels: {15: Z, 18: X, 19: "R'", 20: Y}
+species:
+  raft: {smiles: "[S:13]=[C:14]([Cl:15])[S:16]C(C)(C(=O)OC)C[Cl:18]"}
+  pair: {smiles: "[Br:19]C[I:20]"}
+"""
+
+
+def _generic_nodes(text: str) -> list:
+    return [n for n in etree.fromstring(text.encode(), PARSER).iter("n") if n.get("NodeType") == "GenericNickname"]
+
+
+def test_generic_labels_export_as_generic_nicknames(tmp_path):
+    """inbox 2026-11-25: `labels: {15: Z}` crashed the export (RDKit has no element Z). A plain
+    labels symbol is ChemDraw's GenericNickname (equilibrium_x1.0's "A"), never an element:
+    Y is not yttrium."""
+    spec = tmp_path / "generic.yaml"
+    spec.write_text(GENERIC_SPEC)
+    text = spec_cdxml(spec, warn=lambda m: None)
+    nodes = _generic_nodes(text)
+    assert sorted(n.get("GenericNickname") for n in nodes) == sorted(["Z", "X", "R'", "Y"])
+    for n in nodes:
+        assert n.get("Element") is None and n.get("NumHydrogens") == "0" and n.get("NeedsClean") == "yes"
+        assert _text(n.find("t")) == n.get("GenericNickname")
+    root = etree.fromstring(text.encode(), PARSER)
+    assert all(n.get("Element") not in ("17", "35", "53", "39") for n in root.iter("n"))
+    if DTD_PATH.exists():
+        _check_structure(text)
+
+
+def test_generic_label_in_a_mechanism_exports():
+    """The documented generic-radical example (X for the Cl stand-in, X· and HX) exports."""
+    nodes = _generic_nodes(spec_cdxml(mr.REPO / "tests/specs/phenol_x_abstraction.yaml", warn=lambda m: None))
+    assert [n.get("GenericNickname") for n in nodes] == ["X", "X"]
+    assert [n.get("Radical") for n in nodes] == ["Doublet", None]

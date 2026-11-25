@@ -730,6 +730,9 @@ Rules (M4; unmeasured, user decisions 2026-10-25, flagged at review):
     some arrows' chords. In m4_snar's middle resonance contributor, lp(4) → between(4,8) has a 9.2 pt chord and draws as a head on a stub; the bottom
     row's arrows cross OMe and crowd F. Accepted for now (user decision 2026-11-07: a narrow use, easily fixed by hand). A fix would scale the
     hook's reach or shrink the head on short arrows.
+37. **Generic labels other than "A"** (§13, inbox 2026-11-25): equilibrium_x1.0 shows only "A" as a
+    `GenericNickname` node. Whether ChemDraw keeps Z, X, R, Nu, R' (and a generic label with H, HX) as
+    GenericNickname, rather than re-reading them, needs a ChemDraw re-save of an export with those labels.
 
 ## 7. Design-brief (docs/design.md) discrepancies (references win)
 
@@ -860,6 +863,7 @@ files with `measure_refs.py --cdxml-symbols` and `tests/test_cdxml_species.py` (
 | CreationProgram | "ChemDraw 26.1.0.6801" | "chem-svg-cdxml \<version\>" (user decision 2026-10-28) |
 | Page | 540 × 720 per page; a drawing wider than that makes ChemDraw offer to expand, and the re-save has `BoundingBox="0 0 1080 720" WidthPages="2"` | whole pages, enough for the drawing |
 | Labeled atom | `Element` (none for C), `NumHydrogens` (also 0), `NeedsClean="yes"`; one `<s face="96">` with the text in CDXML order (NH2 even when drawn H₂N) | the same |
+| Generic label (spec `labels:` plain symbol: X, R, Z, Y) | label "A": `NodeType="GenericNickname"` `GenericNickname="A"`, `NumHydrogens="0"`, `NeedsClean="yes"`, a `<t>`, no `Element` (equilibrium_x1.0) | the same for every symbol, so Y is not yttrium; `Charge` / `Radical` as for elements. Only "A" is measured; other symbols and a label with H unmeasured (Open 37) |
 | Label justification | `LabelJustification="Right"` + `Justification="Right"` when the bonds leave to the right and the text has two or more characters (H₂N, HO, –Cl, –Br); a one-character label (–F, –H, –I) stays Left | from `Label.h_side` and the text length |
 | NH with H above / below (nh_x\*) | `LabelJustification="Left"`, no `Justification`, `LabelAlignment="Above"` / `"Below"`, `LineStarts="2 4"` / `"2 3"`; text `NH`; p.x at N's glyph origin; p.y the usual for Below, 8.37 / 6.74 / 5.30 higher for Above (−4.78 / −3.87 / −3.15 from the atom; `cdxml.h_above_rise`) | the same (`measure_refs.py --nh`, `tests/test_nh_vs_chemdraw.py`) |
 | `LabelAlignment` | on 140 of 144 labels of two or more characters, never on one character (the other 4: a charged O, in mech_basic and labels_x1.0) | on labels of two or more characters |

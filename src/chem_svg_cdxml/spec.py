@@ -1039,7 +1039,8 @@ def with_spin(spec: Spec, name: str, mol: chem.Molecule) -> chem.Molecule:
 def relabel(spec: Spec, mol: chem.Molecule) -> chem.Molecule:
     """The drawing's atoms with `labels` symbols in place of their stand-in elements. A registry
     text label (L, Ln, dppf; abbrev.py) on an atom without H is drawn as an abbreviation (Lₙ,
-    reversed and centered by §3.5); a plain symbol (X, R) as an element."""
+    reversed and centered by §3.5); a plain symbol (X, R) as an element, marked `generic` (its
+    CDXML node is a GenericNickname, not that element: Y is not yttrium)."""
     if not spec.labels or not any(a.map in spec.labels for a in mol.atoms):
         return mol
     reg = spec.registry
@@ -1049,7 +1050,7 @@ def relabel(spec: Spec, mol: chem.Molecule) -> chem.Molecule:
         e = reg.get(t)
         if e is not None and e.kind == "text" and not a.num_h:
             return replace(a, abbrev=t, abbrev_info=abbrev.info(t, reg), lone_pairs=0, radicals=0)
-        return replace(a, element=t)
+        return replace(a, element=t, generic=True)
     return replace(mol, atoms=[one(a) if a.map in spec.labels else a for a in mol.atoms])
 
 

@@ -95,6 +95,7 @@ class Atom:
     z: float = 0.0  # depth, larger = nearer the viewer (chair.py); the nearer of two crossing bonds is drawn whole
     seg: int | None = None  # polymers: 0 start side, k unit k, n + 1 end side (polymer.POLY_SEG)
     end: str | None = None  # a '*' drawn as a chain end: "dangling" (bare bond end) | "wavy" (polymer.POLY_END)
+    generic: bool = False  # a spec `labels:` plain symbol (X, R, Z): `element` is the shown symbol, not chemistry
 
     @property
     def p(self) -> Point:
