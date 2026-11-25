@@ -167,6 +167,7 @@ def layout(mol: Chem.Mol) -> None:
     finally:
         rdDepictor.SetPreferCoordGen(prefer)
     chem._take_conformer(mol, m)
+    chem._chicken_feet(mol, fixed=frozenset(cmap))
     if not _tree_layout(mol, path, phase):
         _upright_pairs(mol, path, phase)
     orient(mol, level=True)
@@ -396,6 +397,7 @@ def chain_layout(mol: Chem.Mol) -> bool:
         finally:
             rdDepictor.SetPreferCoordGen(prefer)
         chem._take_conformer(mol, m)
+        chem._chicken_feet(mol, fixed=frozenset(cmap))
         dx = math.sqrt((stretch * b) ** 2 - (b / 2) ** 2) - run
         conf = mol.GetConformer()
         for k in range(cut, len(path)):

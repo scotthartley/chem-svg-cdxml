@@ -832,3 +832,19 @@ charges_lewis_x0.6 holds both sizes side by side, so the same settings don't fix
 x0.8 probe matched only because its symbols were 4.8 (fresh ones would be 6.0). User decision: keep
 the ACS presets as they are; `test_real_probe_hold_out` compares everything but the symbol sizes
 (`FRESH_SYMBOL_KEYS`), and its rule checks still hold the fresh symbols to each other.
+
+
+## 2026-11-25: CoordGen skews XMe₃; Si centered at any angle (inbox 2026-11-17)
+
+In the Sonogashira cycle every Si(CH₃)₃ came out of CoordGen skewed: bond in at 210°, methyls at
+330°, 60° and 120° (tBu the same). No two Si bonds were opposite, so `centered_label` didn't fire
+and the S, not "Si", sat on the atom: the "i" hung about 1 pt to one side (3.4 pt in the
+right-justified `transm`). User decisions: lay out every acyclic four-coordinate center with
+three terminal heavy atoms as a chicken foot (`chem._chicken_feet`: 120° / 180° / 240° from the bond
+in), and center a two-letter symbol whenever two of its bonds are 165–195° apart, at any
+orientation (`CENTER_AXIS_DEG` dropped). Both unmeasured. Crosses (`_square_planar`'s metals, which
+can have three terminal ligands too) and centers with a drawn H (isobutane, chloroform in the
+mechanism examples) are left alone. The drawn-out H₂SO₄ in m4_nitration (an H atom on one O, so
+S has three terminal O's and one bond in) became a chicken foot while the bisulfate beside it (four
+terminal O's) kept CoordGen's cross: the user preferred the cross there and kept the rule, with a
+per-species override (`chicken_foot: false`) set on that H₂SO₄ (examples, nitration_accepted).

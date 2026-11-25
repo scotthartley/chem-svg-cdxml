@@ -4,7 +4,7 @@
 preset: acs1996
 species:
   nitric:       {smiles: "[O:1]=[N+:2]([O-:3])[OH:4]", orientation: {flip_h: true}}
-  sulfuric:     {smiles: "[O:5]=[S:6](=[O:7])([OH:8])[O:9][H:10]"}
+  sulfuric:     {smiles: "[O:5]=[S:6](=[O:7])([OH:8])[O:9][H:10]", chicken_foot: false}  # drawn like bisulfate
   nitric_h:     {smiles: "[O:1]=[N+:2]([O-:3])[OH+:4][H:10]"}
   bisulfate:    {smiles: "[O:5]=[S:6](=[O:7])([OH:8])[O-:9]"}
   nitronium:    {smiles: "[O:1]=[N+:2]=[O:3]"}   # stays linear: an alignment that bends it is dropped

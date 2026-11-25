@@ -389,13 +389,56 @@ def _square_planar(mol: Chem.Mol, laid: Chem.Mol) -> None:
                 conf.SetAtomPosition(j, (x, -y, 0.0))
 
 
-def layout_2d(mol: Chem.Mol) -> None:
+def _chicken_feet(mol: Chem.Mol, laid: Chem.Mol | None = None, fixed=frozenset()) -> None:
+    """Redraw each acyclic four-coordinate atom with three terminal heavy-atom neighbours (tBu,
+    SiMe3, CF3, CCl3, SnMe3, a drawn-out SO3H) as a "chicken foot": with the bond in at 0°, the
+    three others at 120°, 180° and 240°, as tBu is usually drawn, at the median length of their
+    own bonds (not a metal drawn as a cross, _square_planar, nor a center with a drawn H). CoordGen skews them (in at 210°, out at 330/60/120°), so no two bonds are opposite
+    and a two-letter symbol is not centered (draw_mol.centered_label). The user's rule
+    (2026-11-25; unmeasured). `laid` is the molecule whose conformer is moved (default mol);
+    a center with a terminal atom in `fixed` (pinned to a reference) is left alone, and so is
+    one whose new foot overlays another atom (overlaid_atoms; CoordGen's positions kept)."""
+    laid = mol if laid is None else laid
+    conf = laid.GetConformer()
+    ring = laid.GetRingInfo()
+    for a in laid.GetAtoms():
+        i = a.GetIdx()
+        if a.GetDegree() != 4 or ring.NumAtomRings(i) or _arm_metal(laid, i):  # a cross is _square_planar's
+            continue
+        nbs = list(a.GetNeighbors())
+        if any(n.GetAtomicNum() == 1 for n in nbs):  # a drawn H (isobutane's, chloroform's): left alone
+            continue
+        feet = [n.GetIdx() for n in nbs if n.GetDegree() == 1]
+        rest = [n.GetIdx() for n in nbs if n.GetIdx() not in feet]
+        if len(feet) != 3 or len(rest) != 1 or any(f in fixed for f in feet):
+            continue
+        pts = _coords(laid)
+        c = pts[i]
+
+        def ang(j: int) -> float:
+            return math.degrees(math.atan2(-(pts[j][1] - c[1]), pts[j][0] - c[0]))
+
+        theta = ang(rest[0])
+        feet.sort(key=lambda j: (ang(j) - theta) % 360)  # keep their order round the center
+        r = statistics.median(math.dist(c, pts[j]) for j in feet)
+        before = set(overlaid_atoms(laid))
+        for j, turn in zip(feet, (120.0, 180.0, 240.0)):
+            t = math.radians(theta + turn)
+            conf.SetAtomPosition(j, (c[0] + r * math.cos(t), -c[1] + r * math.sin(t), 0.0))
+        if (set(overlaid_atoms(laid)) - before) & set(feet):
+            for j in feet:
+                conf.SetAtomPosition(j, (pts[j][0], -pts[j][1], 0.0))
+
+
+def layout_2d(mol: Chem.Mol, chicken_foot: bool = True) -> None:
     rdDepictor.SetPreferCoordGen(True)
     m = _dative_as_single(mol)
     if m is mol and any(a.GetAtomicNum() in _D_BLOCK for a in mol.GetAtoms()):
         m = Chem.Mol(mol)  # _square_planar reads mol's stereo after laying out its copy
     rdDepictor.Compute2DCoords(m)
     _square_planar(mol, m)
+    if chicken_foot:
+        _chicken_feet(m)
     _take_conformer(mol, m)
 
 
@@ -789,10 +832,12 @@ def _orient_molfile(mol: Chem.Mol, rotate_deg, flip_h: bool, flip_v: bool) -> No
 def from_smiles(smiles: str, name: str, bond_length: float, kekule: list[str] | None = None,
                 rotate_deg: float | str | None = "auto", flip_h: bool = False, flip_v: bool = False,
                 abbreviate: list[str] | None = None, lewis: str | None = None, lewis_lines: bool = False,
-                chair: ChairSpec | None = None, registry: abbrev.Registry | None = None) -> Molecule:
+                chair: ChairSpec | None = None, registry: abbrev.Registry | None = None,
+                chicken_foot: bool = True) -> Molecule:
     """`lewis` (a LEWIS_MODES value): a Lewis structure with every H an atom and every atom
     labeled, laid out by lewis_layout with `bond_length` as the lattice step (lewis.bond_length);
-    `lewis_lines`: its bonds drawn as lines (shared only). `chair`: drawn as a chair (chair.py)."""
+    `lewis_lines`: its bonds drawn as lines (shared only). `chair`: drawn as a chair (chair.py).
+    `chicken_foot` false skips _chicken_feet."""
     if chair is not None:
         p = prepare(parse_smiles(smiles, kekule), name, bond_length, abbreviate, chair=chair, registry=registry)
         return p.molecule()
@@ -812,7 +857,7 @@ def from_smiles(smiles: str, name: str, bond_length: float, kekule: list[str] | 
                     a.charge_label = f"{abs(ox) if abs(ox) > 1 else ''}{'+' if ox > 0 else '-'}"
         return m
     mol = condense(parse_smiles(smiles, kekule), abbreviate, name, registry)
-    layout_2d(mol)
+    layout_2d(mol, chicken_foot)
     orient(mol, rotate_deg, flip_h, flip_v)
     return to_molecule(mol, name, bond_length)
 
@@ -1063,7 +1108,7 @@ class AlignmentError(RuntimeError):
     """align_coords could not hold the matched atoms at the reference's coordinates."""
 
 
-def align_coords(mol: Chem.Mol, ref: Chem.Mol, pairs: list[tuple[int, int]]) -> None:
+def align_coords(mol: Chem.Mol, ref: Chem.Mol, pairs: list[tuple[int, int]], chicken_foot: bool = True) -> None:
     """Lay out `mol` with the matched atoms fixed at the reference's coordinates. CoordGen
     (coordMap) first; it holds them only to ~0.005 A, so if that misses ALIGN_TOL use RDKit's
     GenerateDepictionMatching2DStructure, which holds them exactly. RDKit lays new atoms out at
@@ -1075,6 +1120,9 @@ def align_coords(mol: Chem.Mol, ref: Chem.Mol, pairs: list[tuple[int, int]]) -> 
     m = _dative_as_single(mol)
     rdCoordGen.AddCoords(m, params)
     _take_conformer(mol, m)
+    pinned = frozenset(mi for _, mi in pairs) if chicken_foot else None
+    if chicken_foot:
+        _chicken_feet(mol, fixed=pinned)
     if _max_deviation(mol, ref, pairs) <= ALIGN_TOL:
         return
     pts = _coords(ref)
@@ -1084,6 +1132,8 @@ def align_coords(mol: Chem.Mol, ref: Chem.Mol, pairs: list[tuple[int, int]]) -> 
     rdDepictor.GenerateDepictionMatching2DStructure(m, tmp, list(pairs), -1, True)
     _take_conformer(mol, m)
     _scale_conformer(mol, med / STANDARD_BOND)
+    if chicken_foot:
+        _chicken_feet(mol, fixed=pinned)
     dev = _max_deviation(mol, ref, pairs)
     if dev > ALIGN_TOL:
         raise AlignmentError(f"alignment left matched atoms {dev:.4f} A from their reference positions")
@@ -1244,14 +1294,15 @@ def _collinear(pts: list[Point]) -> bool:
                            for p in pts)
 
 
-def orient_to(mol: Chem.Mol, ref: Chem.Mol, pairs: list[tuple[int, int]], relayout: bool = True) -> None:
+def orient_to(mol: Chem.Mol, ref: Chem.Mol, pairs: list[tuple[int, int]], relayout: bool = True,
+              chicken_foot: bool = True) -> None:
     """Orient mode: the species' own layout (CoordGen, unless `relayout` is off: a molfile keeps
     its coordinates), turned (and mirrored, when at least 3 non-collinear atoms are matched and
     `relayout` is on) to best fit the matched atoms onto the reference's, then snapped to the
     best auto_rotation within 30° of that fit, so bonds sit on ChemDraw's grid and still point
     the way the reactant's did. Nothing is pinned."""
     if relayout:
-        layout_2d(mol)
+        layout_2d(mol, chicken_foot)
     pts, ref_pts = _coords(mol), _coords(ref)
     fits = [(pts, *_fit_angle(pts, ref_pts, pairs))]
     if relayout and not _collinear([ref_pts[r] for r, _ in pairs]):
@@ -1265,7 +1316,7 @@ def orient_to(mol: Chem.Mol, ref: Chem.Mol, pairs: list[tuple[int, int]], relayo
 def prepare(mol: Chem.Mol, name: str, bond_length: float, abbreviate: list[str] | None = None,
             from_file: bool = False, rotate_deg: float | str | None = None, flip_h: bool = False,
             flip_v: bool = False, refs: list[Prepared] | None = None, chair: ChairSpec | None = None,
-            registry: abbrev.Registry | None = None) -> Prepared:
+            registry: abbrev.Registry | None = None, chicken_foot: bool = True) -> Prepared:
     """Condense abbreviations, then lay out against the best of `refs`: the one whose stable
     core (stable_core) is largest, then with the most matched atoms. Pin mode: with a core of at
     least 3 atoms, those atoms keep the reference's coordinates (align_coords); with no core, all
@@ -1278,7 +1329,8 @@ def prepare(mol: Chem.Mol, name: str, bond_length: float, abbreviate: list[str] 
     matched atoms point in the reference; nothing pinned. No reference: its own layout (SMILES:
     CoordGen + orientation, default auto; molfile: its own layout, oriented as asked). A `chair`
     species is laid out by chair.layout and aligns to nothing; nothing aligns to a chair either
-    (its pseudo-3D coordinates would bend a flat drawing)."""
+    (its pseudo-3D coordinates would bend a flat drawing). `chicken_foot` false skips
+    _chicken_feet (the spec's per-species override)."""
     mol = condense(mol, abbreviate, name, registry)
     if mol.GetNumAtoms() and mol.GetAtomWithIdx(0).HasProp(POLY_SEG):  # a polymer: its own backbone layout, aligned to nothing
         from . import polymer
@@ -1312,18 +1364,18 @@ def prepare(mol: Chem.Mol, name: str, bond_length: float, abbreviate: list[str] 
                 continue
             pinned = Chem.Mol(mol)
             try:
-                align_coords(pinned, ref.mol, pins)
+                align_coords(pinned, ref.mol, pins, chicken_foot)
             except AlignmentError:  # RDKit can't hold them either (a ligand's P pinned as a cross)
                 continue
             if not (bent_linear_atoms(pinned) or uneven_bonds(pinned) or crowded_atoms(pinned)
                     or overlaid_atoms(pinned) or off_arm_metals(pinned)):
                 return Prepared(pinned, name, bond_length, ref.scale, ref.name, pins)  # `matched`: the pinned atoms
-        orient_to(mol, ref.mol, pairs, relayout=not from_file)
+        orient_to(mol, ref.mol, pairs, relayout=not from_file, chicken_foot=chicken_foot)
         return Prepared(mol, name, bond_length, layout_scale(mol, bond_length), ref.name)
     if from_file:
         _orient_molfile(mol, rotate_deg or 0.0, flip_h, flip_v)
     else:
-        layout_2d(mol)
+        layout_2d(mol, chicken_foot)
         orient(mol, "auto" if rotate_deg is None else rotate_deg, flip_h, flip_v)
     return Prepared(mol, name, bond_length, layout_scale(mol, bond_length))
 

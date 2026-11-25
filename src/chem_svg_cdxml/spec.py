@@ -327,6 +327,7 @@ class Species(BaseModel):
     abbreviate: list[str] | None = None  # collapse these groups to labels (abbrev registry ∪ spec abbreviations): OMe, OBn, ...
     align: bool = True  # take the orientation of the species it is drawn from (steps); false = own layout
     align_to: str | None = None  # align to this species instead
+    chicken_foot: bool = True  # false: keep CoordGen's layout round tBu / SiMe3 / SO3H-type centers (chem._chicken_feet)
     show_lone_pairs: list[int] = Field(default_factory=list)  # atom-map numbers whose lone pairs are drawn (M3)
     lewis: bool | LewisOptions | None = None  # Lewis structure (M1 only): true = {electrons: shared}
     circled_charges: bool | None = None  # None: the spec's charges.circled
@@ -1105,14 +1106,15 @@ def molecules(spec: Spec, base_dir: Path) -> list[chem.Molecule]:
             mol, _ = _parsed(sp, base_dir, name)  # chain ends marked on the parsed atoms
             try:
                 mol = chem.prepare(mol, name, bl, sp.abbreviate, False, "auto" if o.rotate is None else o.rotate,
-                                   o.flip_h, o.flip_v, registry=spec.registry).molecule()
+                                   o.flip_h, o.flip_v, registry=spec.registry, chicken_foot=sp.chicken_foot).molecule()
             except ValueError as e:
                 raise ValueError(f"species {name}: {e}") from None
         elif sp.smiles is not None:
             rot = "auto" if o.rotate is None else o.rotate
             try:
                 mol = chem.from_smiles(sp.smiles, name, bl, sp.kekule, rot, o.flip_h, o.flip_v, sp.abbreviate,
-                                       chair=chair_spec(sp, preset), registry=spec.registry)
+                                       chair=chair_spec(sp, preset), registry=spec.registry,
+                                       chicken_foot=sp.chicken_foot)
             except ValueError as e:
                 raise ValueError(f"species {name}: {e}") from None
         else:
@@ -1163,7 +1165,8 @@ def scheme_prepared(spec: Spec, base_dir: Path) -> dict[str, chem.Prepared]:
         o = sp.orientation or Orientation()
         try:
             built[name] = chem.prepare(mol, name, bl, sp.abbreviate, from_file, o.rotate, o.flip_h, o.flip_v, cands,
-                                       chair=chair_spec(sp, preset), registry=spec.registry)
+                                       chair=chair_spec(sp, preset), registry=spec.registry,
+                                       chicken_foot=sp.chicken_foot)
         except ValueError as e:
             raise ValueError(f"species {name}: {e}") from None
     return built

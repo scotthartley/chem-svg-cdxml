@@ -1,0 +1,24 @@
+# Sonogashira cycle (issues/inbox.md, 2026-11-17): every SiMe3 drawn as a chicken foot, "Si" centered
+# on its atom (chem._chicken_feet, draw_mol.centered_label; the user, 2026-11-25). transm is pinned to oxadd.
+preset: acs1996
+abbreviations:
+  PPh3lig: {text: "PPh3"}
+species:
+  pd0:    {smiles: "[*:1]->[Pd]<-[*:2]"}
+  oxadd:  {smiles: "[*:1]->[Pd@SP2](<-[*:2])(Br)c1ccc(C)cc1"}
+  transm: {smiles: "[*:1]->[Pd@SP2](<-[*:2])(C#C[Si](C)(C)C)c1ccc(C)cc1"}
+  cis:    {smiles: "[*:1]->[Pd@SP1](<-[*:2])(C#C[Si](C)(C)C)c1ccc(C)cc1", align: false}
+  cuac:   {smiles: "C[Si](C)(C)C#C[Cu]"}
+  arbr:  {smiles: "Cc1ccc(Br)cc1"}
+  product: {smiles: "Cc1ccc(cc1)C#C[Si](C)(C)C"}
+labels: {1: PPh3lig, 2: PPh3lig}
+numbers: {pd0: I, oxadd: II, transm: III, cis: IV}
+cycle:
+  start: pd0
+  direction: clockwise
+  center: "Pd cycle"
+  steps:
+    - {from: pd0, to: oxadd, label: oxidative addition, in: {species: arbr}}
+    - {from: oxadd, to: transm, label: transmetalation, in: {species: cuac}, out: "CuBr"}
+    - {from: transm, to: cis, label: "trans/cis isomerization"}
+    - {from: cis, to: pd0, label: reductive elimination, out: {species: product}}

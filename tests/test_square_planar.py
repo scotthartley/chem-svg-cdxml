@@ -132,13 +132,15 @@ def _star(element: str, dirs: list[float], length: float = 14.4) -> Molecule:
     ("Pd", [0, 90, 180, 270], True), ("Si", [0, 90, 180, 270], True),  # metals_x*
     ("Pd", [90, 270], True), ("Pd", [90, 260], True), ("Pd", [100, 285], True),  # within 165-195°, near vertical
     ("Pd", [0, 180], True), ("Pd", [5, 190], True),  # horizontal P–Pd–P (the user, 2026-10-30)
-    ("Pd", [30, 210], False),  # opposite, but on neither axis (unmeasured)
+    ("Pd", [30, 210], True),  # opposite at any orientation (the user, 2026-11-25; unmeasured)
+    ("Si", [30, 120, 210, 300], True),  # a tilted chicken-foot SiMe3 (chem._chicken_feet)
+    ("Si", [60, 120, 210, 330], False),  # CoordGen's skewed SiMe3: no two bonds opposite
     ("Pd", [90, 240], False), ("Cl", [90], False), ("Br", [270], False), ("Cl", [0], False),  # no opposite bond; terminal (clearance_x*)
     ("P", [90, 270], False),  # one letter
 ])
 def test_centered_label_rule(element, dirs, centered):
-    """ChemDraw centers a two-letter symbol when a vertical or horizontal bond has another bond
-    165-195° from it (metals_x*; the user, 2026-10-30), else its first letter."""
+    """ChemDraw centers a two-letter symbol when two of its bonds are 165-195° apart (metals_x*;
+    the user, 2026-10-30; at any orientation, the user, 2026-11-25), else its first letter."""
     d = Drawer(_star(element, dirs), P)
     assert (d.labels[0].h_side == "center") == centered
 
