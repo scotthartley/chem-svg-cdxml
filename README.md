@@ -145,6 +145,11 @@ fragments. So a generated preset is a close starting point, not the 0.1 pt match
 value came from, and the build's report shows how far each is from ACS. It works with Helvetica only so far. One generated style ships: `presentation_x1.0` (LineWidth 2.16, 18 pt labels, wrapping at 900 pt).
 See [`references/style-spec.md`](references/style-spec.md) §16, which also lists the checks for a new style after the build.
 
+A style can also stay in your project instead of the repo: `build --out-dir styles` writes `styles/mystyle.yaml` with its
+CDXML header in `styles/cdxml/`, and a spec uses it with `preset: styles/mystyle.yaml`. Shared abbreviations
+(`abbreviations: groups.yaml`), structures drawn in ChemDraw (`molfile: structures/core.mol`) and your own batch scripts
+work the same way; see [`references/extending.md`](references/extending.md).
+
 ## Limits
 
 - Not yet supported: explicit CH₂/CH labels on internal carbons, condensed labels that aren't
@@ -162,6 +167,7 @@ See [`references/style-spec.md`](references/style-spec.md) §16, which also list
 | [`SKILL.md`](SKILL.md) | What Claude reads when it uses the skill |
 | [`references/scheme-schema.md`](references/scheme-schema.md) | The YAML spec format |
 | [`references/workflow.md`](references/workflow.md) | Worked example: from a request to a mechanism |
+| [`references/extending.md`](references/extending.md) | Your own styles, groups, structures and scripts in a project folder |
 | [`references/style-spec.md`](references/style-spec.md) | The measured style (ChemDraw ACS Document 1996), with the ChemDraw reference behind each number |
 | [`docs/design.md`](docs/design.md) | Design brief: architecture, validation, milestones |
 | [`CLAUDE.md`](CLAUDE.md) | Rules for development sessions in this repository |

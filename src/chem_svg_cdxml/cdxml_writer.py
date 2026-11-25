@@ -159,6 +159,7 @@ from .draw_mol import Drawer, label_info
 from .geometry import Point, add, arc_point, arc_segments, mul, shift_box, sub, union_box, unit
 from .placed import Placed
 from .mechanism import curved_arrow, fishhook_side
+from . import preset as preset_mod
 from .preset import PRESET_DIR, load_preset
 from .scene import Group, Path, TextRun
 from .spec import ResonanceStep, Spec
@@ -389,10 +390,14 @@ class Ids:
 
 
 def _header_file(preset_name: str, suffix: str, what: str) -> etree._ElementTree:
-    """presets/cdxml/<preset><suffix>, parsed; `what` names it in the missing-file error."""
-    path = HEADER_DIR / f"{preset_name}{suffix}"
+    """presets/cdxml/<preset><suffix> (a preset file's: cdxml/<stem><suffix> beside it), parsed;
+    `what` names it in the missing-file error."""
+    yaml_path, header_dir = preset_mod.resolve(preset_name)
+    path = header_dir / f"{yaml_path.stem}{suffix}"
     if not path.exists():
-        raise FileNotFoundError(f"no CDXML {what} for preset {preset_name!r} ({path}); run scripts/cdxml_headers.py")
+        fix = ("copy it from the preset's source, or write it with scripts/new_preset.py build --out-dir"
+               if preset_mod.is_path(preset_name) else "run scripts/cdxml_headers.py")
+        raise FileNotFoundError(f"no CDXML {what} for preset {preset_name!r}: expected {path}; {fix}")
     return etree.parse(str(path), _PARSER)
 
 

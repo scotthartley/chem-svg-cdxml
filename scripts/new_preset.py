@@ -2,7 +2,7 @@
 
     uv run python scripts/new_preset.py probe [--out build/style_probe]
     uv run python scripts/new_preset.py build --name NAME --probe PATH/style_probe.cdxml
-        [--wrap-width PT] [--default-head standard|large] [--number-weight bold|regular] [--dry-run]
+        [--wrap-width PT] [--default-head standard|large] [--number-weight bold|regular] [--dry-run] [--out-dir DIR]
 
 `probe` writes style_probe.cdxml (presets/probe/style_probe.yaml, at acs1996). In ChemDraw, open it and
 apply the target style's settings to the whole drawing. Then delete every charge sign, lone pair and
@@ -11,7 +11,8 @@ are measured. Save it as CDXML and as SVG, same name. Tidy nothing else: lost bo
 captions don't matter.
 `build` measures that file and writes presets/NAME.yaml, presets/cdxml/NAME.xml and an empty
 presets/cdxml/NAME.nicknames.xml (abbreviations then use generated fragments), and prints each value's
-source and its departure from scaled ACS. It stops if a specimen is missing.
+source and its departure from scaled ACS. It stops if a specimen is missing. `--out-dir DIR` writes
+DIR/NAME.yaml and DIR/cdxml/ instead (a project's own style, `preset: DIR/NAME.yaml`; references/extending.md).
 """
 
 from __future__ import annotations
@@ -178,6 +179,7 @@ def write_preset(name: str, values: dict[str, Value], probe: Path | None, source
     Preset.model_validate(yaml.safe_load(text))  # the schema, before anything is written
     if header_bytes is None:  # caption fonts the probe lost in the re-save: the committed base template's
         header_bytes = header(probe, font_source=HEADER_DIR / f"{BASE_PRESET}.xml")
+    preset_dir.mkdir(parents=True, exist_ok=True)
     path.write_text(text)
     header_dir.mkdir(parents=True, exist_ok=True)
     (header_dir / f"{name}.xml").write_bytes(header_bytes)
@@ -198,6 +200,8 @@ def main(argv=None) -> int:
     b.add_argument("--default-head", choices=["standard", "large"])
     b.add_argument("--number-weight", choices=["bold", "regular"])
     b.add_argument("--dry-run", action="store_true", help="print the report, write nothing")
+    b.add_argument("--out-dir", type=Path, help="write DIR/NAME.yaml and DIR/cdxml/ (a project's own styles/, "
+                   "used as `preset: styles/NAME.yaml`) instead of the repo's presets/")
     args = ap.parse_args(argv)
     if args.cmd == "probe":
         path = write_probe(args.out)
@@ -218,8 +222,13 @@ def main(argv=None) -> int:
         return 1
     print("\n".join(report(values, ring)))
     if not args.dry_run:
-        path = write_preset(args.name, values, args.probe, args.probe.name)
-        print(f"wrote {path.relative_to(mr.REPO)}, presets/cdxml/{args.name}.xml and .nicknames.xml")
+        if args.out_dir:
+            path = write_preset(args.name, values, args.probe, args.probe.name, args.out_dir, args.out_dir / "cdxml")
+            print(f"wrote {path}, {args.out_dir / 'cdxml' / args.name}.xml and .nicknames.xml\n"
+                  f"use it with `preset: <path to {path.name}>` (relative to the spec)")
+        else:
+            path = write_preset(args.name, values, args.probe, args.probe.name)
+            print(f"wrote {path.relative_to(mr.REPO)}, presets/cdxml/{args.name}.xml and .nicknames.xml")
     return 0
 
 

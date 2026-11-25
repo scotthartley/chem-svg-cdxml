@@ -139,6 +139,7 @@ circle (the last back to the first), `start` at 12 o'clock, `direction`, `center
 ## Rules
 
 - Never edit `src/`, `scripts/`, `presets/`, or `references/` from a use session.
+  A project's own style, shared groups, molfiles and scripts go in the project: `references/extending.md`.
 - Keep the user's preset (default acs1996), even when rows wrap; raise `layout.width` only on request.
 - Problems and workarounds go to `<repo>/issues/inbox.md` (create it if missing), appended, with:
   - the date,

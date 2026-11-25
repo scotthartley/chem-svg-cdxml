@@ -1,0 +1,5 @@
+# expect: preset file
+# a user's own style named by a path that doesn't exist (relative to this spec's folder)
+preset: styles/no_such_style.yaml
+species:
+  a: {smiles: "CCO"}

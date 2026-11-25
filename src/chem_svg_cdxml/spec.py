@@ -1,6 +1,7 @@
 """Scheme spec: YAML validated with pydantic (references/scheme-schema.md).
 
-    preset: acs1996                      # or acs1996_x0.8, acs1996_x0.6, or any in presets/
+    preset: acs1996                      # or acs1996_x0.8, acs1996_x0.6, any in presets/, or a .yaml path
+                                         # (relative to the spec; references/extending.md)
     species:
       ester:  {smiles: "COC(=O)c1ccc(O)cc1", abbreviate: [OMe]}
       bnbr:   {smiles: "BrCc1ccccc1"}
@@ -90,12 +91,13 @@ from pathlib import Path
 from typing import Annotated, Literal, Union
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Discriminator, Field, Tag, field_validator, model_validator
+from pydantic import (BaseModel, ConfigDict, Discriminator, Field, Tag, ValidationInfo, field_validator,
+                      model_validator)
 from rdkit import Chem
 
 from . import abbrev, chem
 from .draw_mol import parse_charge_text
-from .preset import available, load_preset
+from .preset import available, is_path, load_preset
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ArrowType = Literal["forward", "equilibrium", "equilibrium_products", "equilibrium_reactants"]  # arrows.ARROW_TYPES
@@ -596,11 +598,45 @@ class Spec(BaseModel):
     charges: ChargeOptions = Field(default_factory=ChargeOptions)
     overrides: Overrides = Field(default_factory=Overrides)
 
+    @model_validator(mode="before")
+    @classmethod
+    def _files(cls, data, info: ValidationInfo):
+        """A `preset:` path and `abbreviations:` files, resolved against the spec's folder (load_spec's
+        context `base_dir`; the working directory without one). `abbreviations:` is a dict, a path, or a
+        list of paths and dicts, merged in order (references/extending.md)."""
+        if not isinstance(data, dict):
+            return data
+        base = Path((info.context or {}).get("base_dir", "."))
+        data = dict(data)
+        p = data.get("preset")
+        if isinstance(p, str) and is_path(p):
+            data["preset"] = str((base / Path(p).expanduser()).resolve())
+        ab = data.get("abbreviations")
+        if isinstance(ab, (str, list)):
+            merged: dict = {}
+            for item in [ab] if isinstance(ab, str) else ab:
+                if isinstance(item, str):
+                    f = (base / Path(item).expanduser()).resolve()
+                    if not f.exists():
+                        raise ValueError(f"abbreviations file {item!r} not found (looked for {f})")
+                    item = yaml.safe_load(f.read_text()) or {}
+                    if not isinstance(item, dict):
+                        raise ValueError(f"abbreviations file {f}: expected a mapping key -> {{smiles, text, ...}}")
+                if not isinstance(item, dict):
+                    raise ValueError("abbreviations: each list item is a file path or a mapping")
+                merged.update(item)
+            data["abbreviations"] = merged
+        return data
+
     @field_validator("preset")
     @classmethod
     def _known(cls, v):
+        if is_path(v):
+            if not Path(v).exists():
+                raise ValueError(f"preset file {v!r} not found")
+            return v
         if v not in available():
-            raise ValueError(f"unknown preset {v!r}; available: {', '.join(available())}")
+            raise ValueError(f"unknown preset {v!r}; available: {', '.join(available())} (or a path to a .yaml preset)")
         return v
 
     @property
@@ -814,7 +850,9 @@ class Spec(BaseModel):
 
 
 def load_spec(path: Path | str) -> Spec:
-    return Spec.model_validate(yaml.safe_load(Path(path).read_text()))
+    """The spec at `path`; a `preset:` path and `abbreviations:` files are relative to its folder."""
+    path = Path(path)
+    return Spec.model_validate(yaml.safe_load(path.read_text()), context={"base_dir": path.parent})
 
 
 def resolve_molfile(ref: str, base_dir: Path) -> Path:

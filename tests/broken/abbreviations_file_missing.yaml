@@ -1,0 +1,5 @@
+# expect: abbreviations file 'no_such_groups.yaml' not found
+# a shared abbreviations file (references/extending.md) that isn't there
+abbreviations: no_such_groups.yaml
+species:
+  a: {smiles: "CCO"}

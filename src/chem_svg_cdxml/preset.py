@@ -240,10 +240,27 @@ def available() -> list[str]:
     return sorted(p.stem for p in PRESET_DIR.glob("*.yaml"))
 
 
+def is_path(name: str) -> bool:
+    """A preset given as a file (a user's own style, references/extending.md), not a presets/ name."""
+    return str(name).endswith((".yaml", ".yml"))
+
+
+def resolve(name: str) -> tuple[Path, Path]:
+    """(the preset's YAML, the folder of its CDXML header and nicknames). A name is presets/<name>.yaml
+    with presets/cdxml/; a path's header and nicknames are <its folder>/cdxml/<stem>.xml and
+    <stem>.nicknames.xml. The files need not exist (callers say which one is missing)."""
+    if is_path(name):
+        path = Path(name).expanduser()
+        return path, path.parent / "cdxml"
+    return PRESET_DIR / f"{name}.yaml", PRESET_DIR / "cdxml"
+
+
 @lru_cache(maxsize=None)
 def load_preset(name: str = "acs1996") -> Preset:
     """Load presets/<name>.yaml, or a path to a preset file."""
-    path = Path(name) if str(name).endswith((".yaml", ".yml")) else PRESET_DIR / f"{name}.yaml"
+    path, _ = resolve(name)
     if not path.exists():
+        if is_path(name):
+            raise FileNotFoundError(f"preset file {str(name)!r} not found")
         raise FileNotFoundError(f"Unknown preset {name!r}; available: {', '.join(available())}")
     return Preset.model_validate(yaml.safe_load(path.read_text()))

@@ -357,3 +357,23 @@ def test_larger_style_curved_arrows_end_inside_their_heads(tmp_path):
     assert len(curved) == 3
     stroke = load_preset("presentation_x1.0").curved_arrow.stroke_width
     assert [round(mechanism.head_spill(a), 2) for a in curved if mechanism.head_spill(a) > stroke] == []
+
+
+def test_build_out_dir_writes_a_project_style(tmp_path, capsys):
+    """`build --out-dir`: the preset and its cdxml/ land in a project folder, not presets/, and a spec there
+    uses it by path (references/extending.md)."""
+    path = PROBES / "style_probe_x0.8.cdxml"
+    if not path.exists():
+        pytest.skip(f"no {path.name}: one ChemDraw round on the probe")
+    styles = tmp_path / "styles"
+    assert np.main(["build", "--name", "mine", "--probe", str(path), "--out-dir", str(styles)]) == 0
+    assert {p.name for p in (styles / "cdxml").iterdir()} == {"mine.xml", "mine.nicknames.xml"}
+    assert not (np.PRESET_DIR / "mine.yaml").exists() and not (np.HEADER_DIR / "mine.xml").exists()
+    raw = yaml.safe_load((REPO / "examples/m1/m1_abbrev2_x1.0.yaml").read_text())
+    raw["preset"] = "styles/mine.yaml"
+    spec = tmp_path / "fig.yaml"
+    spec.write_text(yaml.safe_dump(raw, allow_unicode=True))
+    render_spec(spec)
+    root = etree.fromstring(spec_cdxml(spec, warn=lambda m: None).encode(), np.PARSER)
+    assert root.get("BondLength") == "11.52"
+    cdxml_writer.load_nicknames.cache_clear()
