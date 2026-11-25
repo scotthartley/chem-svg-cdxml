@@ -2,7 +2,7 @@
 
 Step 1 (default): write build/cdxml_gate/<case>.cdxml for the gate cases: the M1 references'
 templates at ChemDraw's own CDXML coordinates (so a re-save can be compared with the original
-reference), and render.py --cdxml's output for examples/m1/m1_smiles_x1.0.yaml.
+reference), and render.py's CDXML output for examples/m1/m1_smiles_x1.0.yaml.
 
 Step 2 (by hand, in ChemDraw): open each file, note any warning, and save it as CDXML and as SVG
 (File > Save As, same name) into reference_renders/resaves/phase1/ (local only, like the
@@ -18,7 +18,7 @@ Step 3: --diff compares each re-saved file with our export, nodes paired by posi
   labels, charge centers. Equal ink means ChemDraw drew our file exactly as its own.
 
 Phase 2 (--phase 2, style-spec.md §13.1; files in build/cdxml_gate/phase2/): the scheme
-references' round-trip exports (compare.reference_cdx_scheme) and render.py --cdxml's output for
+references' round-trip exports (compare.reference_cdx_scheme) and render.py's CDXML output for
 M2 specs. By hand in ChemDraw, besides the
 re-saves: select each arrow (do the reaction tools see its reactants and products?), drag a
 reactant, and retype a condition (does it stay in the step?). --diff then reports, per file:
@@ -30,7 +30,7 @@ reactant, and retype a condition (does it stay in the step?). --diff then report
    (sub- and superscripts included).
 
 Phase 3 (--phase 3, style-spec.md §13.2; files in build/cdxml_gate/phase3/): mech_basic_x1.0 /
-x0.6 round trips (compare.reference_cdx_scheme) and render.py --cdxml's output for M3 specs
+x0.6 round trips (compare.reference_cdx_scheme) and render.py's CDXML output for M3 specs
 (two-electron arrows, fishhooks with HalfRight and HalfLeft barbs, an added reactant above its
 arrow, an S-shaped tangent arrows: m3_carbonyl_addition step 1 and, a fishhook, m3_radical_propagation step 1). By hand in ChemDraw, besides the re-saves (CDXML and SVG): drag an atom with dots (do they
 follow?), move a curve, and run Clean Structure on a copy. --diff reports, besides phase 2's items:
@@ -42,7 +42,7 @@ follow?), move a curve, and run Clean Structure on a copy. --diff reports, besid
 
 Phase 4a (--phase 4a, style-spec.md §13.3; files in build/cdxml_gate/phase4a/): round trips of
 abbrev_x1.0 (templates, as phase 1), resonance_x1.0 and scheme_wrap_x1.0 (as phase 2), and
-render.py --cdxml's output for m1_abbrev, m4_resonance, m4_wrap, m4_nitration and m2_sequence.
+render.py's CDXML output for m1_abbrev, m4_resonance, m4_wrap, m4_nitration and m2_sequence.
 By hand in ChemDraw, besides the re-saves (CDXML and SVG): expand and contract a nickname (Edit >
 Expand Label), drag a contributor (do the brackets and ↔ steps hold?), and move a bracket.
 --diff reports, besides phase 2's items:
@@ -51,8 +51,8 @@ Expand Label), drag a contributor (do the brackets and ↔ steps hold?), and mov
    or objecttag ChemDraw adds (new elements in the re-save).
 
 Phase 4c (--phase 4c, style-spec.md §13.3; files in build/cdxml_gate/phase4c/): general
-abbreviations. abbrev_2_x1.0 and ligands_x1.0 round trips (templates, as phase 1) and render.py
---cdxml's output for m1_abbrev2_x1.0: one of each kind (a reference template, a generated
+abbreviations. abbrev_2_x1.0 and ligands_x1.0 round trips (templates, as phase 1) and render.py's
+CDXML output for m1_abbrev2_x1.0: one of each kind (a reference template, a generated
 fragment for a registry group without a reference and for the spec's own group, OTBS composed,
 ring NTs with two ExternalConnectionPoints, text labels Ln and dppf with no fragment, italic t-Bu,
 N3). By hand in ChemDraw, besides the re-saves (CDXML and SVG): expand and contract each
@@ -64,8 +64,8 @@ Also label_variants_x1.0 (VARIANT_ROWS): Bpin, IPr and P(o-tol)3 with their bond
 four candidate CDXML forms, one per row (user 2026-11-03: row B keeps IPr, row C pinB; cdxml_writer
 now writes those).
 
-Phase 4b (--phase 4b, style-spec.md §13.4; files in build/cdxml_gate/phase4b/): render.py
---cdxml's output for m1_charges (circled signs, 2+ / 2-, +3, triplet CH2), m1_lewis,
+Phase 4b (--phase 4b, style-spec.md §13.4; files in build/cdxml_gate/phase4b/): render.py's
+CDXML output for m1_charges (circled signs, 2+ / 2-, +3, triplet CH2), m1_lewis,
 m1_lewis_lines and m1_lewis_assigned (oxidation states). By hand in ChemDraw, besides the
 re-saves (CDXML and SVG): note any warning, drag a Lewis atom and a charged atom (what follows?).
 --diff reports, besides phase 2's items:
@@ -83,7 +83,7 @@ symbol (shared pairs free, assigned and lone pairs bound to their atom), an odd 
 Electron.
 
 Phase 5 (--phase 5, style-spec.md §14; files in build/cdxml_gate/phase5/): chair_x1.0's templates
-(as phase 1, with ChemDraw's front bonds) and render.py --cdxml's output for m1_chair_x1.0. We
+(as phase 1, with ChemDraw's front bonds) and render.py's CDXML output for m1_chair_x1.0. We
 write each crossing's rear bond with the lower Z (cdxml_writer.z_order) and no CrossingBonds. By
 hand in ChemDraw, besides the re-saves (CDXML and SVG): does each crossing show its gap on the
 same bond as our SVG, and does moving an atom keep it? --diff reports, besides phase 2's items:
@@ -99,7 +99,7 @@ do the equilibrium halves point their barbs outward, are the entering tails plai
 dragging an arc's end keep it an arc? --diff reports phase 2's items: the <step>s, and each
 <arrow> and <graphic> (paired by Head3D / BoundingBox) with what ChemDraw rewrote.
 
-Phase 7 (--phase 7, style-spec.md §17; files in build/cdxml_gate/phase7/): render.py --cdxml's output
+Phase 7 (--phase 7, style-spec.md §17; files in build/cdxml_gate/phase7/): render.py's CDXML output
 for the polymer examples (m7_*). Brackets as polymer_x1.0's: a ']' <graphic> with BracketUsage
 MultipleGroup, its repeat count and subscript in objecttags, a '[', and a <bracketedgroup> with the
 enclosed atoms and crossing bonds; bare chain ends as carbons, wavy ends as ExternalConnectionPoint

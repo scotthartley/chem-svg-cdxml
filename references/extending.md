@@ -1,7 +1,8 @@
 # Extending from a project folder
 
 A project that has the skill linked in (`.claude/skills/chem-svg-cdxml`) can add its own style,
-groups, structures and scripts without touching the skill repo. Everything below lives in the
+groups, structures and scripts without touching the skill repo (`<repo>`: the symlink's target,
+`~/tools/chem-svg-cdxml` in the README's installation). Everything below lives in the
 project; the repo's `src/`, `scripts/`, `presets/` and `references/` stay as they are.
 
 ## Layout
@@ -40,9 +41,9 @@ Two ways to make one:
 - **From ChemDraw** (recommended): the style probe (style-spec.md §16), written into the project:
 
   ```bash
-  uv run --project ~/Coding/productivity/chem-svg-cdxml python ~/Coding/productivity/chem-svg-cdxml/scripts/new_preset.py probe --out probe
+  uv run --project <repo> python <repo>/scripts/new_preset.py probe --out probe
   # open probe/style_probe.cdxml in ChemDraw, apply your style, redo signs and dots, save as CDXML + SVG
-  uv run --project ~/Coding/productivity/chem-svg-cdxml python ~/Coding/productivity/chem-svg-cdxml/scripts/new_preset.py \
+  uv run --project <repo> python <repo>/scripts/new_preset.py \
       build --name mystyle --probe probe/style_probe.cdxml --out-dir styles
   ```
 
@@ -87,7 +88,7 @@ the preset's bond length; wedges and atom aliases naming abbreviations are kept
 A project script runs in the skill's environment:
 
 ```bash
-uv run --project ~/Coding/productivity/chem-svg-cdxml python scripts/make_figures.py
+uv run --project <repo> python scripts/make_figures.py
 ```
 
 ```python

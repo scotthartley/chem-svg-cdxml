@@ -10,7 +10,7 @@ Target usage: in any Claude Code session, the user asks in plain language, e.g.
 
 > Draw the mechanism for electrophilic nitration of benzene, including all curved arrows and resonance structures.
 
-Claude writes a declarative scheme spec (YAML), runs the scripts in this repo to validate and render it, **looks at the rendered PNG**, iterates until it is right, and returns `.svg` + `.yaml` (+ `.png` preview).
+Claude writes a declarative scheme spec (YAML), runs the scripts in this repo to validate and render it, **looks at the rendered PNG**, iterates until it is right, and returns `.svg` + `.yaml` + `.cdxml` (+ `.png` preview).
 
 **Why SVG first.** Claude can rasterize SVG and inspect the result itself, which closes the visual feedback loop. CDXML output cannot be visually verified without ChemDraw. SVG is therefore what Claude checks, and it remains the primary output. A CDXML writer was added later from the same layout model (`references/style-spec.md` §13); it was checked through ChemDraw re-saves and aims for visual consistency, not ChemDraw's chemical reading of every label.
 
@@ -40,12 +40,15 @@ chem-svg-cdxml/
 ├── pyproject.toml / uv.lock # Pinned environment
 ├── fonts/                   # Metric font(s) for label measurement (see §4.3)
 ├── presets/
-│   ├── acs1996.yaml
-│   ├── acs1996_x0.8.yaml
-│   └── acs1996_x0.6.yaml
+│   ├── acs1996.yaml         # also acs1996_x0.8, acs1996_x0.6; presentation_x1.0 (generated, §16 of style-spec.md)
+│   ├── cdxml/               # CDXML header and nickname templates per preset
+│   └── probe/               # The style probe for new presets
 ├── references/
 │   ├── style-spec.md        # Numeric style spec + drawing conventions
 │   ├── scheme-schema.md     # Authoritative YAML schema with examples
+│   ├── workflow.md          # Worked example: request to mechanism
+│   ├── extending.md         # Project-side styles, groups, molfiles, scripts
+│   ├── renderer-spike.md    # M0 spike result (§4.1)
 │   └── lessons.md           # Curated, dated lessons (dev sessions only)
 ├── reference_renders/       # local only (gitignored)
 │   └── chemdraw/            # User-supplied ChemDraw SVG/PDF exports (visual ground truth)
@@ -58,11 +61,14 @@ chem-svg-cdxml/
 │   ├── layout.py            # Scheme layout: species, arrows, text, brackets
 │   ├── mechanism.py         # Lone pairs, radicals, curved-arrow geometry
 │   ├── geometry_checks.py   # Collisions, crossings, clearances
+│   ├── abbrev.py, chair.py, cycle.py, polymer.py   # Abbreviations, chairs, catalytic cycles, polymers
+│   ├── figure.py            # Spec → laid-out figure (shared by render.py and the gallery)
 │   ├── svg_writer.py        # Scene graph → SVG
+│   ├── cdxml_writer.py      # Same layout → CDXML (style-spec.md §13)
 │   └── preview.py           # SVG → PNG, zoomed crops, side-by-side comparisons
-├── scripts/                 # CLI wrappers: render, validate, preview, compare
+├── scripts/                 # CLI: render, validate, compare, measure_refs, cdxml_gate, new_preset, gallery
 ├── templates/               # Curated molfiles with hand-set 2D coordinates
-├── examples/                # Benchmark specs (nitration, SN2, E2, ...)
+├── examples/                # Specs by milestone (m1/ … m7/) and M5 benchmarks (benchmarks/)
 ├── tests/
 │   ├── gallery/             # Approved renders for regression comparison
 │   └── test_*.py
@@ -286,7 +292,7 @@ Also note the ChemDraw version. These are measured (bond spacing, wedge widths, 
 
 **Use sessions** (a project folder with the skill linked in `.claude/skills/`):
 
-- Follow `SKILL.md`: write spec → validate → render → inspect PNG and crops → adjust `overrides` → deliver `.svg`, `.yaml`, `.png`.
+- Follow `SKILL.md`: write spec → validate → render → inspect PNG and crops → adjust `overrides` → deliver `.svg`, `.yaml`, `.png`, `.cdxml`.
 - **Never edit** `src/`, `scripts/`, `presets/`, or `references/`.
 - Append problems and workarounds to `issues/inbox.md` with date, spec excerpt, symptom, and workaround.
 
@@ -310,7 +316,7 @@ Each milestone ends with renders the user approves, which are added to `tests/ga
 | **M3** | Mechanisms: lone pairs, radicals, two-electron and fishhook arrows; electron bookkeeping; geometric checks; zoomed-crop inspection. | SN2, E2, carbonyl addition, and radical bromination pass validation and visual review. Deliberately broken specs are caught. |
 | **M4** | Resonance brackets, ↔ arrows, multi-row wrapping. | Full nitration mechanism approved. |
 | **M5** | Natural-language workflow polish; benchmark prompts in `examples/`. | From a one-sentence request, Claude produces an approved nitration mechanism without the user editing the spec. |
-| Later | Catalytic cycles; foldamer templates; optional CDXML backend from the same scene graph. | — |
+| Later | Catalytic cycles (done, examples `m6/`); CDXML backend from the same layout (done); polymers (done, examples `m7/`); foldamer templates (not started). | — |
 
 Status: M0–M5 are done. M5 was accepted on 2026-10-25: a use session turned the one-sentence
 nitration prompt (`examples/benchmarks/prompts.yaml`) into `examples/benchmarks/nitration_accepted.yaml`,
@@ -320,15 +326,16 @@ approved without edits; fresh-agent trials of all six benchmark prompts are summ
 Catalytic cycles (`cycle:`, `references/style-spec.md` §15, 2026-10-29): arc arrows measured on
 the user's arcs_x\* reference (§15.1); the circle layout, labels and tails are our own placement
 (§15.2), with the rules settled on a geometry spike (since retired). CDXML export of cycles
-(phase 5, §15.3): ChemDraw arc arrows, gate passed 2026-10-30. Gallery cases (phase 6):
+(§15.3, `cdxml_gate.py --phase 6`): ChemDraw arc arrows, gate passed 2026-10-30. Gallery cases:
 the Suzuki and proline/enamine cycles, approved 2026-10-30.
 
-CDXML export (the "Later" backend, `render.py --cdxml`, `references/style-spec.md` §13): phase 1,
+CDXML export (the "Later" backend, written by every `render.py` run, `references/style-spec.md` §13): phase 1,
 M1 species, and phase 2, M2 schemes (arrows, conditions, plus signs, numbers, `<scheme><step>`,
 §13.1), both passed their ChemDraw gates on 2026-10-28. Phase 3, M3 mechanisms (curved arrows as
 `<curve>`, lone-pair and radical dots as symbols, §13.2), passed its gate the same day. Phase
 4a, abbreviations (ChemDraw's nickname nodes), resonance ↔ arrows and brackets, and the wrapped
-and multi-row specs that use them (§13.3), is implemented and passed its ChemDraw gate (2026-10-28). Phase
+and multi-row specs that use them (§13.3), is implemented and passed its ChemDraw gate (2026-10-28). Phase 4c, general abbreviations (generated
+fragments, ring NTs, text labels; §13.3), passed its gate on 2026-11-03. Phase
 4b, Lewis structures (dots or bond lines) and the remaining charge forms (circled signs, 2+ / 2−,
 `charge_labels`, oxidation states, two unpaired electrons; §13.4, from the user's
 charges_lewis_x\* reference), is implemented and passed its ChemDraw gate (2026-10-29; no 4b edit check, closed by the user). Known chemistry-only limits: a lone "+" text beside an atom becomes a charge (`InterpretChemically="no"` doesn't stop it), and ChemDraw drops the charge of an atom whose charge is text (2+, +3); the drawing is unchanged, since the CDXML is for appearance (style-spec.md §13.4).
@@ -349,7 +356,7 @@ ends or end groups, random copolymers with a slashed bond and a ratio, block cop
 the crossing bonds stretched where a bracket would crowd the unit (`polymer.py`); `chain_ends`
 draws wavy ends, `bond_lengths` stretches any acyclic bond, and `coefficients` sets n before a
 reactant. The CDXML writes ChemDraw's bracketed groups (`<bracketedgroup>`, crossing bonds,
-parameterized labels); its gate (`cdxml_gate.py --phase 7`) awaits re-saves. ×0.8 / ×0.6 values
+parameterized labels); its gate (`cdxml_gate.py --phase 7`) passed on ChemDraw's re-saves of 2026-11-25 (§17.1). ×0.8 / ×0.6 values
 are acs1996's x k (no references); new styles derive them too (no probe specimen).
 ---
 

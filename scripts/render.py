@@ -21,7 +21,7 @@ output is for Inkscape and browsers; its markers follow edits.
 SVG's coordinates, from the same layout as the SVG: single species (Lewis structures included), or
 a scheme (arrows, conditions, plus signs, numbers and <scheme><step>, §13.1; curved arrows and
 dots, §13.2; abbreviations, resonance arrows and brackets, §13.3), or a catalytic cycle (arc arrows
-and tails as ChemDraw arc arrows, §15.1). What it can't write is a "warning: no CDXML:" line on
+and tails as ChemDraw arc arrows, §15.1), or polymers (bracketed groups, §17.1). What it can't write is a "warning: no CDXML:" line on
 stderr (the SVG and PNG are still written); what it writes as plain chemistry (atom maps) is
 listed on stderr. --no-cdxml skips it (--cdxml is accepted and does nothing).
 

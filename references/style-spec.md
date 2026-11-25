@@ -705,7 +705,7 @@ Rules (M4; unmeasured, user decisions 2026-10-25, flagged at review):
     anchor, composition), so a label without a reference is drawn and exported too.
 30. ~~**Repeat-unit brackets**~~ **Resolved (polymer_x1.0, 2026-11-25):** §17. Open within it:
     no polymer_x0.8 / x0.6 (the polymer keys there are acs1996's x k, `derived:`); the style probe has
-    no polymer specimen, so a generated preset derives them too; the phase 7 CDXML gate awaits ChemDraw's re-saves.
+    no polymer specimen, so a generated preset derives them too. The phase 7 CDXML gate passed (2026-11-25, §17.1).
 
 31. **dppf above Pd** (§3.5, ligands_x1.0): ChemDraw stops the bond below dppf's p descenders,
     1.9 pt beyond our anchor-glyph clip, and draws no bond at ×0.8 / ×0.6; Lₙ above Pd (its
@@ -847,7 +847,7 @@ Unmeasured user decisions (2026-10-26), round defaults on the 0.5 pt grid, **app
 | Charges on a Lewis atom: the upper right corner first (every lattice bond is 45° from each corner, so only the 45° limit applies), then the clearance search | — | `draw_mol.Drawer.charge_center` (user review 2026-10-28: the user put every sign at the upper right, "aim for consistency") |
 | Checks: shared dots ≥ 2 × gap from labels; assigned dots on the owner's half; dot sets ≥ `dot_spacing` apart | — | `geometry_checks.check_lewis` |
 
-## 13. CDXML export (phase 1: M1 species, phase 2: M2 schemes §13.1, phase 3: M3 mechanisms §13.2, phase 4a: abbreviations, resonance, wrap §13.3, phase 4b: charges and Lewis §13.4; source: every reference's .cdxml)
+## 13. CDXML export (phase 1: M1 species, phase 2: M2 schemes §13.1, phase 3: M3 mechanisms §13.2, phase 4a: abbreviations, resonance, wrap §13.3, phase 4c: general abbreviations §13.3, phase 4b: charges and Lewis §13.4; phase 5: chairs §14.2, phase 6: cycles §15.3, phase 7: polymers §17.1; source: every reference's .cdxml)
 
 `chem_svg_cdxml.cdxml_writer` writes what ChemDraw writes for its own structures, so ChemDraw can
 edit a figure. These are file conventions, not drawn geometry. They are measured from the CDXML
@@ -1305,7 +1305,7 @@ free arcs, labels inside the circle, tails as tangent arcs). Values at x1.0; x0.
 | Tail text or structure `tail_text_gap` beyond the free end, along the tail; consecutive texts share a tail (", ") | `cycle.tail_text_gap` 2.5 |
 | A crowded tail (path or item within `label_clear` of a species, label, earlier tail or the arrows) tries radius ×1.3 / ×1.6, turns 65° / 100° / 50° / 120° and joins ±0.06 / −0.12; still crowded: a `validate.py` problem | — |
 
-### 15.3 CDXML export (`render.py --cdxml`, `cdxml_writer.cycle_records`)
+### 15.3 CDXML export (`render.py`, `cdxml_writer.cycle_records`)
 
 Every arrow and tail is a ChemDraw arc arrow as §15.1: an `<arrow>` with its legacy
 `<graphic GraphicType="Arc">`, on the drawn circle. Rewritten on ChemDraw's own circles, the

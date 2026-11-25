@@ -14,7 +14,7 @@ reference exists and validates.
    - the number of `validate.py` runs and render iterations,
    - each validator message it hit (verbatim),
    - what it guessed,
-   - the final files (`.yaml`, `.svg`, `.png`).
+   - the final files (`.yaml`, `.svg`, `.png`, `.cdxml`).
 4. Compare the round's counts with the previous round; triage the inbox items (CLAUDE.md).
 
 `build/` is not committed; summarize each round in `references/lessons.md`.

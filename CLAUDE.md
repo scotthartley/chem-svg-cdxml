@@ -50,8 +50,10 @@ they disagree, `style-spec.md` (the ChemDraw references) wins.
 
 - `uv run python scripts/measure_refs.py [--summary | --json out.json] [names]` measures ChemDraw exports.
   The command line and `mr.<name>` re-exports are in `measure_refs.py`; the methods are in `scripts/chemdraw_refs/`
-  (`core` model and loaders, `measurements`, `clip`, `scheme`, `mech`, `labels`, `cdxml`, `chair`, `arcs`).
-- Examples are grouped by milestone: `examples/m1/` … `examples/m7/` (m7: polymers; file names keep the `mN_` prefix).
+  (`core` model and loaders, `measurements`, `clip`, `scheme`, `mech`, `labels`, `cdxml`, `chair`, `arcs`, `polymer`,
+  `probe` for `new_preset.py`).
+- Examples are grouped by milestone: `examples/m1/` … `examples/m4/`, `examples/m6/` (catalytic cycles) and `examples/m7/`
+  (polymers); file names keep the `mN_` prefix. M5's benchmark prompts are in `examples/benchmarks/`.
 - The CDXML export tests are `tests/test_cdxml_{species,scheme,mech,resonance,abbrev,cycle,polymer}.py`, sharing `tests/cdxml_helpers.py`.
 - `uv run python scripts/compare_fonts.py` compares Helvetica with the Heros fallback (advances, kerning).
 - `uv run python scripts/check_rasterizer.py` is the rasterizer/font acceptance test.
@@ -73,7 +75,7 @@ they disagree, `style-spec.md` (the ChemDraw references) wins.
   bracket and row items. resonance_x* also gets our ↔ arrows and brackets on ChemDraw's. Arrows take the head
   variant of their CDXML HeadSize; equilibrium_x* and arrows_large_x* draw our arrows and captions only.
 - `uv run python scripts/render.py spec.yaml [--out DIR] [--crops] [--maps] [--no-cdxml]` renders a spec: an M2–M4 scheme
-  (`examples/m2/m2_*.yaml` … `examples/m4/m4_*.yaml`), a catalytic cycle (`examples/m6/m6_*_cycle_*.yaml`) or M1 species (`examples/m1/m1_smiles_x*.yaml`). `--crops` adds
+  (`examples/m2/m2_*.yaml` … `examples/m4/m4_*.yaml`), a catalytic cycle (`examples/m6/m6_*_cycle_*.yaml`), polymers (`examples/m7/m7_*.yaml`) or M1 species (`examples/m1/m1_smiles_x*.yaml`). `--crops` adds
   16 px/pt crops of curved arrows, charged or dotted labels, ↔ arrows, equilibrium arrow ends and bracket corners; `--maps` adds
   `<stem>_maps.png` with map numbers beside the atoms (preview only). It prints each curved arrow's bow.
   It also writes `<stem>.cdxml` for ChemDraw (every spec kind; `cdxml_writer`, style-spec.md §13); `--no-cdxml` skips it, and a spec it can't export

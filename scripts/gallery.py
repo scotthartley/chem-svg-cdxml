@@ -31,7 +31,7 @@ Cases:
   cdxml/m4_nitration_x1.0.cdxml, cdxml/m1_lewis_x1.0.cdxml, cdxml/m1_lewis_lines_x1.0.cdxml,
   cdxml/m1_lewis_assigned_x1.0.cdxml, cdxml/m1_carbenes_x1.0.cdxml, cdxml/m1_chair_x1.0.cdxml,
   cdxml/m6_suzuki_cycle_x1.0.cdxml, cdxml/m6_enamine_cycle_x1.0.cdxml, cdxml/m7_polymers_x1.0.cdxml,
-  cdxml/m7_scheme_x1.0.cdxml: render.py --cdxml's
+  cdxml/m7_scheme_x1.0.cdxml: render.py's CDXML
   output for those specs (cdxml_writer), compared as text after lxml C14N.
 
 All PNGs are rendered at 4 px/pt with a transparent background. tests/test_gallery.py re-renders
@@ -137,7 +137,7 @@ def cdxml_case_names() -> list[str]:
 
 
 def cdxml_case(name: str) -> str:
-    """The CDXML text (render.py --cdxml) of one CDXML case."""
+    """The CDXML text (render.py writes it by default) of one CDXML case."""
     return spec_cdxml(mr.REPO / _CDXML_SPEC_BY_NAME[name], warn=lambda m: None)
 
 
