@@ -33,6 +33,10 @@ FALLBACK_FILES = {
 }
 
 
+class MissingGlyph(ValueError):
+    """A character the font has no glyph for (a spec problem, so validate.py reports it)."""
+
+
 @dataclass(eq=False)  # hashed by identity for the lru_caches below
 class FontFace:
     path: Path
@@ -54,7 +58,7 @@ class FontFace:
         try:
             return cmap[ord(ch)]
         except KeyError:
-            raise KeyError(f"{ch!r} (U+{ord(ch):04X}) not in {self.path.name}") from None
+            raise MissingGlyph(f"{ch!r} (U+{ord(ch):04X}) not in {self.path.name}") from None
 
     def has_char(self, ch: str) -> bool:
         return ord(ch) in self.font.getBestCmap()

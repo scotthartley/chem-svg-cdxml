@@ -23,7 +23,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from functools import lru_cache
 
-from .fontmetrics import FontFace, load_face
+from .fontmetrics import FontFace, load_face, load_fallback
 from .geometry import union_box
 from .preset import Preset
 from .scene import TextRun
@@ -101,9 +101,32 @@ def has_sub(runs: list[Run]) -> bool:
     return any(r.script == "sub" for r in runs)
 
 
+_SUBFAMILY = {"regular": "Regular", "italic": "Oblique", "bold": "Bold"}
+
+
 @lru_cache(maxsize=None)
 def face_for(style: str) -> FontFace:
-    return load_face({"regular": "Regular", "italic": "Oblique", "bold": "Bold"}[style])
+    return load_face(_SUBFAMILY[style])
+
+
+@lru_cache(maxsize=None)
+def fallback_for(style: str) -> FontFace:
+    return load_fallback(_SUBFAMILY[style])
+
+
+def check_glyphs(parts: list[Run], text: str, source: str = "") -> None:
+    """Raise ValueError if a character is missing from the face in use or from the fallback of the
+    same style, so a spec doesn't pass on one machine and fail on another."""
+    for p in parts:
+        for ch in p.text:
+            in_face, in_fallback = face_for(p.style).has_char(ch), fallback_for(p.style).has_char(ch)
+            if in_face and in_fallback:
+                continue
+            fonts = ("in neither Helvetica nor the TeX Gyre Heros fallback" if not (in_face or in_fallback)
+                     else "not in Helvetica" if in_fallback else "not in the TeX Gyre Heros fallback")
+            prefix = f"{source}: " if source else ""
+            raise ValueError(f"{prefix}{text}: {ch!r} (U+{ord(ch):04X}) is {fonts}; write it another way, "
+                             "or draw the species as a structure (in: {species: …})")
 
 
 @dataclass
@@ -142,6 +165,7 @@ def layout_line(text: str | list[Run], x: float, baseline: float, size: float, p
                 source: str = "", style: str = "regular") -> Line:
     """Set one line with its first glyph origin at (x, baseline)."""
     parts = parse(text, style) if isinstance(text, str) else text
+    check_glyphs(parts, text if isinstance(text, str) else "".join(p.text for p in parts), source)
     runs, cx = [], x
     for p in parts:
         sz, dy = run_metrics(p, size, preset)

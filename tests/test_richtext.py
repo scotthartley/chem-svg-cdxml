@@ -1,5 +1,7 @@
 """Rich-text parsing and line layout (richtext.py, style-spec.md §3)."""
 
+import re
+
 import pytest
 
 from chem_svg_cdxml import richtext
@@ -82,3 +84,13 @@ def test_line_pitch_rule():
     assert richtext.line_pitch(plain, plain, 10.0, P) == pytest.approx(10.05)  # scheme_basic_x1.0
     assert richtext.line_pitch(sub, plain, 10.0, P) == pytest.approx(10.825)  # scheme_multi_x1.0
     assert richtext.line_pitch(sub, sub2, 10.0, P) == pytest.approx(10.975)
+
+
+@pytest.mark.parametrize("text, code", [
+    ("C≡C", "U+2261"),  # in neither font
+    ("A → B", "U+2192"),  # in Heros only: rejected so a spec passes or fails the same everywhere
+])
+def test_layout_line_rejects_characters_the_fonts_cannot_set(text, code):
+    with pytest.raises(ValueError, match=re.escape(code)) as err:
+        richtext.layout_line(text, 0.0, 0.0, 10.0, P, "cycle-in:0")
+    assert str(err.value).startswith(f"cycle-in:0: {text}: ")
