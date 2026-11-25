@@ -866,3 +866,73 @@ obvious:
   vertices after an ester whose OMe points toward the tail puts =S straight down beside the OMe label (the
   clash check sees atoms, not labels); `bond_lengths: {"13-14": 1.9}` on the S–C(=S) bond clears it (1.6
   still touches).
+
+## 2026-11-25 (M5: round r2, skill bloat check)
+
+Question: has a month of features (CDXML, Lewis, chairs, cycles, abbreviations, polymers) made the
+skill harder to use? r1's six prompts plus nine new ones (one per new feature, three combinations:
+`examples/benchmarks/prompts.yaml`), on a frozen HEAD 8f31bff. Validate runs / renders (r1 → r2):
+synthesis 2/1 → 1/1, SN2 4/4 → 3/3, carbonyl 7/6 → 6/5, radical 3/3 → 5/5, nitration 7/4 → 6/4,
+E2 4/3 → 16/5. New: lewis 1/1, chair 2/2, suzuki_cycle 2/2, polymers 1/1, protection 1/1,
+polymerization 1/1, acetate_resonance 2/2, metf_sn2 3/2, e2_chair 7/6. All 15 delivered.
+
+- **No sign of bloat in the simple cases.** The six old prompts held or improved, except E2
+  (and e2_chair), where the agent fought an arrow that was drawn as intended (below).
+- **Copied examples are weak tests.** synthesis, polymers, polymerization and suzuki_cycle are
+  nearly copies of the SKILL.md / schema examples, which the agents said themselves. Future
+  prompts should differ from every doc example.
+- **The pass-through hook read as a defect** (e2, e2_chair, nitration). The C–H → C–C hook passes
+  through the forming π bond on purpose (style-spec.md §4, user choice 2026-10-26), so the
+  validator accepts it. Nothing in the use-session docs said so; workflow.md now does, with two
+  more common mistakes the trials hit: choosing which H is mapped, and dropping the bracket H count.
+- **`--crops` skipped specs without steps** (lewis, polymers, polymerization): only schemes and
+  cycles got crops. Single species now get their atoms and polymer bracket corners
+  (`render.species_crop_boxes`); `test_crops_cover_single_species`.
+- **A silent cis/trans slip on a chair** (chair): the wrong SMILES stereo validated and drew.
+  render.py now prints each chair's `axial: …; equatorial: …` (`chair.summary`);
+  `test_render_prints_each_chairs_axial_and_equatorial_groups`.
+- **"drawn and never used again" on reused species** (radical): a later use is a clone
+  `name~k`, which the note didn't match. Fixed; `test_a_product_reused_by_name_on_a_later_row_is_not_noted`.
+- Doc fixes: SKILL.md's override example now targets the arrow that needs it (SN2's C–Br arrow,
+  index 1); the schema's chair example drops `start: 2`, which crowded E2's arrows.
+- SKILL.md restructured: per-feature bullets became a Features table (feature, minimal key,
+  schema section), so a new feature adds a row rather than a paragraph; feature combinations go in
+  `references/feature-matrix.md` (probed 2026-11-25: nearly all pairs work; Lewis is refused
+  everywhere but alone).
+- Open, for the user (each changes approved renders or needs a design choice):
+  - lone pairs differ between related structures: a product or second resonance contributor shows
+    none on an atom whose lone pairs were drawn in the reactant (SN2's methanol O, acetate's =O,
+    Br· after homolysis);
+  - `abbreviate: [OTf]` fails on the free triflate anion; `[Tf]` draws ⁻:Ö–Tf;
+  - cycle tails crowding a step label and each other aren't reported (suzuki_cycle);
+  - a curved arrow 1 pt above the reaction arrow passes (carbonyl);
+  - geometry messages name bonds by internal ids (`bond:3,5`), not map numbers (e2);
+  - an aligned product may turn an acyclic CH₂–O bond (protection);
+  - Lewis layouts on the square lattice (nitrate as a T) are by design, not reported as a limit.
+
+## 2026-11-25 (M5: round r3, after the r2 fixes)
+
+Same 15 prompts on the working tree with the r2 fixes and the restructured SKILL.md (Features
+table, feature-matrix.md). Validate runs / renders (r2 → r3): synthesis 1/1 → 1/1, SN2 3/3 → 4/2,
+E2 16/5 → 2/2, carbonyl 6/5 → 4/4, radical 5/5 → 6/6, nitration 6/4 → 1/1, lewis 1/1 → 2/2,
+chair 2/2 → 1/1, suzuki_cycle 2/2 → 2/1, polymers 1/1 → 1/1, protection 1/1 → 1/1,
+polymerization 1/1 → 1/1, acetate_resonance 2/2 → 2/2, metf_sn2 3/2 → 3/2, e2_chair 7/6 → 3/3.
+Totals 57/41 → 34/30. All 15 delivered.
+
+- **The pass-through note worked**: E2 and e2_chair stopped fighting the hook (16 → 2, 7 → 3
+  validate runs). Nitration's 1/1 is partly copying: workflow.md works through that very request.
+- **The chair summary worked**: the chair trial checked cis from `axial: O …` on its first run.
+- **Agents found the Features table and feature-matrix.md** (chair, polymerization, metf_sn2 cite
+  them); nothing was harder to find than in r2.
+- Doc fixes from r3: `rotate` is counter-clockwise (SKILL.md; 2 trials guessed wrong), `flip_h` is
+  allowed on Lewis species, and a merged heteroatom (the O of OTf) can be an arrow end.
+- Still open (added to r2's list): SN2's C–Br arrow needs `bow: right` in every trial since r1 (the
+  default changes an approved render); the omit note fires on a radical chain's regenerated Br·;
+  `coefficients` invites italic `*n*`, but the measured ChemDraw style is roman; small cycle items
+  (short Pd–Br stubs, an out tail near its arc's head); polystyrene's Br end bond crosses its
+  bracket shallower than the left bond.
+
+User decisions on the r2/r3 open items (2026-11-25): lone pairs stay per species (which pairs are
+shown often changes along a long scheme, so no carrying over); SN2's C–Br arrow keeps its default
+bow; a coefficient's letters are italic like the bracket subscript (ChemDraw's reference sets it
+roman; the m7_scheme gallery case changes); the triflate anion and the smaller items went to issues/inbox.md.

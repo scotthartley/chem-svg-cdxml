@@ -1,0 +1,5 @@
+# Benchmark reference (prompts.yaml: chair).
+preset: acs1996
+species:
+  cis_4_tert_butylcyclohexanol: {smiles: "CC(C)(C)[C@H]1CC[C@@H](O)CC1", chair: true}
+  menthol: {smiles: "CC(C)[C@@H]1CC[C@@H](C)C[C@H]1O", chair: true}

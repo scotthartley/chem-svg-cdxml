@@ -1,0 +1,5 @@
+# Benchmark reference (prompts.yaml: lewis).
+preset: acs1996
+species:
+  nitrate: {smiles: "[O-][N+](=O)[O-]", lewis: true}
+  acetic_acid: {smiles: "CC(=O)O", lewis: true, orientation: {flip_h: true}}

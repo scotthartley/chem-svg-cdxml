@@ -116,3 +116,12 @@ that is expected.
 - **Pasting a suggestion that looks wrong.** The suggestions are what the arrows give. If
   they show odd charges (`[OH+:1]`, `[CH3-:2]`), the arrows are wrong, not the products: a
   new bond is `to: between(a,b)`, while `to: atom(b)` makes a lone pair on b.
+- **Fighting the pass-through hook.** A C–H → C–C arrow forming a π bond (E2, the sigma
+  complex's deprotonation) has no room on its own side, so by default it passes *through* the
+  target bond and curls back onto it. That is the intended drawing (a user choice), and the
+  validator accepts it on purpose. Don't spend overrides on it; only the head may not touch a bond.
+- **Which H moves.** On a CH₂/CH₃, the H written as `[H:n]` is drawn where the SMILES puts it.
+  To choose which drawn H is the mapped one (anti to the leaving group in E2), write all of the
+  carbon's H explicitly with the mapped one last (`[C:3]([H])([H])[H:2]`), then orient the species.
+- **A bracket H count left in.** Writing one H as an atom means removing it from the bracket:
+  `[C:11]([H:17])`, not `[CH:11]([H:17])` (the validator names the atom).

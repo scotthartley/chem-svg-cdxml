@@ -33,7 +33,7 @@ align: auto                # or false: every species on its own layout
 | `steps[].stages` | list of ≥ 1 strings | Numbered stages, left-justified: the first ⌈n/2⌉ above, the rest below (2 → "1." / "2."; 3 → "1.", "2." / "3."). Exclusive with above/below. |
 | `steps[].arrow_type` | `forward` (default) \| `equilibrium` \| `equilibrium_products` \| `equilibrium_reactants` | The step's arrow: → , balanced ⇌, or unbalanced ⇌ with the long shaft pointing to the favored side (products: right; reactants: left). Equilibrium conditions sit above and below the outer shafts, centered on the arrow (style-spec.md §3.6). Not on resonance steps. Works with `stages` and curved `arrows` (a reversible proton transfer). |
 | `arrow_head` | `standard` \| `large` | Head of every reaction, equilibrium and ↔ arrow. Default: the preset's (`large` at ×1.0, `standard` at ×0.8 and ×0.6; style-spec.md §3.1). `standard` at ×1.0 matches ChemDraw's default head. Curved arrows are unaffected. |
-| `steps[].coefficients` | map: reactant → text | Drawn before that reactant, its ink centered on the arrow axis (`{styrene: n}` for n styrene → polystyrene; richtext, so `"*n*"` is italic; style-spec.md §17). A free caption in the CDXML. |
+| `steps[].coefficients` | map: reactant → text | Drawn before that reactant, its ink centered on the arrow axis (`{styrene: n}` for *n* styrene → polystyrene; letters italic and digits regular, as the bracket subscript; richtext markup such as `"*n*"` is kept as written; style-spec.md §17). A free caption in the CDXML. |
 | `numbers.<name>` | int or string | Bold compound number under the species, on one shared baseline. |
 | `species.<name>.abbreviate` | list | Collapse these terminal groups to labels: any key of the registry (`src/chem_svg_cdxml/data/abbreviations.yaml`: groups Me, Et, *i*-Pr, *t*-Bu, Ph, Bn, Cy, Mes, Ac, Bz, Piv, Boc, Cbz, Fmoc, Ts, Ms, Tf, TMS, TES, TBS, TIPS, TBDPS, MOM, MEM, SEM, THP, PMB, …; formulas OMe, OAc, OTf, OTs, NHBoc, NMe2, N3, NO2, CO2Me, CO2*t*-Bu, CHO, CF3, CN, B(OH)2, Bpin, SnBu3, …; ligands PPh3, PMe3, PCy3, P(*t*-Bu)3, P(*o*-tol)3, bonded to the metal, `<-` included) or of the spec's `abbreviations:`. A group whose bond leaves to the right is set right-justified in reversed text (MeO, MeO₂C, TfO, BocHN, (HO)₂B, Me₃P; one-token names such as Boc, *t*-Bu, N₃ keep their text). A **group** collapsed on a heteroatom merges into its label (composition: TBS on O → OTBS, Ts on a ring N → NTs with Ts beside, above or below N, Bu ×3 on Sn → SnBu₃); a d-block metal keeps its groups. |
 | `species.<name>.align` | bool (default true) | A product takes the orientation of the species it is drawn from (of several sources, the one it shares the largest unchanged part with). Shared atoms: atom maps (≥ 2 common maps, plus the unmapped atoms around them), else the maximum common substructure. **Pin**: when ≥ 3 connected shared atoms keep their neighbor count, those keep the reference's coordinates exactly; with no such group, all shared atoms do (a trigonal center turning tetrahedral). **Orient**: if pinning would bend an sp atom, stretch a bond or crowd an acyclic atom's bonds, the species gets its own layout, turned (or mirrored) the way its shared atoms point in the reference and snapped to the 30° grid. `false` = own layout, auto-oriented. Molfile species keep their layout unless `align_to` is set. |
@@ -88,7 +88,7 @@ is in SKILL.md ("Mechanisms"), a full mechanism in `examples/m4/m4_nitration_x1.
 Map numbers are atom identities. They must be unique among a step's reactants (and among its
 products) and keep the same atom across steps. H atoms that move must be atoms in the SMILES
 (`[H:4]`). A SMILES carbon with one H written as an atom gets its other H's as unmapped atoms
-(`[H:4][CH2:3]` draws three C–H bonds), so write only the H that moves. An arrow can't start or end inside an abbreviation.
+(`[H:4][CH2:3]` draws three C–H bonds), so write only the H that moves. An arrow can't start or end inside an abbreviation; a heteroatom whose group merges into its label (the O of OTf, OTBS) stays an atom and can be an arrow end.
 
 ### Electron bookkeeping (`electrons.py`)
 
@@ -288,7 +288,7 @@ species:
 | `charges.circled` | bool (default false) | Draw every ±1 sign in a ring (⊕ / ⊖). Unmeasured ring size (`charge.circle_radius`). |
 | `species.<name>.circled_charges` | bool | Overrides `charges.circled` for this species. |
 | `species.<name>.charge_labels` | map: atom-map number → text | Draw this charge text instead of the formal charge: one sign before or after optional digits (`+3`, `2+`, `-`; `-` draws the minus bar). Display only: electron bookkeeping keeps the SMILES charge; a neutral atom draws it too (an oxidation state). Never circled. |
-| `species.<name>.lewis` | `true` \| `{electrons: shared \| formal_charge \| oxidation_state, bonds: dots \| lines}` | Draw a Lewis structure (below). `true` = `{electrons: shared, bonds: dots}`; `bonds: lines` needs `shared`. SMILES only, specs without `steps` only; not with `kekule`, `abbreviate`, `show_carbons` or `show_lone_pairs` (the last two are implied). `orientation.rotate` must be a multiple of 90. |
+| `species.<name>.lewis` | `true` \| `{electrons: shared \| formal_charge \| oxidation_state, bonds: dots \| lines}` | Draw a Lewis structure (below). `true` = `{electrons: shared, bonds: dots}`; `bonds: lines` needs `shared`. SMILES only, specs without `steps` only; not with `kekule`, `abbreviate`, `show_carbons` or `show_lone_pairs` (the last two are implied). `orientation.rotate` must be a multiple of 90; `flip_h` / `flip_v` are allowed. |
 | `species.<name>.chair` | `true` \| `{ring, flip, axial, equatorial, start}` | Draw the six-membered ring as a chair (below). SMILES only; not with `lewis`, `molfile` or `orientation`. Atoms are atom-map numbers. |
 | `species.<name>.front` | list of `"m-n"` (atom-map numbers of a bond) | Where two bonds cross at equal depth, draw these whole and cut the other (default: the later bond in the SMILES). A chair sets its own front/back from depth. |
 
@@ -342,7 +342,7 @@ steps:
 species:
   menthol: {smiles: "CC(C)[C@@H]1CC[C@@H](C)C[C@H]1O", chair: true}
   axial_methyl: {smiles: "[CH3:1]C1CCCCC1", chair: {flip: true}}
-  e2_substrate: {smiles: "[H:4][CH:3]1CCCC[CH:2]1[Br:5]", chair: {axial: [5, 4], start: 2}}
+  e2_substrate: {smiles: "[H:4][CH:3]1CCCC[CH:2]1[Br:5]", chair: {axial: [5, 4]}}   # start: 2 would crowd its E2 arrows
 ```
 
 - **Ring:** one six-membered ring of sp³ atoms (ring O, N, S allowed), not fused, bridged or
@@ -357,6 +357,8 @@ species:
   template's directions (style-spec.md §14.1). `start: <map>` puts that ring atom on the right
   tip; otherwise the layout with the least crowding is used (a ring O at the back right, as in
   sugars). Ring stereo shows in the geometry, so the ring gets no wedges.
+- **Check:** `render.py` prints each chair's `axial: …; equatorial: …` substituents. Compare them
+  with the name (cis-4-*tert*-butylcyclohexanol: O axial); a cis/trans slip in the SMILES validates.
 - **Crossings:** where an axial bond crosses a ring bond, the farther bond gets a gap
   (§14.2). The CDXML export orders the bonds so ChemDraw cuts the same ones, but carries no ring
   stereo (ChemDraw's own chairs carry none).

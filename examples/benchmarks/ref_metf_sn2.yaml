@@ -1,0 +1,13 @@
+# Benchmark reference (prompts.yaml: metf_sn2): mechanism + abbreviations.
+preset: acs1996
+species:
+  phenoxide: {smiles: "c1ccccc1[O-:1]", orientation: {rotate: 180}}
+  metf:      {smiles: "[CH3:2][O:3]S(=O)(=O)C(F)(F)F", abbreviate: [OTf], show_carbons: terminal}
+  anisole:   {smiles: "c1ccccc1[O:1][CH3:2]", show_carbons: terminal}
+  triflate:  {smiles: "[O-:3]S(=O)(=O)C(F)(F)F", abbreviate: [Tf]}
+steps:
+  - from: [phenoxide, metf]
+    to: [anisole, triflate]
+    arrows:
+      - {from: "lp(1)", to: "between(1,2)"}
+      - {from: "bond(2-3)", to: "atom(3)"}

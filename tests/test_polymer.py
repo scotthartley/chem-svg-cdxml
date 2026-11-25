@@ -181,7 +181,7 @@ def test_coefficient_before_its_reactant():
     sty = lay.species["styrene"].group.ink_bbox()
     assert sty[0] - ink[2] == pytest.approx(P.polymer.coefficient_gap)
     assert (ink[1] + ink[3]) / 2 == pytest.approx(lay.steps[0].tail[1], abs=1e-6)  # centered on the arrow axis
-    assert [r.style for r in ln.runs] == ["normal"]  # roman, as polymer_x1.0's n
+    assert [r.style for r in ln.runs] == ["italic"]  # like the subscript (user choice 2026-11-25; polymer_x1.0 has it roman)
 
 
 @pytest.mark.parametrize("p, msg", [

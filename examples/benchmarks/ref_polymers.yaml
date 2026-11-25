@@ -1,0 +1,7 @@
+# Benchmark reference (prompts.yaml: polymers).
+preset: acs1996
+species:
+  ps_ends:
+    polymer: {start: "N#CC(C)(C)*", units: ["*CC(*)c1ccccc1"], end: "Br*"}
+  random:
+    polymer: {kind: random, units: ["*CC(C)(*)C(=O)OC", "*CC(C)(*)C(=O)OCC"], ratio: "70:30"}

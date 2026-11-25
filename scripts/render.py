@@ -6,7 +6,8 @@ Layout is chem_svg_cdxml.figure.build_figure, shared with scripts/gallery.py. Wr
 labeled atom with a charge or dots, every resonance arrow, both ends of every equilibrium arrow
 and every bracket corner: <stem>_crop_arrow-<step>-<index>.png, <stem>_crop_<species>-atom<id>.png,
 <stem>_crop_resonance-<step>-<k>.png, <stem>_crop_equilibrium-<step>-<tail|head>.png and
-<stem>_crop_bracket-<step>-<left|right>-<top|bottom>.png. A catalytic cycle gets each arc arrow's
+<stem>_crop_bracket-<step>-<left|right>-<top|bottom>.png; single species (Lewis structures,
+polymers) get their atoms and each polymer bracket corner, <stem>_crop_<species>-bracket-<k>-<side>-<top|bottom>.png. A catalytic cycle gets each arc arrow's
 head (and an equilibrium arc's tail end), <stem>_crop_cycle-arc-<n>-<head|tail>.png, and each
 tail, <stem>_crop_cycle-<in|out>-<n>-<i>.png; its radius and free arc, and any tail still
 crowded, are printed.
@@ -40,28 +41,54 @@ from chem_svg_cdxml.cycle import CycleLayout
 from chem_svg_cdxml.figure import build_figure
 from chem_svg_cdxml.geometry import arc_point, pad_box, shift_box, union_box
 from chem_svg_cdxml.layout import SchemeLayout
+from chem_svg_cdxml.placed import Placed
 from chem_svg_cdxml.preview import crops, rasterize, rasterize_file
+from chem_svg_cdxml.scene import Group
 from chem_svg_cdxml.svg_writer import FONT_FAMILY, PADDING, faces_used, num, to_svg
 
 MAP_COLOR = "#d01c5b"
 
 
+def species_crop_boxes(species: dict[str, Placed], offset: tuple[float, float]) -> dict[str, tuple]:
+    """name -> box in the SVG frame: each labeled atom with a charge or dots (the union of its
+    label runs, charge bars and dots) and each polymer bracket corner (6 pt around it)."""
+    out = {}
+    for name, p in species.items():
+        if p.drawer is not None:
+            dots = p.drawer.dot_sets()
+            for i in p.drawer.labels:
+                a = p.mol.atoms[i]
+                if not (a.charge or dots.get(i)):
+                    continue
+                src = f"atom:{a.id}"
+                box = union_box(leaf.bbox() for leaf in p.group.leaves() if getattr(leaf, "source", "") == src)
+                out[f"{name}-atom{a.id}"] = shift_box(box, offset)
+        for g in _groups(p.group):
+            tail = g.id.rsplit("-bracket-", 1)
+            if len(tail) != 2 or not g.id.startswith(f"species-{name}-"):
+                continue
+            b = g.bbox()
+            x = b[0] if tail[1].endswith("left") else b[2]
+            for corner, y in (("top", b[1]), ("bottom", b[3])):
+                out[f"{name}-bracket-{tail[1]}-{corner}"] = shift_box(pad_box((x, y, x, y), 6), offset)
+    return out
+
+
+def _groups(g: Group):
+    for c in g.children:
+        if isinstance(c, Group):
+            yield c
+            yield from _groups(c)
+
+
 def crop_boxes(lay: SchemeLayout, offset: tuple[float, float]) -> dict[str, tuple]:
-    """name -> box in the SVG frame: each curved arrow, each labeled atom with a charge or dots
-    (the union of its label runs, charge bars and dots), each resonance arrow, each end of an
-    equilibrium arrow (12 pt long) and each bracket corner (6 pt around it)."""
+    """name -> box in the SVG frame: each curved arrow, the species' boxes (species_crop_boxes),
+    each resonance arrow, each end of an equilibrium arrow (12 pt long) and each resonance
+    bracket corner (6 pt around it)."""
     def moved(b):
         return shift_box(b, offset)
     out = {f"arrow-{a.step}-{a.index}": moved(a.group.bbox()) for a in lay.curved}
-    for name, p in lay.species.items():
-        dots = p.drawer.dot_sets()
-        for i in p.drawer.labels:
-            a = p.mol.atoms[i]
-            if not (a.charge or dots.get(i)):
-                continue
-            src = f"atom:{a.id}"
-            out[f"{name}-atom{a.id}"] = moved(union_box(leaf.bbox() for leaf in p.group.leaves()
-                                                        if getattr(leaf, "source", "") == src))
+    out.update(species_crop_boxes(lay.species, offset))
     for st in lay.steps:
         if st.kind != "forward":
             b = st.group.bbox()
@@ -157,6 +184,9 @@ def render(spec_path: Path, out_dir: Path | None = None, px_per_pt: float = 4.0,
         print(f"  curved arrow step {a.step} index {a.index} ({a.spec.from_} -> {a.spec.to}): bow {a.bow}"
               + (", shape tangent (S)" if a.tangent and a.s_shape else ", shape tangent" if a.tangent else ""),
               file=sys.stderr)
+    for p in (list(lay.species.values()) if lay else fig.placed or []):
+        if getattr(p.mol, "chair_summary", None):
+            print(f"  chair {p.name}: {p.mol.chair_summary}", file=sys.stderr)
     if cyc:
         print(f"  cycle: radius {cyc.radius:.2f} pt, free arc {cyc.free:.2f} pt", file=sys.stderr)
         for t in cyc.tails:
@@ -171,6 +201,9 @@ def render(spec_path: Path, out_dir: Path | None = None, px_per_pt: float = 4.0,
         paths += crops(svg, crop_boxes(lay, offset), out_dir, prefix=f"{spec_path.stem}_crop_")
     if with_crops and cyc:
         paths += crops(svg, cycle_crop_boxes(cyc, offset), out_dir, prefix=f"{spec_path.stem}_crop_")
+    if with_crops and fig.placed:
+        boxes = species_crop_boxes({p.name: p for p in fig.placed}, offset)
+        paths += crops(svg, boxes, out_dir, prefix=f"{spec_path.stem}_crop_")
     if with_maps and lay:
         maps_png = out_dir / f"{spec_path.stem}_maps.png"
         maps_png.write_bytes(rasterize(maps_svg(lay), px_per_pt))

@@ -114,3 +114,26 @@ def test_validator_notes_a_loss_below_an_equilibrium_arrow():
     above = Spec.model_validate({"species": species, "steps": [
         {"from": "a", "to": "b", "arrow_type": "equilibrium", "above": "−H2O", "below": "H2O"}]})
     assert notes(above) == []
+
+
+def test_a_product_reused_by_name_on_a_later_row_is_not_noted():
+    """r2 radical trial: br_b (step 1) and tbu (step 2) start the next rows by name, as clones
+    br_b~2 and tbu~2; only br_c, never used again, gets the note."""
+    spec = Spec.model_validate(yaml.safe_load("""
+species:
+  br2: {smiles: "[Br:1][Br:2]"}
+  br_a: {smiles: "[Br:1]"}
+  br_b: {smiles: "[Br:2]"}
+  isobutane: {smiles: "[H:4][C:3](C)(C)C"}
+  hbr: {smiles: "[H:4][Br:2]"}
+  tbu: {smiles: "[C:3](C)(C)C"}
+  br2_b: {smiles: "[Br:5][Br:6]"}
+  tbubr: {smiles: "[C:3](C)(C)(C)[Br:5]"}
+  br_c: {smiles: "[Br:6]"}
+steps:
+  - {from: br2, to: [br_a, br_b], arrows: [{type: fishhook, from: "bond(1-2)", to: "atom(1)"}, {type: fishhook, from: "bond(1-2)", to: "atom(2)"}]}
+  - {new_row: true, from: [br_b, isobutane], to: [hbr, tbu], arrows: [{type: fishhook, from: "electron(2)", to: "between(2,4)"}]}
+  - {new_row: true, from: [tbu, br2_b], to: [tbubr, br_c], arrows: [{type: fishhook, from: "electron(3)", to: "between(3,5)"}]}
+"""))
+    got = notes(spec)
+    assert len(got) == 1 and "br_c" in got[0], got

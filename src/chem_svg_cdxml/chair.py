@@ -422,6 +422,15 @@ def depths(mol: Chem.Mol, ring: list[int], pl: Placement) -> dict[int, float]:
     return z
 
 
+def summary(mol: Chem.Mol, pl: Placement) -> str:
+    """Which substituents the placement draws axial and which equatorial (render.py prints it, so a
+    SMILES stereo slip, cis written as trans, shows without reading the picture). Implicit H aren't atoms."""
+    subs = [s for i in pl.ring for s in substituents(mol, pl.ring)[i]]
+    ax = [_name(mol.GetAtomWithIdx(s)) for s in subs if s in pl.axial]
+    eq = [_name(mol.GetAtomWithIdx(s)) for s in subs if s not in pl.axial]
+    return f"axial: {', '.join(ax) or 'none'}; equatorial: {', '.join(eq) or 'none'}"
+
+
 def layout(mol: Chem.Mol, c: Chair, bond_length: float, ring: list[int] | None = None, flip: bool | None = None,
            axial: list[int] = (), equatorial: list[int] = (), start: int | None = None,
            ) -> tuple[Chem.Mol, dict[int, float], Placement]:

@@ -92,10 +92,11 @@ def notes(spec: Spec) -> list[str]:
         return out
     for i in mech:
         st = steps[i - 1]
-        later = {n for s in steps[i:] for n in (s.resonance if isinstance(s, ResonanceStep) else s.sources)}
+        # a later use of a drawn species is a clone `name~k` (spec.occurrence): compare base names
+        later = {n.split("~")[0] for s in steps[i:] for n in (s.resonance if isinstance(s, ResonanceStep) else s.sources)}
         side = "below" if spec.over_names(i) and st.arrow_type == "forward" else "above"
         for n in st.drawn_products[1:]:
-            if n not in later:
+            if n.split("~")[0] not in later:
                 out.append(f"note: step {i}: {n} is drawn and never used again; omit it (omit: [{n}]) and, if the "
                            f"loss matters, write it on the arrow ({side}: \"−<formula>\", e.g. \"−H2O\")")
     return out

@@ -1434,7 +1434,7 @@ objects are ChemDraw's own and exact. One reference at ×1.0: ×0.8 and ×0.6 ta
 | label_dx, label_drop | 2.0, 2.0 | 1.5 / 1.0 | subscript origin 2.02 (n=6) / 2.52 (n=5) right of ']', baseline 2.00–2.01 below its bottom |
 | ratio_drop | 11.5 | 9.0 / 7.0 | "70:30" baseline 11.55 below the brackets, centered on them (−0.87, by eye) |
 | slash_length, slash_angle | 14.0, 75° | 11.0 / 8.5, 75° | 14.17 long, 74.8° clockwise from its bond (59.8° from horizontal), on the bond's midpoint (0.501) |
-| coefficient_gap | 9.5 | 7.5 / 5.5 | n's ink to styrene's 9.65; n's ink centered on the arrow axis (0.01); roman, caption size |
+| coefficient_gap | 9.5 | 7.5 / 5.5 | n's ink to styrene's 9.65; n's ink centered on the arrow axis (0.01); caption size. ChemDraw's reference sets it roman; letters are italic here, digits regular, like the subscript (user choice 2026-11-25) |
 | wave_length, wave_half_period, wave_amplitude | 17.0, 0.972, 0.5 | x k | ChemDraw's squiggle: 17.01 long across the bond end, half-ellipses 0.9723 apart, 0.50 high, 17.5 of them; stroke LineWidth |
 
 **Layout** (`polymer.py`). The units join head (first `*`) to tail (second `*`). An acyclic backbone is

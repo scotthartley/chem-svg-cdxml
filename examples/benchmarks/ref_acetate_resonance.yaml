@@ -1,0 +1,9 @@
+# Benchmark reference (prompts.yaml: acetate_resonance): resonance + circled charges.
+preset: acs1996
+charges: {circled: true}
+species:
+  a: {smiles: "C[C:1](=[O:2])[O-:3]"}
+  b: {smiles: "C[C:1]([O-:2])=[O:3]"}
+steps:
+  - resonance: [a, b]
+    arrows: [[{from: "lp(3)", to: "between(1,3)"}, {from: "bond(1=2)", to: "atom(2)"}]]

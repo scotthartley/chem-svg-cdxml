@@ -28,3 +28,40 @@
   prompt: "Draw a three-step synthesis scheme: methyl 4-hydroxybenzoate is benzylated with BnBr and K2CO3 in acetone, reduced with LiAlH4 in THF, and oxidized with PCC to the aldehyde; number the compounds."
   preset: acs1996
   reference: [examples/m2/m2_sequence_x1.0.yaml]
+# Round r2 additions (2026-11-25): one prompt per feature added since r1, then combinations of features.
+- id: lewis
+  prompt: "Draw the Lewis structures of the nitrate ion and acetic acid, showing all lone pairs and formal charges."
+  preset: acs1996
+  reference: [examples/benchmarks/ref_lewis.yaml]
+- id: chair
+  prompt: "Draw cis-4-tert-butylcyclohexanol and (−)-menthol as chair conformations."
+  preset: acs1996
+  reference: [examples/benchmarks/ref_chair.yaml]
+- id: suzuki_cycle
+  prompt: "Draw the catalytic cycle of a Suzuki coupling of bromobenzene with 4-tolylboronic acid catalyzed by Pd(PMe3)2, labeling oxidative addition, transmetalation and reductive elimination."
+  preset: acs1996
+  reference: [examples/m6/m6_suzuki_cycle_x1.0.yaml]
+- id: polymers
+  prompt: "Draw polystyrene with a 2-cyano-2-propyl start group and a bromine end group, and a 70:30 random copolymer of methyl methacrylate and ethyl methacrylate."
+  preset: acs1996
+  reference: [examples/benchmarks/ref_polymers.yaml]
+- id: protection
+  prompt: "Draw a two-step scheme: 4-(hydroxymethyl)phenol is silylated on the primary alcohol with TBSCl and imidazole in DMF, then the phenol is converted to its triflate with Tf2O and pyridine in CH2Cl2; abbreviate OTBS and OTf and number the compounds."
+  preset: acs1996
+  reference: [examples/benchmarks/ref_protection.yaml]
+- id: polymerization
+  prompt: "Draw the radical polymerization of styrene to polystyrene with AIBN in toluene at 70 °C."
+  preset: acs1996
+  reference: [examples/benchmarks/ref_polymerization.yaml]
+- id: e2_chair
+  prompt: "Draw the E2 mechanism of hydroxide with bromocyclohexane, showing the chair with the bromine and the β-hydrogen axial and anti-periplanar."
+  preset: acs1996
+  reference: [examples/m3/m3_e2_chair_x1.0.yaml]
+- id: acetate_resonance
+  prompt: "Draw the two resonance structures of the acetate ion with curved arrows, using circled charges."
+  preset: acs1996
+  reference: [examples/benchmarks/ref_acetate_resonance.yaml]
+- id: metf_sn2
+  prompt: "Draw the SN2 mechanism for phenoxide reacting with methyl triflate, with the triflate abbreviated."
+  preset: acs1996
+  reference: [examples/benchmarks/ref_metf_sn2.yaml]

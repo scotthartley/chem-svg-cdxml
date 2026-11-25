@@ -272,9 +272,12 @@ def _place(spec: Spec, out: SchemeLayout, breaks: set[tuple[str, int]], rings: d
 
     def coefficient(text: str, nm: str) -> None:
         """A reactant's coefficient (n) from x, its ink centered on the axis and coefficient_gap
-        before the species (polymer_x1.0's n styrene; style-spec.md §17)."""
+        before the species (polymer_x1.0's n styrene; style-spec.md §17). Plain text is set like a
+        polymer subscript (letters italic, digits regular: n, 2n); richtext markup is kept as written."""
         nonlocal x
-        ln = richtext.layout_line(text, 0.0, 0.0, preset.text.caption_size, preset, f"coefficient:{nm}")
+        from .polymer import label_runs
+        parts = richtext.parse(text) if "*" in text or "\\" in text else label_runs(text)
+        ln = richtext.layout_line(parts, 0.0, 0.0, preset.text.caption_size, preset, f"coefficient:{nm}")
         ink = ln.ink()
         ln.shift(x - ink[0], -s.center_above_axis - (ink[1] + ink[3]) / 2)
         out.coefficients.append(ln)

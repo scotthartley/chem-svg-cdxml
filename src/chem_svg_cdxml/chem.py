@@ -130,6 +130,7 @@ class Molecule:
     circled_charges: bool = False  # ±1 signs drawn in a ring (spec charges.circled / circled_charges)
     front: list[int] = field(default_factory=list)  # bond indices drawn whole where they cross a bond at equal depth (spec front)
     polymer: object | None = None  # polymer.PolymerMarks: brackets, subscripts, slashes (polymer.finish)
+    chair_summary: str | None = None  # chairs: axial / equatorial substituents (chair.summary; render.py prints it)
 
     def neighbors(self, i: int) -> list[tuple[int, Bond]]:
         return [(b.other(i), b) for b in self.bonds if i in (b.a, b.b)]
@@ -1038,10 +1039,13 @@ class Prepared:
     matched: list[tuple[int, int]] = field(default_factory=list)  # (reference idx, idx)
     depth: dict[int, float] | None = None  # chairs: atom idx -> Atom.z
     chair_ring: list[int] | None = None  # chairs: the ring, whose stereo the geometry shows
+    chair_summary: str | None = None  # chairs: chair.summary (axial / equatorial substituents)
 
     def molecule(self) -> Molecule:
-        return to_molecule(self.mol, self.name, self.bond_length, self.scale, self.depth,
-                           set(self.chair_ring or ()))
+        m = to_molecule(self.mol, self.name, self.bond_length, self.scale, self.depth,
+                        set(self.chair_ring or ()))
+        m.chair_summary = self.chair_summary
+        return m
 
 
 def _mcs_copy(mol: Chem.Mol) -> Chem.Mol:
@@ -1346,7 +1350,8 @@ def prepare(mol: Chem.Mol, name: str, bond_length: float, abbreviate: list[str] 
         from . import chair as chair_mod
         m, z, pl = chair_mod.layout(mol, chair.templates, bond_length, chair.ring, chair.flip,
                                     chair.axial, chair.equatorial, chair.start)
-        return Prepared(m, name, bond_length, bond_length / STANDARD_BOND, depth=z, chair_ring=pl.ring)
+        return Prepared(m, name, bond_length, bond_length / STANDARD_BOND, depth=z, chair_ring=pl.ring,
+                        chair_summary=chair_mod.summary(mol, pl))
     best = None
     for ref in refs or []:
         if ref.chair_ring is not None:
