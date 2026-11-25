@@ -34,6 +34,10 @@ KNOWN_DERIVED_MISSES = {"cdxml.resonance_box_pad"}  # 0.18 / 0.67 / 0.67 (not dr
 # bars with k in the ACS family; a generated preset keeps what ChemDraw draws (user decision 2026-11-06),
 # 2.733 / 1.798 against 3.148 / 2.361.
 KNOWN_MEASURED_MISSES = {"charge.bar_length"}
+# A real probe's signs and dots are drawn fresh, at 0.75 x LabelSize (style-spec.md §13.4); the ACS presets keep the
+# references' symbols (m1_set_x*, mech_basic_x*, resonance_x*: 2.7 / 4.8 / 2.40 at x0.6), so a probe isn't compared on them
+# (user decision 2026-11-25; its rule checks still hold them to each other).
+FRESH_SYMBOL_KEYS = {"charge.bar_length", "cdxml.charge_box_dx", "cdxml.electron_box_dx", "lone_pair.dot_radius", "lone_pair.dot_spacing"}
 
 
 def _committed(name):
@@ -99,12 +103,12 @@ def test_sign_sizes_follow_their_box(scale):
             assert s["ring_radius"] == pytest.approx(probe.ring_radius_of_box(s["dx"], 0.6), abs=0.03), s
 
 
-def _check_measured(values, name):
+def _check_measured(values, name, skip=frozenset()):
     base_raw, _ = np.base_values()
     assert values.keys() == _committed(name)[1].keys() - {"name", "scale"}
     d = _diffs(values, _committed(name)[1])
-    off = {k for k, v in d.items() if v > (PLACEMENT_TOL if k in base_raw["placement"] else MEASURED_TOL)}
-    assert off == KNOWN_DERIVED_MISSES | KNOWN_MEASURED_MISSES
+    off = {k for k, v in d.items() if k not in skip and v > (PLACEMENT_TOL if k in base_raw["placement"] else MEASURED_TOL)}
+    assert off == (KNOWN_DERIVED_MISSES | KNOWN_MEASURED_MISSES) - skip
 
 
 @needs_refs
@@ -119,13 +123,13 @@ def test_methods_on_the_references(scale, name):
 
 @pytest.mark.parametrize("scale,name", TARGETS.items())
 def test_real_probe_hold_out(scale, name):
-    """A probe saved from ChemDraw with x<scale>'s settings: the same comparison, from one file."""
+    """A probe saved from ChemDraw with x<scale>'s settings: the same comparison, from one file, symbol sizes aside."""
     path = PROBES / f"style_probe_x{scale}.cdxml"
     if not path.exists():
         pytest.skip(f"no {path.name}: one ChemDraw round on the probe")
     sources = probe.single_file(path)
     values = np.collect(sources, {})
-    _check_measured(values, name)
+    _check_measured(values, name, skip=FRESH_SYMBOL_KEYS)
     bad = [c for c in probe.rule_checks(values, probe.circled_ring(sources["circled"])) if abs(c[1] - c[2]) > probe.RULE_TOL]
     assert bad == []
 

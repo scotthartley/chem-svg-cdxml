@@ -820,3 +820,15 @@ and end groups are now placed by rule (polymer._tree_layout: 120° zigzag, large
 fourth bond between parent and main, sp straight, rings rigid), with RDKit's layout only as the clash
 fallback. Chain-end species (~~CH₂–CH(Ph)•) take the same layout, as the reference draws them, so a
 propagation scheme's reactants hang their Ph down like the product's.
+
+
+## 2026-11-25: a real probe measures fresh symbols, not the references'
+
+The x0.6 probe (`reference_renders/probes/style_probe_x0.6.cdxml`, signs and dots deleted and redrawn
+in ChemDraw) gave charge and electron boxes of 4.5 and dots 2.25 apart (r 0.5), i.e. 0.75 x LabelSize,
+the size ChemDraw gives a symbol the user adds (style-spec.md §13.4). The committed acs1996_x0.6 copies
+the references' symbols (m1_set_x0.6, mech_basic_x0.6, resonance_x0.6: 2.7 / 4.8 / 2.40), and
+charges_lewis_x0.6 holds both sizes side by side, so the same settings don't fix a symbol's size. The
+x0.8 probe matched only because its symbols were 4.8 (fresh ones would be 6.0). User decision: keep
+the ACS presets as they are; `test_real_probe_hold_out` compares everything but the symbol sizes
+(`FRESH_SYMBOL_KEYS`), and its rule checks still hold the fresh symbols to each other.
