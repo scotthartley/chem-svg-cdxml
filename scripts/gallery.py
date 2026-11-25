@@ -31,7 +31,7 @@ Cases:
   cdxml/m4_nitration_x1.0.cdxml, cdxml/m1_lewis_x1.0.cdxml, cdxml/m1_lewis_lines_x1.0.cdxml,
   cdxml/m1_lewis_assigned_x1.0.cdxml, cdxml/m1_carbenes_x1.0.cdxml, cdxml/m1_chair_x1.0.cdxml,
   cdxml/m6_suzuki_cycle_x1.0.cdxml, cdxml/m6_enamine_cycle_x1.0.cdxml, cdxml/m7_polymers_x1.0.cdxml,
-  cdxml/m7_scheme_x1.0.cdxml: render.py's CDXML
+  cdxml/m7_scheme_x1.0.cdxml, cdxml/m7_raft_x1.0.cdxml: render.py's CDXML
   output for those specs (cdxml_writer), compared as text after lxml C14N.
 
 All PNGs are rendered at 4 px/pt with a transparent background. tests/test_gallery.py re-renders
@@ -89,7 +89,7 @@ SPECS = ["examples/m1/m1_smiles_x1.0.yaml", "examples/m1/m1_smiles_x0.8.yaml", "
          "examples/m4/m4_cyclopropanation_x1.0.yaml",
          "examples/m6/m6_suzuki_cycle_x1.0.yaml", "examples/m6/m6_enamine_cycle_x1.0.yaml",
          "examples/m7/m7_polymers_x1.0.yaml", "examples/m7/m7_chain_end_x1.0.yaml", "examples/m7/m7_scheme_x1.0.yaml",
-         "examples/m7/m7_propagation_x1.0.yaml",
+         "examples/m7/m7_propagation_x1.0.yaml", "examples/m7/m7_raft_x1.0.yaml",
          "examples/benchmarks/nitration_accepted.yaml"]
 
 
@@ -101,7 +101,7 @@ CDXML_SPECS = ["examples/m1/m1_smiles_x1.0.yaml", "examples/m1/m1_charges_x1.0.y
                "examples/m1/m1_lewis_assigned_x1.0.yaml", "examples/m1/m1_chair_x1.0.yaml",
                "examples/m1/m1_carbenes_x1.0.yaml", "examples/m6/m6_suzuki_cycle_x1.0.yaml",
                "examples/m6/m6_enamine_cycle_x1.0.yaml", "examples/m7/m7_polymers_x1.0.yaml",
-               "examples/m7/m7_scheme_x1.0.yaml"]
+               "examples/m7/m7_scheme_x1.0.yaml", "examples/m7/m7_raft_x1.0.yaml"]
 
 
 _SPEC_BY_NAME = {Path(s).stem: s for s in SPECS}

@@ -445,32 +445,52 @@ def _expand_aliases(m: Chem.Mol) -> Chem.Mol:
     return m
 
 
-def _ends_as_written(sp) -> str:
+def _generic_maps(spec) -> set[int]:
+    """Atom maps drawn as a plain `labels:` symbol (Z, X, R): written as ChemDraw GenericNickname
+    nodes, which RDKit reads back as a carbon with no H (spec.relabel; a text label has no chemistry)."""
+    reg = spec.registry
+    return {k for k, t in spec.labels.items() if not (reg.get(t) is not None and reg.get(t).kind == "text")}
+
+
+def _as_generic(m, generic: set[int]) -> None:
+    for a in m.GetAtoms():
+        if a.GetAtomMapNum() in generic:
+            a.SetAtomicNum(6)
+            a.SetNoImplicit(True)
+            a.SetNumExplicitHs(0)
+
+
+def _ends_as_written(sp, generic: set[int] = frozenset()) -> str:
     """A polymer or chain-end species as its CDXML reads back: a bare chain end is a carbon (as
     polymer_x1.0's), and RDKit reads a wavy ExternalConnectionPoint as one too (style-spec.md §17)."""
     from chem_svg_cdxml import polymer
     m = Chem.RWMol(polymer.assemble(sp.polymer) if sp.polymer is not None else Chem.MolFromSmiles(sp.smiles))
     for a in m.GetAtoms():
-        a.SetAtomMapNum(0)
-        if a.GetAtomicNum() == 0:
+        if a.GetAtomicNum() == 0 and a.GetAtomMapNum() not in generic:
             a.SetAtomicNum(6)
             a.SetNoImplicit(False)
+    _as_generic(m, generic)
+    for a in m.GetAtoms():
+        a.SetAtomMapNum(0)
     Chem.SanitizeMol(m)
     return Chem.MolToSmiles(m)
 
 
 def _spec_smiles(spec_path) -> dict[str, str]:
     """name -> canonical SMILES (no maps) of each species as the spec gives it, abbreviations
-    expanded. A chair's stereo is in its geometry, which ChemDraw doesn't read either (chair_x*:
-    no wedges in ChemDraw's own chairs), so a chair species is compared without stereo."""
+    expanded, generic `labels:` symbols as read back (_generic_maps). A chair's stereo is in its
+    geometry, which ChemDraw doesn't read either (chair_x*: no wedges in ChemDraw's own chairs), so a
+    chair species is compared without stereo."""
     spec = load_spec(spec_path)
+    generic = _generic_maps(spec)
     out = {}
     for name, sp in spec.species.items():
         if sp.polymer is not None or sp.chain_ends:
-            out[name] = _ends_as_written(sp)
+            out[name] = _ends_as_written(sp, generic)
             continue
         m = (Chem.MolFromSmiles(sp.smiles) if sp.smiles
              else _expand_aliases(Chem.MolFromMolFile(str(resolve_molfile(sp.molfile, spec_path.parent)))))
+        _as_generic(m, generic)
         for a in m.GetAtoms():
             a.SetAtomMapNum(0)
         if sp.chair is not None:

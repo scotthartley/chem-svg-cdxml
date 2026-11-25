@@ -848,3 +848,21 @@ mechanism examples) are left alone. The drawn-out H₂SO₄ in m4_nitration (an 
 S has three terminal O's and one bond in) became a chicken foot while the bisulfate beside it (four
 terminal O's) kept CoordGen's cross: the user preferred the cross there and kept the rule, with a
 per-species override (`chicken_foot: false`) set on that H₂SO₄ (examples, nitration_accepted).
+
+## 2026-11-25: explicit atoms between polymer blocks; long end groups
+
+Inbox (RAFT adduct Pm–S–C(Z)–S–Pn): the use session faked the S–C(Z)–S linker as a block labeled `x` and
+dropped its brackets in a project script; block junctions then put `block_gap` between `]` and `[` on bonds
+with no second bracket. Now `bracket: false` units take the end-group bracket rule. Two things were not
+obvious:
+- The adduct's junction bonds are still `crossing_stretch` x long: PMMA's ester ink reaches past the bond's
+  midpoint, exactly as on homopolymer PMMA's right bond. Reviewing it, the user found every PMMA-type pair
+  lopsided (2.74 pt from the ink at the midpoint bracket, `gap_x` 6.0 at the stretched one); the stretched
+  side now takes the other bracket's gap (style-spec.md §17). Only a linker next to a unit whose ink clears the
+  midpoint (polyethylene) keeps them at bond length (tests/test_polymer.py).
+- Extending the backbone into an end group along the longest chain tied at C(q)(Me)(CO₂Me)–S–C(=S)Me: the
+  ester and the S chain have the same length and branch size, and the ester won (first neighbor). The tie now
+  goes away from a carbonyl carbon, so esters stay pendants as in PMMA. Known leftover: a C(=S)Z end two
+  vertices after an ester whose OMe points toward the tail puts =S straight down beside the OMe label (the
+  clash check sees atoms, not labels); `bond_lengths: {"13-14": 1.9}` on the S–C(=S) bond clears it (1.6
+  still touches).

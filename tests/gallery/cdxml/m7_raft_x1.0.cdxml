@@ -1,0 +1,294 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE CDXML SYSTEM "https://static.chemistry.revvitycloud.com/cdxml/CDXML.dtd">
+<CDXML CreationProgram="chem-svg-cdxml 0.4.0" Name="m7_raft_x1.0.cdxml" BoundingBox="2.45 2.10 353.02 68.69" WindowPosition="0 0" WindowSize="0 0" FractionalWidths="yes" InterpretChemically="yes" ShowAtomQuery="yes" ShowAtomStereo="no" ShowAtomEnhancedStereo="yes" ShowAtomNumber="no" ShowResidueID="no" ShowBondQuery="yes" ShowBondRxn="yes" ShowBondStereo="no" ShowTerminalCarbonLabels="no" ShowNonTerminalCarbonLabels="no" HideImplicitHydrogens="no" Magnification="250" LabelFont="21" LabelSize="10" LabelFace="96" CaptionFont="21" CaptionSize="10" HashSpacing="2.50" MarginWidth="1.60" LineWidth="0.60" BoldWidth="2" BondLength="14.40" BondSpacing="18" ChainAngle="120" LabelJustification="Auto" CaptionJustification="Left" AminoAcidTermini="HOH" ShowSequenceTermini="yes" ShowSequenceBonds="yes" ShowSequenceUnlinkedBranches="no" ShowPrimeLabels="no" ResidueWrapCount="40" PrintMargins="36 36 36 36" MacPrintInfo="0003000000480048000000000300024CFFF4FFF4030C02580367052803FB0002000000480048000000000300024C000100000064000000010001010100000001270F000100010000000000000000000000000002001901900000000000400000000000000000000100000000000000000000000000000000" ChemPropName="" ChemPropFormula="Chemical formula: " ChemPropExactMass="Exact mass: " ChemPropMolWt="Molecular weight: " ChemPropMOverZ="m/z: " ChemPropAnalysis="Elemental analysis: " ChemPropBoilingPt="Boiling point: " ChemPropMeltingPt="Melting point: " ChemPropCritTemp="Critical temp: " ChemPropCritPres="Critical pres: " ChemPropCritVol="Critical vol: " ChemPropGibbs="Gibbs energy: " ChemPropLogP="Log P: " ChemPropMR="MR: " ChemPropHenry="Henry's law: " ChemPropEForm="Heat of form: " ChemProptPSA="tPSA: " ChemPropID="" ChemPropFragmentLabel="" color="0" bgcolor="1" RxnAutonumberStart="1" RxnAutonumberConditions="no" RxnAutonumberStyle="Roman" RxnAutonumberFormat="(#)">
+  <colortable>
+    <color r="1" g="1" b="1"/>
+    <color r="0" g="0" b="0"/>
+    <color r="1" g="0" b="0"/>
+    <color r="1" g="1" b="0"/>
+    <color r="0" g="1" b="0"/>
+    <color r="0" g="1" b="1"/>
+    <color r="0" g="0" b="1"/>
+    <color r="1" g="0" b="1"/>
+  </colortable>
+  <fonttable>
+    <font id="21" charset="x-mac-roman" name="Helvetica"/>
+    <font id="307" charset="x-mac-roman" name="Helvetica Oblique"/>
+    <font id="310" charset="x-mac-roman" name="Helvetica Bold"/>
+  </fonttable>
+  <page id="1" BoundingBox="0 0 540 720" HeaderPosition="36" FooterPosition="36" PrintTrimMarks="yes" HeightPages="1" WidthPages="1">
+    <fragment id="2" BoundingBox="2.45 9.44 183.23 59.84" Z="69">
+      <n id="3" p="2.60 23.84" Z="1"/>
+      <n id="4" p="15.07 16.64" Z="2"/>
+      <n id="5" p="27.54 23.84" Z="3"/>
+      <n id="6" p="27.54 9.44" Z="4"/>
+      <n id="7" p="27.54 38.24" Z="5"/>
+      <n id="8" p="15.07 45.44" Z="6" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="11.18 49.13" BoundingBox="11.57 41.76 18.56 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="9" p="40.01 45.44" Z="7" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="36.12 49.13" BoundingBox="36.51 41.76 43.51 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="10" p="40.01 59.84" Z="8"/>
+      <n id="11" p="55.43 16.64" Z="9"/>
+      <n id="12" p="67.90 23.84" Z="10"/>
+      <n id="13" p="67.90 9.44" Z="11"/>
+      <n id="14" p="67.90 38.24" Z="12"/>
+      <n id="15" p="55.43 45.44" Z="13" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="51.54 49.13" BoundingBox="51.93 41.76 58.92 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="16" p="80.37 45.44" Z="14" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="76.48 49.13" BoundingBox="76.87 41.76 83.86 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="17" p="80.37 59.84" Z="15"/>
+      <n id="18" p="80.37 16.64" Z="16" Element="16" NumHydrogens="0" NeedsClean="yes">
+        <t p="77.03 20.33" BoundingBox="77.52 12.96 83.23 20.54" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">S</s>
+        </t>
+      </n>
+      <n id="19" p="92.84 23.84" Z="17" Radical="Doublet"/>
+      <n id="20" p="92.84 38.24" Z="18" NodeType="GenericNickname" GenericNickname="Z" NumHydrogens="0" NeedsClean="yes">
+        <t p="89.79 41.83" BoundingBox="90.01 34.66 95.66 41.83" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">Z</s>
+        </t>
+      </n>
+      <n id="21" p="105.31 16.64" Z="19" Element="16" NumHydrogens="0" NeedsClean="yes">
+        <t p="101.98 20.33" BoundingBox="102.46 12.96 108.18 20.54" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">S</s>
+        </t>
+      </n>
+      <n id="22" p="117.78 23.84" Z="20"/>
+      <n id="23" p="117.78 9.44" Z="21"/>
+      <n id="24" p="117.78 38.24" Z="22"/>
+      <n id="25" p="105.31 45.44" Z="23" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="101.42 49.13" BoundingBox="101.81 41.76 108.80 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="26" p="130.25 45.44" Z="24" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="126.36 49.13" BoundingBox="126.75 41.76 133.75 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="27" p="130.25 59.84" Z="25"/>
+      <n id="28" p="130.25 16.64" Z="26"/>
+      <n id="29" p="158.14 23.84" Z="27"/>
+      <n id="30" p="158.14 9.44" Z="28"/>
+      <n id="31" p="158.14 38.24" Z="29"/>
+      <n id="32" p="145.67 45.44" Z="30" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="141.78 49.13" BoundingBox="142.17 41.76 149.16 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="33" p="170.61 45.44" Z="31" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="166.72 49.13" BoundingBox="167.11 41.76 174.10 49.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="34" p="170.61 59.84" Z="32"/>
+      <n id="35" p="170.61 16.64" Z="33"/>
+      <n id="36" p="183.08 23.84" Z="34"/>
+      <b id="37" Z="35" B="3" E="4"/>
+      <b id="38" Z="36" B="4" E="5"/>
+      <b id="39" Z="37" B="5" E="6"/>
+      <b id="40" Z="38" B="5" E="7"/>
+      <b id="41" Z="39" B="7" E="8" Order="2"/>
+      <b id="42" Z="40" B="7" E="9"/>
+      <b id="43" Z="41" B="9" E="10"/>
+      <b id="44" Z="42" B="11" E="12"/>
+      <b id="45" Z="43" B="12" E="13"/>
+      <b id="46" Z="44" B="12" E="14"/>
+      <b id="47" Z="45" B="14" E="15" Order="2"/>
+      <b id="48" Z="46" B="14" E="16"/>
+      <b id="49" Z="47" B="16" E="17"/>
+      <b id="50" Z="48" B="12" E="18"/>
+      <b id="51" Z="49" B="18" E="19"/>
+      <b id="52" Z="50" B="19" E="20"/>
+      <b id="53" Z="51" B="19" E="21"/>
+      <b id="54" Z="52" B="21" E="22"/>
+      <b id="55" Z="53" B="22" E="23"/>
+      <b id="56" Z="54" B="22" E="24"/>
+      <b id="57" Z="55" B="24" E="25" Order="2"/>
+      <b id="58" Z="56" B="24" E="26"/>
+      <b id="59" Z="57" B="26" E="27"/>
+      <b id="60" Z="58" B="22" E="28"/>
+      <b id="61" Z="59" B="29" E="30"/>
+      <b id="62" Z="60" B="29" E="31"/>
+      <b id="63" Z="61" B="31" E="32" Order="2"/>
+      <b id="64" Z="62" B="31" E="33"/>
+      <b id="65" Z="63" B="33" E="34"/>
+      <b id="66" Z="64" B="29" E="35"/>
+      <b id="67" Z="65" B="35" E="36"/>
+      <b id="68" Z="66" B="5" E="11"/>
+      <b id="69" Z="67" B="28" E="29"/>
+      <graphic id="70" BoundingBox="92.84 20.84 85.34 20.84" Z="68" GraphicType="Symbol" SymbolType="Electron">
+        <represent attribute="Radical" object="19"/>
+      </graphic>
+    </fragment>
+    <fragment id="85" BoundingBox="200.13 2.10 353.02 65.43" Z="128">
+      <n id="86" p="200.28 27.38" Z="74"/>
+      <n id="87" p="212.75 20.18" Z="75"/>
+      <n id="88" p="225.22 27.38" Z="76"/>
+      <n id="89" p="225.22 12.98" Z="77"/>
+      <n id="90" p="225.22 41.78" Z="78"/>
+      <n id="91" p="236.72 50.45" Z="79" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="232.83 54.13" BoundingBox="233.22 46.77 240.21 54.34" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="92" p="213.42 50.04" Z="80" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="209.54 53.73" BoundingBox="209.93 46.36 216.92 53.94" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="93" p="214.68 64.39" Z="81"/>
+      <n id="94" p="253.11 20.18" Z="82"/>
+      <n id="95" p="265.58 27.38" Z="83"/>
+      <n id="96" p="265.58 12.98" Z="84"/>
+      <n id="97" p="265.58 41.78" Z="85"/>
+      <n id="98" p="278.05 48.98" Z="86" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="274.16 52.67" BoundingBox="274.55 45.30 281.54 52.88" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="99" p="255.40 51.97" Z="87" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="251.51 55.65" BoundingBox="251.90 48.28 258.89 55.86" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="100" p="260.79 65.32" Z="88"/>
+      <n id="101" p="278.05 20.18" Z="89" Element="16" NumHydrogens="0" NeedsClean="yes">
+        <t p="274.71 23.87" BoundingBox="275.20 16.50 280.91 24.08" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">S</s>
+        </t>
+      </n>
+      <n id="102" p="290.52 27.38" Z="90" Radical="Doublet"/>
+      <n id="103" p="290.52 41.78" Z="91" NodeType="GenericNickname" GenericNickname="Z" NumHydrogens="0" NeedsClean="yes">
+        <t p="287.46 45.37" BoundingBox="287.69 38.20 293.34 45.37" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">Z</s>
+        </t>
+      </n>
+      <n id="104" p="302.99 20.18" Z="92" Element="16" NumHydrogens="0" NeedsClean="yes">
+        <t p="299.65 23.87" BoundingBox="300.14 16.50 305.85 24.08" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">S</s>
+        </t>
+      </n>
+      <n id="105" p="315.46 27.38" Z="93"/>
+      <n id="106" p="315.46 12.98" Z="94"/>
+      <n id="107" p="327.93 20.18" Z="95"/>
+      <n id="108" p="327.93 5.78" Z="96" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="324.04 9.47" BoundingBox="324.43 2.10 331.42 9.68" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="109" p="340.40 27.38" Z="97" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="336.51 31.07" BoundingBox="336.90 23.70 343.89 31.28" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="110" p="352.87 20.18" Z="98"/>
+      <n id="111" p="315.46 41.78" Z="99"/>
+      <n id="112" p="327.93 48.98" Z="100"/>
+      <b id="113" Z="101" B="86" E="87"/>
+      <b id="114" Z="102" B="87" E="88"/>
+      <b id="115" Z="103" B="88" E="89"/>
+      <b id="116" Z="104" B="88" E="90"/>
+      <b id="117" Z="105" B="90" E="91" Order="2"/>
+      <b id="118" Z="106" B="90" E="92"/>
+      <b id="119" Z="107" B="92" E="93"/>
+      <b id="120" Z="108" B="94" E="95"/>
+      <b id="121" Z="109" B="95" E="96"/>
+      <b id="122" Z="110" B="95" E="97"/>
+      <b id="123" Z="111" B="97" E="98" Order="2"/>
+      <b id="124" Z="112" B="97" E="99"/>
+      <b id="125" Z="113" B="99" E="100"/>
+      <b id="126" Z="114" B="95" E="101"/>
+      <b id="127" Z="115" B="101" E="102"/>
+      <b id="128" Z="116" B="102" E="103"/>
+      <b id="129" Z="117" B="102" E="104"/>
+      <b id="130" Z="118" B="104" E="105"/>
+      <b id="131" Z="119" B="105" E="106"/>
+      <b id="132" Z="120" B="105" E="107"/>
+      <b id="133" Z="121" B="107" E="108" Order="2"/>
+      <b id="134" Z="122" B="107" E="109"/>
+      <b id="135" Z="123" B="109" E="110"/>
+      <b id="136" Z="124" B="105" E="111"/>
+      <b id="137" Z="125" B="111" E="112"/>
+      <b id="138" Z="126" B="88" E="94"/>
+      <graphic id="139" BoundingBox="287.92 28.88 280.42 28.88" Z="127" GraphicType="Symbol" SymbolType="Electron">
+        <represent attribute="Radical" object="102"/>
+      </graphic>
+    </fragment>
+    <graphic id="71" BoundingBox="46.24 7.14 46.24 62.14" Z="70" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="48.24 64.14" BoundingBox="48.73 60.13 54.62 64.14" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">m</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="72" BoundingBox="8.84 62.14 8.84 7.14" Z="71" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="78" BoundingBox="176.84 7.14 176.84 62.14" Z="72" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="178.84 64.14" BoundingBox="179.33 60.13 183.13 64.14" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="79" BoundingBox="139.43 62.14 139.43 7.14" Z="73" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="140" BoundingBox="243.63 10.68 243.63 66.69" Z="129" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 58.01" Name="parameterizedBracketLabel">
+        <t p="245.63 68.69" BoundingBox="246.11 64.68 249.91 68.69" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="141" BoundingBox="206.51 66.69 206.51 10.68" Z="130" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <bracketedgroup id="73" BracketedObjectIDs="4 5 6 7 8 9 10" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="74" GraphicID="72">
+        <crossingbond id="75" BondID="37" InnerAtomID="4"/>
+      </bracketattachment>
+      <bracketattachment id="76" GraphicID="71">
+        <crossingbond id="77" BondID="68" InnerAtomID="5"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="80" BracketedObjectIDs="29 30 31 32 33 34 35" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="81" GraphicID="79">
+        <crossingbond id="82" BondID="69" InnerAtomID="29"/>
+      </bracketattachment>
+      <bracketattachment id="83" GraphicID="78">
+        <crossingbond id="84" BondID="67" InnerAtomID="35"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="142" BracketedObjectIDs="87 88 89 90 91 92 93" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="143" GraphicID="141">
+        <crossingbond id="144" BondID="113" InnerAtomID="87"/>
+      </bracketattachment>
+      <bracketattachment id="145" GraphicID="140">
+        <crossingbond id="146" BondID="138" InnerAtomID="88"/>
+      </bracketattachment>
+    </bracketedgroup>
+  </page>
+</CDXML>

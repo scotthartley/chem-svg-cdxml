@@ -258,10 +258,12 @@ class AbbrevDef(BaseModel):
 
 class PolymerUnit(BaseModel):
     """A repeat unit: SMILES with two `*`, the first the head (drawn on the left), the second the tail.
-    `label`: a block's subscript (block copolymers only)."""
+    `label`: a block's subscript (block copolymers only). `bracket: false`: a block copolymer's
+    segment drawn without brackets, between two blocks (explicit atoms joining them)."""
     model_config = ConfigDict(extra="forbid")
     smiles: str
     label: int | str | None = None
+    bracket: bool = True
 
 
 BLOCK_LABELS = "lmn"  # default block subscripts, the last block's n (polymer_x1.0: m, n)
@@ -300,16 +302,28 @@ class Polymer(BaseModel):
                 raise ValueError("polymer: a block copolymer's subscripts go on its units (units: [{smiles, label}])")
         elif any(u.label is not None for u in self.units):
             raise ValueError("polymer: unit labels are for block copolymers; use polymer.label")
-        if self.kind == "block" and n > len(BLOCK_LABELS) and any(u.label is None for u in self.units):
+        loose = [k for k, u in enumerate(self.units) if not u.bracket]
+        if loose and self.kind != "block":
+            raise ValueError("polymer: bracket: false is for a block copolymer's segment between blocks (kind: block)")
+        for k in loose:
+            if k in (0, n - 1):
+                side = "start" if k == 0 else "end"
+                raise ValueError(f"polymer: unit {k + 1} has bracket: false at the chain's {side}; "
+                                 f"give its atoms as polymer.{side} instead")
+            if self.units[k].label is not None:
+                raise ValueError(f"polymer: unit {k + 1} has bracket: false, so no subscript: drop its label")
+        blocks = [u for u in self.units if u.bracket]
+        if self.kind == "block" and len(blocks) > len(BLOCK_LABELS) and any(u.label is None for u in blocks):
             raise ValueError(f"polymer: more than {len(BLOCK_LABELS)} blocks: give each unit a label")
         return self
 
     def labels(self) -> list[str]:
-        """The subscript of each bracket pair, left to right."""
+        """The subscript of each bracket pair, left to right (bracket: false units have none)."""
         if self.kind != "block":
             return [str(self.label) if self.label is not None else "n"]
-        default = BLOCK_LABELS[len(BLOCK_LABELS) - len(self.units):]
-        return [str(u.label) if u.label is not None else default[k] for k, u in enumerate(self.units)]
+        blocks = [u for u in self.units if u.bracket]
+        default = BLOCK_LABELS[len(BLOCK_LABELS) - len(blocks):]
+        return [str(u.label) if u.label is not None else default[k] for k, u in enumerate(blocks)]
 
 
 class Species(BaseModel):

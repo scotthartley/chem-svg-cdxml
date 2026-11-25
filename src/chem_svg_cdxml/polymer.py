@@ -7,19 +7,22 @@ to nowhere, written to CDXML as a plain carbon, as ChemDraw's references do). Ea
 its segment (POLY_SEG): 0 the start side, k unit k, n + 1 the end side; the bonds between
 segments are the crossing bonds (and a random copolymer's slashed bonds).
 
-orient() lays the backbone out horizontally, head on the left, pendants below (polymer_x1.0).
+orient() lays the backbone out horizontally, head on the left, pendants below (polymer_x1.0); the
+backbone runs on through the start and end groups along their longest chain (_backbone).
 
 finish() works on the drawn Molecule (pt), where label ink is known. Rules (§17), from
 polymer_x1.0, whose brackets were placed by eye; round values in preset.polymer:
 - A bracket crosses its crossing bond at the bond's midpoint (measured 0.44-0.52 of 14.4 pt)
   when that leaves min_gap_x to the enclosed ink. Otherwise the bond is stretched to
   crossing_stretch x bond_length keeping its rise (28.8 pt at 15 deg in the reference) and the
-  bracket goes gap_x beyond the ink, the bond reaching at least half its old run past it.
+  bracket goes as far beyond the ink as the pair's other bracket at its midpoint (within
+  min_gap_x..gap_x; else gap_x), the bond reaching at least half its old run past it.
 - A random copolymer's bonds between units are crossing_stretch x long too, with a slash across
   their middle (slash_length, slash_angle clockwise from the bond); one bracket pair round all
   units, `ratio` centered below.
 - A block copolymer has a bracket pair per unit; on a junction bond the two brackets are
-  block_gap apart (more if the left subscript needs it), each placed from its own block.
+  block_gap apart (more if the left subscript needs it), each placed from its own block. A
+  `bracket: false` unit between blocks has none: the brackets beside it take the end-group rule.
 - Both brackets of the polymer reach from the highest enclosed ink (or crossing point) less
   gap_above to the lowest plus gap_below; the lip is lip_per_height x the bar (ChemDraw's).
 - The subscript (n, m, 10, n-1: letters italic) sits label_dx right of each ']', its baseline
@@ -130,13 +133,52 @@ def _junction(mol: Chem.Mol, seg: list[int], s: int) -> tuple[int, int]:
     raise ValueError(f"polymer: no bond joins segment {s} to {s + 1}")
 
 
+def _chainy(mol: Chem.Mol, i: int) -> bool:
+    """An atom a drawn chain may run through: not H, not in a ring, not an abbreviation label."""
+    a = mol.GetAtomWithIdx(i)
+    return a.GetAtomicNum() != 1 and not mol.GetRingInfo().NumAtomRings(i) and not a.HasProp(chem.ABBREV_PROP)
+
+
+def _longest(mol: Chem.Mol, u: int, prev: int, keep=lambda i: True) -> list[int]:
+    """The longest path from u (reached from prev) through chainy atoms that `keep` allows (a
+    tree): ties to the larger branch, then to one not leaving through a carbonyl carbon (an ester
+    stays a pendant, as polymer_x1.0's PMMA)."""
+    def rank(path):
+        if len(path) == 1:
+            return (1, -1, False)
+        w = path[1]
+        carbonyl = any(b.GetBondType() == Chem.BondType.DOUBLE and b.GetOtherAtom(mol.GetAtomWithIdx(w)).GetAtomicNum() == 8
+                       for b in mol.GetAtomWithIdx(w).GetBonds())
+        return (len(path), len(_branch(mol, w, u)), not carbonyl)
+
+    best = [u]
+    for nb in mol.GetAtomWithIdx(u).GetNeighbors():
+        w = nb.GetIdx()
+        if w != prev and _chainy(mol, w) and keep(w):
+            cand = [u] + _longest(mol, w, u, keep)
+            if rank(cand) > rank(best):
+                best = cand
+    return best
+
+
 def _backbone(mol: Chem.Mol) -> list[int]:
-    """Atoms from the head-side chain end (or start group's atom) to the tail-side one."""
+    """Atoms from the head-side chain end to the tail-side one: junction to junction, then on into
+    the start and end groups along their longest chain (_longest), up to an sp atom (style-spec.md §17)."""
     seg = segs(mol)
     n = max(seg)
     left, _ = _junction(mol, seg, 0)
     _, right = _junction(mol, seg, n - 1)
-    return list(Chem.GetShortestPath(mol, left, right))
+    path = list(Chem.GetShortestPath(mol, left, right))
+    on = set(path)
+
+    def into(end: int, side: int) -> list[int]:  # path[0] or path[-1] onward, excluding it
+        if not _chainy(mol, end):
+            return []
+        ext = _longest(mol, end, -1, lambda w: seg[w] == side and w not in on)[1:]
+        cut = next((k for k, i in enumerate(ext) if _linear(mol.GetAtomWithIdx(i))), len(ext))
+        return ext[:cut]
+
+    return into(left, 0)[::-1] + path + into(right, n)
 
 
 def layout(mol: Chem.Mol) -> None:
@@ -352,24 +394,7 @@ def chain_layout(mol: Chem.Mol) -> bool:
     ends = [a.GetIdx() for a in mol.GetAtoms() if a.HasProp(POLY_END) and a.GetProp(POLY_END) == "wavy"]
     if len(ends) != 1 or is_polymer(mol):
         return False
-    ring = mol.GetRingInfo()
-
-    def chainy(i):
-        a = mol.GetAtomWithIdx(i)
-        return a.GetAtomicNum() != 1 and not ring.NumAtomRings(i) and not a.HasProp(chem.ABBREV_PROP)
-
-    # the longest path from the end through chain atoms (a tree): ties to the larger branch
-    def longest(u, prev):
-        best = [u]
-        for nb in mol.GetAtomWithIdx(u).GetNeighbors():
-            w = nb.GetIdx()
-            if w != prev and chainy(w):
-                cand = [u] + longest(w, u)
-                if (len(cand), len(_branch(mol, w, u))) > (len(best), len(_branch(mol, best[1], u)) if len(best) > 1 else -1):
-                    best = cand
-        return best
-
-    path = longest(ends[0], -1)
+    path = _longest(mol, ends[0], -1)
     if len(path) < 3 or any(_linear(mol.GetAtomWithIdx(i)) for i in path[1:-1]):
         return False
     on = set(path)
@@ -598,7 +623,11 @@ def finish(m: chem.Molecule, p, preset: Preset) -> chem.Molecule:
         a, b = m.atoms[i].p, m.atoms[j].p
         return add(a, mul(unit(sub(b, a)), dist))[0]
 
-    groups = [list(range(1, n + 1))] if p.kind != "block" else [[k] for k in range(1, n + 1)]
+    if p.kind != "block":
+        groups = [list(range(1, n + 1))]
+    else:  # a pair per bracketed unit; a bracket: false unit sits between two pairs
+        groups = [[k] for k in range(1, n + 1) if p.units[k - 1].bracket]
+    bracketed = {s for S in groups for s in S}
     labels = p.labels()
     if p.kind == "random":
         for k in range(1, n):
@@ -607,23 +636,37 @@ def finish(m: chem.Molecule, p, preset: Preset) -> chem.Molecule:
     for g, S in enumerate(groups):
         lo, hi = S[0], S[-1]
         inside = {i for i, s in seg.items() if lo <= s <= hi}
+        box = _ink(m, preset, inside)
+
+        def mid_gap(i: int, j: int, own_len: bool) -> float:
+            """Ink to a bracket at the midpoint of bond i (inside) - j, unstretched."""
+            half = (length(sub(m.atoms[j].p, m.atoms[i].p)) if own_len else L) / 2
+            x = along(i, j, half)
+            return box[0] - x if x < box[0] else x - box[2]
+
+        def beside_stretch(other: float) -> float:
+            """A bracket beside a stretched bond: as far from the ink as the pair's other bracket at
+            its bond's midpoint, within [min_gap_x, gap_x]; else gap_x."""
+            return other if pp.min_gap_x <= other <= pp.gap_x else pp.gap_x
+
+        left_mid = mid_gap(*junction(lo - 1)[::-1], lo - 1 not in bracketed)
+        right_mid = mid_gap(*junction(hi), hi + 1 not in bracketed)
         # left bracket: on the bond from segment lo - 1
         outer, inner = junction(lo - 1)
-        box = _ink(m, preset, inside)
-        if g == 0:
+        if lo - 1 not in bracketed:  # the start side or a bracketless segment
             run0 = abs(m.atoms[inner].x - m.atoms[outer].x)
             xl = along(inner, outer, length(sub(m.atoms[outer].p, m.atoms[inner].p)) / 2)
             if box[0] - xl < pp.min_gap_x:
                 before = m.atoms[inner].x
                 _stretch_level(m, seg, outer, inner, pp.crossing_stretch * L)
                 dx = m.atoms[inner].x - before
-                xl = box[0] + dx - pp.gap_x
+                xl = box[0] + dx - beside_stretch(right_mid)
                 short = m.atoms[outer].x - (xl - run0 / 2)
                 if short > 0:  # the bond must still reach half its old run past the bracket
                     _shift_from(m, seg, lo, short)
                     xl += short
-            if p.start:  # the start group's other bonds keep min_gap_x from the bracket too
-                ob = _ink(m, preset, {i for i, s in seg.items() if s < lo})
+            if lo - 1 > 0 or p.start:  # the drawn atoms outside keep min_gap_x from the bracket too
+                ob = _ink(m, preset, {i for i, s in seg.items() if s == lo - 1})
                 need = ob[2] + pp.min_gap_x - xl
                 if need > 0:
                     _shift_from(m, seg, lo, need)
@@ -631,7 +674,7 @@ def finish(m: chem.Molecule, p, preset: Preset) -> chem.Molecule:
         else:  # a block junction: this block's own place for '[', then the block moved block_gap from ']'
             own = along(inner, outer, L / 2)
             if box[0] - own < pp.min_gap_x:
-                own = box[0] - pp.gap_x
+                own = box[0] - beside_stretch(right_mid)
             gap = max(pp.block_gap, pp.label_dx + label_advance(labels[g - 1], preset) + pp.gap_x)
             dx = xs[-1][1] + gap - own
             _shift_from(m, seg, lo, dx)
@@ -640,16 +683,17 @@ def finish(m: chem.Molecule, p, preset: Preset) -> chem.Molecule:
         inner, outer = junction(hi)
         box = _ink(m, preset, inside)
         run0 = abs(m.atoms[outer].x - m.atoms[inner].x)
-        xr = along(inner, outer, (L if g < len(groups) - 1 else length(sub(m.atoms[outer].p, m.atoms[inner].p))) / 2)
+        loose = hi + 1 not in bracketed  # the end side or a bracketless segment
+        xr = along(inner, outer, (length(sub(m.atoms[outer].p, m.atoms[inner].p)) if loose else L) / 2)
         if xr - box[2] < pp.min_gap_x:
-            xr = box[2] + pp.gap_x
-            if g == len(groups) - 1:
+            xr = box[2] + beside_stretch(left_mid)
+            if loose:
                 _stretch_level(m, seg, inner, outer, pp.crossing_stretch * L)
                 short = (xr + run0 / 2) - m.atoms[outer].x
                 if short > 0:
                     _shift_from(m, seg, hi + 1, short)
-        if g == len(groups) - 1 and p.end:  # the end group's other bonds keep min_gap_x from it
-            ob = _ink(m, preset, {i for i, s in seg.items() if s > hi})
+        if loose and (hi + 1 <= n or p.end):  # the drawn atoms outside keep min_gap_x from it
+            ob = _ink(m, preset, {i for i, s in seg.items() if s == hi + 1})
             need = xr + pp.min_gap_x - ob[0]
             if need > 0:
                 _shift_from(m, seg, hi + 1, need)

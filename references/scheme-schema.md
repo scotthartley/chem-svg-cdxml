@@ -308,20 +308,31 @@ species:
   ps_10:   {polymer: {units: ["*CC(*)c1ccccc1"], label: 10}}            # also x, n-1 (drawn n−1)
   random:  {polymer: {kind: random, units: ["*CC(C)(*)C(=O)OC", "*CC(C)(*)C(=O)OCC"], ratio: "70:30"}}
   block:   {polymer: {kind: block, units: [{smiles: "*CC(*)c1ccccc1", label: m}, "*CC(C)(*)C(=O)OC"], end: "C*"}}
+  adduct:                                                               # RAFT: Pm–S–C(Z)–S–Pn
+    polymer:
+      kind: block
+      units:
+        - {smiles: "*CC(*)(C)C(=O)OC", label: m}
+        - {smiles: "*C[C:12](C)(C(=O)OC)[S:13][C:14]([*:15])[S:16][C:17](C)(C(=O)OC)C*", bracket: false}
+        - {smiles: "*C(C)(C(=O)OC)C*", label: n}
   chain:   {smiles: "[*:1]C[CH]c1ccccc1", chain_ends: [1], abbreviate: [Ph]}   # ~~CH2–CH(Ph)•
 steps:
   - {from: styrene, to: ps, coefficients: {styrene: n}}
 ```
 
 - `units`: SMILES with two `*`, the first the head (drawn on the left), the second the tail; a string
-  or `{smiles, label}` (label: block copolymers only). Atom maps must be unique across start, units and end.
+  or `{smiles, label, bracket}` (label: block copolymers only). Atom maps must be unique across start, units and end.
+- `bracket: false` (block copolymers): a unit between two blocks drawn without brackets or subscript, for
+  explicit atoms joining them (the adduct above; `labels: {15: Z}` at the spec level draws its Z). Not on the first
+  or last unit: give those atoms as `start` / `end`.
 - `start` / `end`: an end group, SMILES with one `*` (its bond to the chain). Without one, the chain end is
   a bare bond (a carbon in the CDXML, as ChemDraw draws it).
 - `kind`: `homo` (default, one unit), `random` (one bracket pair round all units, a slash across each bond
   between them, optional `ratio` caption centered below) or `block` (a bracket pair per unit; default
   subscripts m, n or l, m, n).
 - `label`: the subscript of `homo` / `random` (default n). Letters are set italic, digits and signs regular.
-- The backbone is laid out horizontally, head left, pendants below; crossing bonds are stretched where a
+- The backbone is laid out horizontally, head left, pendants below, and runs on through `start` / `end`
+  along their longest chain (a long end group stays on the zigzag); crossing bonds are stretched where a
   bracket would crowd the unit (style-spec.md §17). Not with `kekule`, `orientation`, `lewis`, `chair`,
   `align_to`; a polymer aligns to nothing. Example: `examples/m7/`.
 

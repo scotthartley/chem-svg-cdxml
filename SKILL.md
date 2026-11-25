@@ -39,7 +39,8 @@ If the Read tool refuses `<repo>` files (outside the working directory, symlink 
      (bond lines), or `lewis: {electrons: formal_charge | oxidation_state}`; see `references/scheme-schema.md`.
    - Chairs: `chair: true` draws a single six-membered sp³ ring as a chair, axial/equatorial from the SMILES
      stereo (`chair: {flip: true}`, `{axial: [maps]}`, `{start: map}`); see `references/scheme-schema.md`.
-   - Polymers: `polymer: {units: ["*CC(*)c1ccccc1"], start, end, kind: homo|random|block, label, ratio}`;
+   - Polymers: `polymer: {units: ["*CC(*)c1ccccc1"], start, end, kind: homo|random|block, label, ratio}`
+     (a block unit `{smiles, bracket: false}`: atoms between blocks, no brackets);
      wavy ends `chain_ends: [map]`; `coefficients: {styrene: n}` on a step. See the schema (Polymers).
    - Charges: `charges: {circled: true}` (spec) or `circled_charges` (species) circles ±1 signs;
      `charge_labels: {1: "+3"}` (species, by atom map) draws a text, display only.

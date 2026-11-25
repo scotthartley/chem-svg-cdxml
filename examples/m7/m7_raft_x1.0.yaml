@@ -1,0 +1,17 @@
+# M7: RAFT, explicit atoms on the chain (style-spec.md §17). The adduct's middle unit is drawn without
+# brackets (bracket: false) between the m and n blocks; long_end's end group continues the backbone
+# zigzag along its longest chain.
+preset: acs1996
+labels: {15: Z, 25: Z}
+species:
+  adduct:
+    polymer:
+      kind: block
+      units:
+        - {smiles: "*CC(*)(C)C(=O)OC", label: m}
+        - {smiles: "*C[C:12](C)(C(=O)OC)[S:13][C:14]([*:15])[S:16][C:17](C)(C(=O)OC)C*", bracket: false}
+        - {smiles: "*C(C)(C(=O)OC)C*", label: n}
+  long_end:
+    polymer:
+      units: ["*CC(*)(C)C(=O)OC"]
+      end: "*C[C:22](C)(C(=O)OC)[S:23][C:24]([*:25])[S:26][C:27](C)(C(=O)OC)CC"

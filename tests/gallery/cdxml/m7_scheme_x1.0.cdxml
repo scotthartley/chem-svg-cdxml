@@ -61,14 +61,14 @@
       <s font="21" size="10" color="0">n</s>
     </t>
     <graphic id="48" SupersededBy="49" BoundingBox="119.09 40.90 79.09 40.90" Z="42" GraphicType="Line" ArrowType="FullHead" HeadSize="1500"/>
-    <graphic id="40" BoundingBox="175.96 2.60 175.96 57.60" Z="39" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+    <graphic id="40" BoundingBox="175.89 2.60 175.89 57.60" Z="39" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
       <objecttag id="1" TagType="Unknown" Name="bracketusage">
         <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
           <s font="21" size="7.5" color="0">1</s>
         </t>
       </objecttag>
       <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
-        <t p="177.96 59.60" BoundingBox="178.44 55.59 182.24 59.60" Visible="no" CaptionLineHeight="variable">
+        <t p="177.89 59.60" BoundingBox="178.37 55.59 182.18 59.60" Visible="no" CaptionLineHeight="variable">
           <s font="307" size="7.5" color="0" face="2">n</s>
         </t>
       </objecttag>

@@ -189,6 +189,13 @@ def test_coefficient_before_its_reactant():
     (dict(kind="random", units=["*CC(*)C"]), "two or more units"),
     (dict(units=["*CC(*)C"], ratio="1:1"), "random copolymer only"),
     (dict(kind="block", units=["*CC(*)C", "*CC(*)C"], label="n"), "go on its units"),
+    (dict(kind="random", units=["*CC(*)C", {"smiles": "*CC(*)C", "bracket": False}, "*CC(*)C"]), "bracket: false"),
+    (dict(units=[{"smiles": "*CC(*)C", "bracket": False}]), "bracket: false"),
+    (dict(kind="block", units=[{"smiles": "*CC(*)C", "bracket": False}, "*CC(*)C", "*CC(*)C"]), "polymer.start"),
+    (dict(kind="block", units=["*CC(*)C", "*CC(*)C", {"smiles": "*CC(*)C", "bracket": False}]), "polymer.end"),
+    (dict(kind="block", units=["*CC(*)C", {"smiles": "*CSC*", "bracket": False, "label": "x"}, "*CC(*)C"]),
+     "drop its label"),
+    (dict(kind="block", units=["*CC(*)C", {"smiles": "*CSC*", "bracket": False}]), "polymer.end"),
 ])
 def test_polymer_schema(p, msg):
     with pytest.raises(ValueError, match=msg):
@@ -266,3 +273,67 @@ def test_chain_end_pendants_kept_apart_by_a_stretched_bond():
 def test_chain_stretch_is_the_presets():
     for name in ("acs1996", "acs1996_x0.8", "acs1996_x0.6", "presentation_x1.0"):
         assert load_preset(name).polymer.crossing_stretch == polymer.CHAIN_STRETCH
+
+
+@pytest.fixture(scope="module")
+def raft():
+    spec = Spec.model_validate(yaml.safe_load(example("m7_raft_x1.0").read_text()))
+    return {m.name: m for m in molecules(spec, Path("."))}
+
+
+@pytest.mark.parametrize("name, units, stretch", [
+    ("adduct", None, None),  # PMMA's ester reaches past the midpoint: stretched as homopolymer PMMA's right bond
+    ("pe", ["*CC*", {"smiles": "*CSC*", "bracket": False}, "*CC*"], 1.0),
+])
+def test_bracketless_segment_between_blocks(raft, mols, name, units, stretch):
+    """bracket: false: the linker (the RAFT adduct's S-C(Z)-S) has no brackets; the blocks keep
+    theirs with the start / end side's rule on the junction bonds to it (the bracket at the bond's
+    midpoint if that clears min_gap_x, else the bond stretched), the linker's ink at least
+    min_gap_x from each bracket."""
+    if units:
+        spec = _spec({name: {"polymer": {"kind": "block", "units": units}}})
+        m = next(x for x in molecules(spec, Path(".")) if x.name == name)
+    else:
+        m = raft[name]
+    pairs = m.polymer.pairs
+    assert [pr.label for pr in pairs] == ["m", "n"]
+    linker = {a.idx for a in m.atoms if a.seg == 2}
+    assert not any(linker & set(pr.atoms) for pr in pairs)
+    if stretch is None:
+        stretch = _crossings(mols["pmma"])[1][0]
+        assert stretch > P.polymer.crossing_stretch - 1e-6
+    assert [ln for ln, _ in _crossings(m)][1:3] == pytest.approx([stretch, stretch], abs=1e-3)
+    ink = polymer._ink(m, P, linker)
+    assert ink[0] - pairs[0].x[1] >= P.polymer.min_gap_x - 1e-6
+    assert pairs[1].x[0] - ink[2] >= P.polymer.min_gap_x - 1e-6
+
+
+def test_bracketless_unit_has_no_label():
+    p = Polymer(kind="block", units=["*CC(*)C", {"smiles": "*CSC*", "bracket": False}, "*CC(*)C"])
+    assert p.labels() == ["m", "n"]
+
+
+def test_long_end_group_continues_the_backbone(raft):
+    """An end group's longest chain (C-C(q)-S-C-S-C(q)-C(=O)-O) stays on the backbone's zigzag:
+    its atoms on the zigzag's two levels, the S-C-S-C chain on the 30 deg grid."""
+    m = raft["long_end"]
+    by_map = {a.map: a for a in m.atoms if a.map}
+    levels = [m.atoms[inner].y for _, inner in m.polymer.pairs[0].crossing]  # CH2 and C(q): one per level
+    assert abs(levels[0] - levels[1]) > 1.0
+    chain = [by_map[k] for k in (22, 23, 24, 26, 27)]
+    for a in chain:
+        assert min(abs(a.y - y) for y in levels) < 1e-3, (a.id, a.y, levels)
+    _on_grid(m, [by_map[k].idx for k in (23, 24, 26)])
+
+
+@pytest.mark.parametrize("name", ["pmma", "random", "block", "ps_x"])
+def test_bracket_beside_a_stretched_bond_matches_its_pair(mols, name):
+    """User review 2026-11-25: a bracket beside a stretched crossing bond sits as far from the ink as
+    the pair's other bracket at its midpoint (PMMA 2.74 / 2.74, not 2.74 / gap_x), within
+    [min_gap_x, gap_x]."""
+    m = mols[name]
+    for pr in m.polymer.pairs:
+        box = polymer._ink(m, P, set(pr.atoms))
+        left, right = box[0] - pr.x[0], pr.x[1] - box[2]
+        assert left == pytest.approx(right, abs=0.1)
+        assert P.polymer.min_gap_x <= left <= P.polymer.gap_x

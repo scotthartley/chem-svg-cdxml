@@ -1445,14 +1445,20 @@ zigzags at 120° on the 30° grid: the larger branch continues the zigzag, a car
 the tail (the reference's esters: C=O down-left, O down-right, CH₃ straight down), a fourth bond sits
 between the parent bond and the main one at 60° to each, sp atoms run straight, and rings keep RDKit's
 shape, turned so the bond to them bisects their outside angle. A start or end group continues the
+backbone along its longest chain (no H, rings or labels; ties to the larger branch, then away from a carbonyl
+carbon), whose atoms join the zigzag with the pendant rule above, up to an sp atom; the rest continues the
 zigzag (AIBN's nitrile; its methyls up and down as an upright pair). Copolymer units may meet before
 their junction bond is stretched; any other clash falls back to RDKit's layout round the pinned zigzag.
 A backbone through a ring (poly(p-phenylene)) is laid out freely and turned to
 its principal axis. Then, in pt with the labels known:
 - a bracket crosses its crossing bond at the midpoint (0.44–0.52 in the reference, unstretched 14.4) if
   that clears the enclosed ink by `min_gap_x`; otherwise the bond becomes `crossing_stretch` x long with its
-  rise kept and the bracket goes `gap_x` beyond the ink (PS's right bond, 28.8 at 15°, as the reference);
+  rise kept (PS's right bond, 28.8 at 15°, as the reference) and the bracket goes as far beyond the ink as the
+  pair's other bracket sits from it at its bond's midpoint, if that is within [`min_gap_x`, `gap_x`], else
+  `gap_x` (PMMA 2.7 / 2.7 pt rather than 2.7 / 6.0: chosen 2026-11-25, the reference's 2.97 / 4.06 were by eye);
   an end group's other bonds keep `min_gap_x` from the bracket too;
+- a block copolymer's `bracket: false` unit (atoms joining two blocks, as a RAFT adduct's S–C(Z)–S) has no
+  brackets; the brackets on either side of it take the end-group rule above, its ink kept `min_gap_x` away;
 - a random copolymer's bonds between units are `crossing_stretch` x long, slashed at the middle; one
   bracket pair holds all units and `ratio` is centered `ratio_drop` below;
 - block brackets on one junction bond are `block_gap` apart (wider if the left subscript needs it);
@@ -1471,7 +1477,7 @@ bond length, the smaller side moving. A step's `coefficients: {species: n}` sets
 The electron bookkeeping treats `*` as R: neutral, with no electrons of its own.
 
 **Not measured, chosen:** the zigzag pinning, the upright pendant rule and the branch zigzag (the reference's
-look and 120° angles, not measured); bracket spans shared by all pairs of a polymer (the reference's two blocks differ by 0.6 pt).
+look and 120° angles, not measured); the backbone through start and end groups and the bracketless-unit rule; bracket spans shared by all pairs of a polymer (the reference's two blocks differ by 0.6 pt).
 
 ### 17.1 CDXML (gate phase 7: `cdxml_gate.py --phase 7`)
 
