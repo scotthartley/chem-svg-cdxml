@@ -1,0 +1,7 @@
+# expect: is a '*' with nothing to draw
+# inbox 2026-11-25: a '*' with no labels: symbol and not a chain end passed validate and crashed
+# the drawing (unclosed '*' (italic)).
+preset: acs1996
+labels: {15: Z}
+species:
+  macrocta: {smiles: "[S:13]=[C:14]([*:15])[S:16]C(C)(C(=O)OC)C[*:18]"}

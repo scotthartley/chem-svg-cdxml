@@ -1014,6 +1014,13 @@ def check_maps(spec: Spec, base_dir: Path) -> None:
         unknown = sorted(set(spec.species[name].charge_labels) - {a.GetAtomMapNum() for a in mol.GetAtoms()})
         if unknown:
             raise ValueError(f"species {name}: charge_labels: no atom has map number {', '.join(map(str, unknown))}")
+        bare = [_atom_id(a) for a in mol.GetAtoms()
+                if a.GetAtomicNum() == 0 and not a.HasProp(chem.POLY_END) and a.GetAtomMapNum() not in spec.labels
+                and not a.HasProp("atomLabel") and not a.HasProp("molFileAlias")]
+        if bare:  # nothing to draw for it: no label text, not a chain end (inbox 2026-11-25)
+            raise ValueError(f"species {name}: atom {', '.join(bare)} is a '*' with nothing to draw: give it a "
+                             "`labels:` symbol (labels: {k: R}) or, if it is a polymer chain end, list it in "
+                             "`chain_ends:`; a '*' needs a map number ([*:k]) for either")
 
 
 def with_charges(spec: Spec, name: str, mol: chem.Molecule) -> chem.Molecule:
