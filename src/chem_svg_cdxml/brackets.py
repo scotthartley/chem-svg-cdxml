@@ -13,11 +13,14 @@ from .preset import Preset
 from .scene import Group, Polyline
 
 
-def square_bracket(x: float, top: float, bottom: float, side: str, preset: Preset, name: str = "bracket") -> Group:
+def square_bracket(x: float, top: float, bottom: float, side: str, preset: Preset, name: str = "bracket",
+                   lip: float | None = None) -> Group:
     """'[' (side "left": lips point right) or ']' (side "right") with its bar's stroke center at
-    x and its lips' stroke centers at top and bottom."""
+    x and its lips' stroke centers at top and bottom. `lip`: its lips' length (default
+    bracket.lip_length; polymers: polymer.lip_per_height x the bar)."""
     b = preset.bracket
-    lip = x + (b.lip_length if side == "left" else -b.lip_length)
+    n = b.lip_length if lip is None else lip
+    lip = x + (n if side == "left" else -n)
     pts = [(lip, top), (x, top), (x, bottom), (lip, bottom)]
     return Group(name, [Polyline(pts, b.stroke_width, source=name)])
 

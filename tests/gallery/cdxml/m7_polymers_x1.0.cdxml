@@ -1,0 +1,466 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE CDXML SYSTEM "https://static.chemistry.revvitycloud.com/cdxml/CDXML.dtd">
+<CDXML CreationProgram="chem-svg-cdxml 0.4.0" Name="m7_polymers_x1.0.cdxml" BoundingBox="2.00 2.30 705.45 76.49" WindowPosition="0 0" WindowSize="0 0" FractionalWidths="yes" InterpretChemically="yes" ShowAtomQuery="yes" ShowAtomStereo="no" ShowAtomEnhancedStereo="yes" ShowAtomNumber="no" ShowResidueID="no" ShowBondQuery="yes" ShowBondRxn="yes" ShowBondStereo="no" ShowTerminalCarbonLabels="no" ShowNonTerminalCarbonLabels="no" HideImplicitHydrogens="no" Magnification="250" LabelFont="21" LabelSize="10" LabelFace="96" CaptionFont="21" CaptionSize="10" HashSpacing="2.50" MarginWidth="1.60" LineWidth="0.60" BoldWidth="2" BondLength="14.40" BondSpacing="18" ChainAngle="120" LabelJustification="Auto" CaptionJustification="Left" AminoAcidTermini="HOH" ShowSequenceTermini="yes" ShowSequenceBonds="yes" ShowSequenceUnlinkedBranches="no" ShowPrimeLabels="no" ResidueWrapCount="40" PrintMargins="36 36 36 36" MacPrintInfo="0003000000480048000000000300024CFFF4FFF4030C02580367052803FB0002000000480048000000000300024C000100000064000000010001010100000001270F000100010000000000000000000000000002001901900000000000400000000000000000000100000000000000000000000000000000" ChemPropName="" ChemPropFormula="Chemical formula: " ChemPropExactMass="Exact mass: " ChemPropMolWt="Molecular weight: " ChemPropMOverZ="m/z: " ChemPropAnalysis="Elemental analysis: " ChemPropBoilingPt="Boiling point: " ChemPropMeltingPt="Melting point: " ChemPropCritTemp="Critical temp: " ChemPropCritPres="Critical pres: " ChemPropCritVol="Critical vol: " ChemPropGibbs="Gibbs energy: " ChemPropLogP="Log P: " ChemPropMR="MR: " ChemPropHenry="Henry's law: " ChemPropEForm="Heat of form: " ChemProptPSA="tPSA: " ChemPropID="" ChemPropFragmentLabel="" color="0" bgcolor="1" RxnAutonumberStart="1" RxnAutonumberConditions="no" RxnAutonumberStyle="Roman" RxnAutonumberFormat="(#)">
+  <colortable>
+    <color r="1" g="1" b="1"/>
+    <color r="0" g="0" b="0"/>
+    <color r="1" g="0" b="0"/>
+    <color r="1" g="1" b="0"/>
+    <color r="0" g="1" b="0"/>
+    <color r="0" g="1" b="1"/>
+    <color r="0" g="0" b="1"/>
+    <color r="1" g="0" b="1"/>
+  </colortable>
+  <fonttable>
+    <font id="21" charset="x-mac-roman" name="Helvetica"/>
+    <font id="307" charset="x-mac-roman" name="Helvetica Oblique"/>
+    <font id="310" charset="x-mac-roman" name="Helvetica Bold"/>
+  </fonttable>
+  <page id="1" BoundingBox="0 0 1080 720" HeaderPosition="36" FooterPosition="36" PrintTrimMarks="yes" HeightPages="1" WidthPages="2">
+    <fragment id="2" BoundingBox="2.00 6.50 89.17 68.04" Z="29">
+      <n id="3" p="4.85 10.09" Z="1" Element="7" NumHydrogens="0" NeedsClean="yes">
+        <t p="1.24 13.68" BoundingBox="2.00 6.50 7.69 13.68" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">N</s>
+        </t>
+      </n>
+      <n id="4" p="17.32 17.29" Z="2"/>
+      <n id="5" p="29.79 24.49" Z="3"/>
+      <n id="6" p="29.79 38.89" Z="4"/>
+      <n id="7" p="29.79 10.09" Z="5"/>
+      <n id="8" p="42.26 17.29" Z="6"/>
+      <n id="9" p="54.73 24.49" Z="7"/>
+      <n id="10" p="54.73 38.89" Z="8"/>
+      <n id="11" p="42.26 46.09" Z="9"/>
+      <n id="12" p="42.26 60.49" Z="10"/>
+      <n id="13" p="54.73 67.69" Z="11"/>
+      <n id="14" p="67.20 60.49" Z="12"/>
+      <n id="15" p="67.20 46.09" Z="13"/>
+      <n id="16" p="82.62 17.29" Z="14" Element="35" NumHydrogens="0" NeedsClean="yes">
+        <t p="79.28 20.88" BoundingBox="80.02 13.70 89.17 20.88" LabelJustification="Left" LabelAlignment="Left">
+          <s font="21" size="10" color="0" face="96">Br</s>
+        </t>
+      </n>
+      <b id="17" Z="15" B="3" E="4" Order="3"/>
+      <b id="18" Z="16" B="4" E="5"/>
+      <b id="19" Z="17" B="5" E="6"/>
+      <b id="20" Z="18" B="5" E="7"/>
+      <b id="21" Z="19" B="8" E="9"/>
+      <b id="22" Z="20" B="9" E="10"/>
+      <b id="23" Z="21" B="10" E="11" Order="2"/>
+      <b id="24" Z="22" B="11" E="12"/>
+      <b id="25" Z="23" B="12" E="13" Order="2"/>
+      <b id="26" Z="24" B="13" E="14"/>
+      <b id="27" Z="25" B="14" E="15" Order="2"/>
+      <b id="28" Z="26" B="15" E="10"/>
+      <b id="29" Z="27" B="5" E="8"/>
+      <b id="30" Z="28" B="9" E="16"/>
+    </fragment>
+    <fragment id="38" BoundingBox="105.77 25.77 163.37 51.32" Z="48">
+      <n id="39" p="105.77 38.54" Z="32"/>
+      <n id="40" p="120.16 38.55" Z="33"/>
+      <n id="41" p="127.37 26.08" Z="34"/>
+      <n id="42" p="141.77 26.07" Z="35"/>
+      <n id="43" p="148.97 38.54" Z="36"/>
+      <n id="44" p="163.37 38.55" Z="37"/>
+      <n id="45" p="141.77 51.02" Z="38"/>
+      <n id="46" p="127.37 51.02" Z="39"/>
+      <b id="47" Z="40" B="39" E="40"/>
+      <b id="48" Z="41" B="40" E="41" Order="2"/>
+      <b id="49" Z="42" B="41" E="42"/>
+      <b id="50" Z="43" B="42" E="43" Order="2"/>
+      <b id="51" Z="44" B="43" E="44"/>
+      <b id="52" Z="45" B="43" E="45"/>
+      <b id="53" Z="46" B="45" E="46" Order="2"/>
+      <b id="54" Z="47" B="46" E="40"/>
+    </fragment>
+    <fragment id="62" BoundingBox="180.42 13.35 233.78 63.75" Z="68">
+      <n id="63" p="180.57 27.75" Z="51"/>
+      <n id="64" p="193.04 20.55" Z="52"/>
+      <n id="65" p="205.51 27.75" Z="53"/>
+      <n id="66" p="205.51 13.35" Z="54"/>
+      <n id="67" p="233.71 20.55" Z="55"/>
+      <n id="68" p="205.51 42.15" Z="56"/>
+      <n id="69" p="193.04 49.35" Z="57" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="189.15 53.03" BoundingBox="189.54 45.66 196.53 53.24" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="70" p="217.98 49.35" Z="58" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="214.09 53.03" BoundingBox="214.48 45.66 221.47 53.24" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="71" p="217.98 63.75" Z="59"/>
+      <b id="72" Z="60" B="63" E="64"/>
+      <b id="73" Z="61" B="64" E="65"/>
+      <b id="74" Z="62" B="65" E="66"/>
+      <b id="75" Z="63" B="65" E="67"/>
+      <b id="76" Z="64" B="65" E="68"/>
+      <b id="77" Z="65" B="68" E="69" Order="2"/>
+      <b id="78" Z="66" B="68" E="70"/>
+      <b id="79" Z="67" B="70" E="71"/>
+    </fragment>
+    <fragment id="87" BoundingBox="250.76 4.90 353.74 62.76" Z="105">
+      <n id="88" p="250.91 19.30" Z="71"/>
+      <n id="89" p="263.38 12.10" Z="72"/>
+      <n id="90" p="275.85 19.30" Z="73"/>
+      <n id="91" p="275.85 4.90" Z="74"/>
+      <n id="92" p="275.85 33.70" Z="75"/>
+      <n id="93" p="263.38 40.90" Z="76" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="259.49 44.58" BoundingBox="259.88 37.22 266.87 44.79" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="94" p="288.32 40.90" Z="77" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="284.43 44.58" BoundingBox="284.82 37.22 291.81 44.79" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="95" p="288.32 55.30" Z="78"/>
+      <n id="96" p="303.73 12.10" Z="79"/>
+      <n id="97" p="316.21 19.30" Z="80"/>
+      <n id="98" p="316.21 4.90" Z="81"/>
+      <n id="99" p="353.68 12.10" Z="82"/>
+      <n id="100" p="316.21 33.70" Z="83"/>
+      <n id="101" p="303.73 40.90" Z="84" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="299.85 44.58" BoundingBox="300.24 37.22 307.23 44.79" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="102" p="328.68 40.90" Z="85" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="324.79 44.58" BoundingBox="325.18 37.22 332.17 44.79" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="103" p="328.68 55.30" Z="86"/>
+      <n id="104" p="341.15 62.50" Z="87"/>
+      <b id="105" Z="88" B="88" E="89"/>
+      <b id="106" Z="89" B="89" E="90"/>
+      <b id="107" Z="90" B="90" E="91"/>
+      <b id="108" Z="91" B="90" E="92"/>
+      <b id="109" Z="92" B="92" E="93" Order="2"/>
+      <b id="110" Z="93" B="92" E="94"/>
+      <b id="111" Z="94" B="94" E="95"/>
+      <b id="112" Z="95" B="96" E="97"/>
+      <b id="113" Z="96" B="97" E="98"/>
+      <b id="114" Z="97" B="97" E="99"/>
+      <b id="115" Z="98" B="97" E="100"/>
+      <b id="116" Z="99" B="100" E="101" Order="2"/>
+      <b id="117" Z="100" B="100" E="102"/>
+      <b id="118" Z="101" B="102" E="103"/>
+      <b id="119" Z="102" B="103" E="104"/>
+      <b id="120" Z="103" B="90" E="96"/>
+      <curve id="121" Z="104" ArrowheadType="Solid" CurvePoints="286.35 9.61 286.35 9.61 286.35 9.61 293.24 21.79 293.24 21.79 293.24 21.79"/>
+    </fragment>
+    <fragment id="130" BoundingBox="370.73 9.75 491.03 67.61" Z="142">
+      <n id="131" p="370.88 24.15" Z="109"/>
+      <n id="132" p="383.35 16.95" Z="110"/>
+      <n id="133" p="395.82 24.15" Z="111"/>
+      <n id="134" p="395.82 9.75" Z="112"/>
+      <n id="135" p="395.82 38.55" Z="113"/>
+      <n id="136" p="383.35 45.75" Z="114" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="379.46 49.43" BoundingBox="379.85 42.06 386.85 49.64" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="137" p="408.29 45.75" Z="115" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="404.41 49.43" BoundingBox="404.80 42.06 411.79 49.64" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="138" p="408.29 60.15" Z="116"/>
+      <n id="139" p="441.02 16.95" Z="117"/>
+      <n id="140" p="453.49 24.15" Z="118"/>
+      <n id="141" p="453.49 9.75" Z="119"/>
+      <n id="142" p="453.49 38.55" Z="120"/>
+      <n id="143" p="441.02 45.75" Z="121" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="437.13 49.43" BoundingBox="437.52 42.06 444.52 49.64" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="144" p="465.96 45.75" Z="122" Element="8" NumHydrogens="0" NeedsClean="yes">
+        <t p="462.08 49.43" BoundingBox="462.47 42.06 469.46 49.64" LabelJustification="Left">
+          <s font="21" size="10" color="0" face="96">O</s>
+        </t>
+      </n>
+      <n id="145" p="465.96 60.15" Z="123"/>
+      <n id="146" p="478.44 67.35" Z="124"/>
+      <n id="147" p="490.97 16.95" Z="125"/>
+      <b id="148" Z="126" B="131" E="132"/>
+      <b id="149" Z="127" B="132" E="133"/>
+      <b id="150" Z="128" B="133" E="134"/>
+      <b id="151" Z="129" B="133" E="135"/>
+      <b id="152" Z="130" B="135" E="136" Order="2"/>
+      <b id="153" Z="131" B="135" E="137"/>
+      <b id="154" Z="132" B="137" E="138"/>
+      <b id="155" Z="133" B="139" E="140"/>
+      <b id="156" Z="134" B="140" E="141"/>
+      <b id="157" Z="135" B="140" E="142"/>
+      <b id="158" Z="136" B="142" E="143" Order="2"/>
+      <b id="159" Z="137" B="142" E="144"/>
+      <b id="160" Z="138" B="144" E="145"/>
+      <b id="161" Z="139" B="145" E="146"/>
+      <b id="162" Z="140" B="133" E="139"/>
+      <b id="163" Z="141" B="140" E="147"/>
+    </fragment>
+    <fragment id="178" BoundingBox="508.02 13.00 561.07 64.09" Z="167">
+      <n id="179" p="508.17 20.55" Z="147"/>
+      <n id="180" p="520.64 13.35" Z="148"/>
+      <n id="181" p="533.11 20.55" Z="149"/>
+      <n id="182" p="561.00 13.35" Z="150"/>
+      <n id="183" p="533.11 34.95" Z="151"/>
+      <n id="184" p="520.64 42.15" Z="152"/>
+      <n id="185" p="520.64 56.55" Z="153"/>
+      <n id="186" p="533.11 63.75" Z="154"/>
+      <n id="187" p="545.58 56.55" Z="155"/>
+      <n id="188" p="545.58 42.15" Z="156"/>
+      <b id="189" Z="157" B="179" E="180"/>
+      <b id="190" Z="158" B="180" E="181"/>
+      <b id="191" Z="159" B="181" E="182"/>
+      <b id="192" Z="160" B="181" E="183"/>
+      <b id="193" Z="161" B="183" E="184" Order="2"/>
+      <b id="194" Z="162" B="184" E="185"/>
+      <b id="195" Z="163" B="185" E="186" Order="2"/>
+      <b id="196" Z="164" B="186" E="187"/>
+      <b id="197" Z="165" B="187" E="188" Order="2"/>
+      <b id="198" Z="166" B="188" E="183"/>
+    </fragment>
+    <fragment id="206" BoundingBox="578.05 12.93 631.10 64.02" Z="190">
+      <n id="207" p="578.20 20.47" Z="170"/>
+      <n id="208" p="590.67 13.27" Z="171"/>
+      <n id="209" p="603.14 20.47" Z="172"/>
+      <n id="210" p="631.03 13.27" Z="173"/>
+      <n id="211" p="603.14 34.87" Z="174"/>
+      <n id="212" p="590.67 42.07" Z="175"/>
+      <n id="213" p="590.67 56.47" Z="176"/>
+      <n id="214" p="603.14 63.67" Z="177"/>
+      <n id="215" p="615.61 56.47" Z="178"/>
+      <n id="216" p="615.61 42.07" Z="179"/>
+      <b id="217" Z="180" B="207" E="208"/>
+      <b id="218" Z="181" B="208" E="209"/>
+      <b id="219" Z="182" B="209" E="210"/>
+      <b id="220" Z="183" B="209" E="211"/>
+      <b id="221" Z="184" B="211" E="212" Order="2"/>
+      <b id="222" Z="185" B="212" E="213"/>
+      <b id="223" Z="186" B="213" E="214" Order="2"/>
+      <b id="224" Z="187" B="214" E="215"/>
+      <b id="225" Z="188" B="215" E="216" Order="2"/>
+      <b id="226" Z="189" B="216" E="211"/>
+    </fragment>
+    <fragment id="234" BoundingBox="648.38 13.00 701.44 64.09" Z="213">
+      <n id="235" p="648.53 20.55" Z="193"/>
+      <n id="236" p="661.00 13.35" Z="194"/>
+      <n id="237" p="673.48 20.55" Z="195"/>
+      <n id="238" p="701.36 13.35" Z="196"/>
+      <n id="239" p="673.48 34.95" Z="197"/>
+      <n id="240" p="661.00 42.15" Z="198"/>
+      <n id="241" p="661.00 56.55" Z="199"/>
+      <n id="242" p="673.48 63.75" Z="200"/>
+      <n id="243" p="685.95 56.55" Z="201"/>
+      <n id="244" p="685.95 42.15" Z="202"/>
+      <b id="245" Z="203" B="235" E="236"/>
+      <b id="246" Z="204" B="236" E="237"/>
+      <b id="247" Z="205" B="237" E="238"/>
+      <b id="248" Z="206" B="237" E="239"/>
+      <b id="249" Z="207" B="239" E="240" Order="2"/>
+      <b id="250" Z="208" B="240" E="241"/>
+      <b id="251" Z="209" B="241" E="242" Order="2"/>
+      <b id="252" Z="210" B="242" E="243"/>
+      <b id="253" Z="211" B="243" E="244" Order="2"/>
+      <b id="254" Z="212" B="244" E="239"/>
+    </fragment>
+    <t id="129" p="289.81 76.30" BoundingBox="290.18 69.30 314.41 76.49" Z="108" LineHeight="auto">
+      <s font="21" size="10" color="0">70:30</s>
+    </t>
+    <graphic id="31" BoundingBox="73.50 14.99 73.50 69.99" Z="30" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="75.50 71.99" BoundingBox="75.99 67.98 79.79 71.99" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="32" BoundingBox="36.03 69.99 36.03 14.99" Z="31" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="55" BoundingBox="156.17 23.77 156.17 53.32" Z="49" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 31.54" Name="parameterizedBracketLabel">
+        <t p="158.17 55.32" BoundingBox="158.65 51.31 162.45 55.32" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="56" BoundingBox="112.97 53.32 112.97 23.77" Z="50" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="80" BoundingBox="227.47 11.05 227.47 66.05" Z="69" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="229.47 68.05" BoundingBox="229.96 64.04 233.76 68.05" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="81" BoundingBox="186.80 66.05 186.80 11.05" Z="70" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="122" BoundingBox="347.45 2.60 347.45 64.80" Z="106" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 64.20" Name="parameterizedBracketLabel">
+        <t p="349.45 66.80" BoundingBox="349.93 62.79 353.73 66.80" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="123" BoundingBox="257.14 64.80 257.14 2.60" Z="107" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="164" BoundingBox="417.79 7.45 417.79 69.65" Z="143" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 64.20" Name="parameterizedBracketLabel">
+        <t p="419.79 71.65" BoundingBox="420.27 67.64 426.16 71.65" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">m</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="165" BoundingBox="377.12 69.65 377.12 7.45" Z="144" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="171" BoundingBox="484.74 7.45 484.74 69.65" Z="145" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 64.20" Name="parameterizedBracketLabel">
+        <t p="486.74 71.65" BoundingBox="487.22 67.64 491.02 71.65" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="172" BoundingBox="434.79 69.65 434.79 7.45" Z="146" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="199" BoundingBox="551.88 11.05 551.88 66.05" Z="168" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="553.88 68.05" BoundingBox="553.92 64.12 558.29 68.05" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">x</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="200" BoundingBox="514.41 66.05 514.41 11.05" Z="169" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="227" BoundingBox="621.91 10.97 621.91 65.97" Z="191" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.24 8.02 0.14" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">10</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="623.91 67.97" BoundingBox="624.63 62.73 631.93 68.12" Visible="no" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">10</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="228" BoundingBox="584.43 65.97 584.43 10.97" Z="192" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <graphic id="255" BoundingBox="692.25 11.05 692.25 66.05" Z="214" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="694.25 68.05" BoundingBox="694.73 62.82 705.45 68.05" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+          <s font="21" size="7.5" color="0">−1</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="256" BoundingBox="654.77 66.05 654.77 11.05" Z="215" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <bracketedgroup id="33" BracketedObjectIDs="8 9 10 11 12 13 14 15" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="34" GraphicID="32">
+        <crossingbond id="35" BondID="29" InnerAtomID="8"/>
+      </bracketattachment>
+      <bracketattachment id="36" GraphicID="31">
+        <crossingbond id="37" BondID="30" InnerAtomID="9"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="57" BracketedObjectIDs="40 41 42 43 45 46" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="58" GraphicID="56">
+        <crossingbond id="59" BondID="47" InnerAtomID="40"/>
+      </bracketattachment>
+      <bracketattachment id="60" GraphicID="55">
+        <crossingbond id="61" BondID="51" InnerAtomID="43"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="82" BracketedObjectIDs="64 65 66 68 69 70 71" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="83" GraphicID="81">
+        <crossingbond id="84" BondID="72" InnerAtomID="64"/>
+      </bracketattachment>
+      <bracketattachment id="85" GraphicID="80">
+        <crossingbond id="86" BondID="75" InnerAtomID="65"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="124" BracketedObjectIDs="89 90 91 92 93 94 95 96 97 98 100 101 102 103 104" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="125" GraphicID="123">
+        <crossingbond id="126" BondID="105" InnerAtomID="89"/>
+      </bracketattachment>
+      <bracketattachment id="127" GraphicID="122">
+        <crossingbond id="128" BondID="114" InnerAtomID="97"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="166" BracketedObjectIDs="132 133 134 135 136 137 138" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="167" GraphicID="165">
+        <crossingbond id="168" BondID="148" InnerAtomID="132"/>
+      </bracketattachment>
+      <bracketattachment id="169" GraphicID="164">
+        <crossingbond id="170" BondID="162" InnerAtomID="133"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="173" BracketedObjectIDs="139 140 141 142 143 144 145 146" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="174" GraphicID="172">
+        <crossingbond id="175" BondID="162" InnerAtomID="139"/>
+      </bracketattachment>
+      <bracketattachment id="176" GraphicID="171">
+        <crossingbond id="177" BondID="163" InnerAtomID="140"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="201" BracketedObjectIDs="180 181 183 184 185 186 187 188" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="202" GraphicID="200">
+        <crossingbond id="203" BondID="189" InnerAtomID="180"/>
+      </bracketattachment>
+      <bracketattachment id="204" GraphicID="199">
+        <crossingbond id="205" BondID="191" InnerAtomID="181"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="229" BracketedObjectIDs="208 209 211 212 213 214 215 216" BracketUsage="MultipleGroup" RepeatCount="10">
+      <bracketattachment id="230" GraphicID="228">
+        <crossingbond id="231" BondID="217" InnerAtomID="208"/>
+      </bracketattachment>
+      <bracketattachment id="232" GraphicID="227">
+        <crossingbond id="233" BondID="219" InnerAtomID="209"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <bracketedgroup id="257" BracketedObjectIDs="236 237 239 240 241 242 243 244" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="258" GraphicID="256">
+        <crossingbond id="259" BondID="245" InnerAtomID="236"/>
+      </bracketattachment>
+      <bracketattachment id="260" GraphicID="255">
+        <crossingbond id="261" BondID="247" InnerAtomID="237"/>
+      </bracketattachment>
+    </bracketedgroup>
+  </page>
+</CDXML>

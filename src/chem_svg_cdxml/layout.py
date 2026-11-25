@@ -125,6 +125,7 @@ class SchemeLayout:
     resonance: list[ResonanceLayout] = field(default_factory=list)
     pluses: list[TextRun] = field(default_factory=list)
     numbers: dict[str, list[TextRun]] = field(default_factory=dict)
+    coefficients: list[richtext.Line] = field(default_factory=list)  # step reactants' coefficients (n), as placed
     curved: list[MechArrow] = field(default_factory=list)
     checks: list[electrons.StepCheck] = field(default_factory=list)
 
@@ -229,7 +230,7 @@ def _place(spec: Spec, out: SchemeLayout, breaks: set[tuple[str, int]], rings: d
     the measuring pass, where only x matters."""
     preset = out.preset
     s = preset.scheme
-    out.steps, out.pluses, out.resonance = [], [], []
+    out.steps, out.pluses, out.resonance, out.coefficients = [], [], [], []
     units: list[Unit] = []
     x, row = 0.0, 0
 
@@ -269,10 +270,23 @@ def _place(spec: Spec, out: SchemeLayout, breaks: set[tuple[str, int]], rings: d
         units[-1].species.append(nm)
         x += b[2] - b[0]
 
-    def put_species(names: list[str]) -> None:
+    def coefficient(text: str, nm: str) -> None:
+        """A reactant's coefficient (n) from x, its ink centered on the axis and coefficient_gap
+        before the species (polymer_x1.0's n styrene; style-spec.md §17)."""
+        nonlocal x
+        ln = richtext.layout_line(text, 0.0, 0.0, preset.text.caption_size, preset, f"coefficient:{nm}")
+        ink = ln.ink()
+        ln.shift(x - ink[0], -s.center_above_axis - (ink[1] + ink[3]) / 2)
+        out.coefficients.append(ln)
+        units[-1].items.append(Group(f"coefficient-{nm}", ln.runs))
+        x = ln.ink()[2] + preset.polymer.coefficient_gap
+
+    def put_species(names: list[str], coefficients: dict | None = None) -> None:
         for k, nm in enumerate(names):
             if k:
                 plus()
+            if nm in (coefficients or {}):
+                coefficient(str(coefficients[nm]), nm)
             put(nm)
 
     def put_bracket(n: int) -> None:
@@ -331,7 +345,7 @@ def _place(spec: Spec, out: SchemeLayout, breaks: set[tuple[str, int]], rings: d
         over = spec.over_names(i)
         if i == 1 or st.new_row:
             unit("reactants", i, 0.0, new_row=i > 1)
-            put_species([n for n in st.sources if n not in over])
+            put_species([n for n in st.sources if n not in over], st.coefficients)
         else:
             extra = [n for n in st.sources[spec.kept(i):] if n not in over]
             if extra:  # more reactants join the previous products: "+ X" (after a bracket, no plus)
@@ -339,7 +353,7 @@ def _place(spec: Spec, out: SchemeLayout, breaks: set[tuple[str, int]], rings: d
                     x += s.plus_gap
                 else:
                     plus()
-                put_species(extra)
+                put_species(extra, st.coefficients)
         unit("step", i, s.arrow_gap, glue=bool(st.arrows))
         staged = bool(st.stages)
         above, below, need = _conditions(st.lines(), staged, preset, i)

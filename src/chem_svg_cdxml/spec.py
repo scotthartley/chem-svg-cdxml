@@ -85,6 +85,7 @@ Charges: a formal charge of ±1 draws a plain sign, ±2 or more "2+" / "2−". C
 
 from __future__ import annotations
 
+import copy
 import re
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -95,7 +96,7 @@ from pydantic import (BaseModel, ConfigDict, Discriminator, Field, Tag, Validati
                       model_validator)
 from rdkit import Chem
 
-from . import abbrev, chem
+from . import abbrev, chem, polymer
 from .draw_mol import parse_charge_text
 from .preset import available, is_path, load_preset
 
@@ -255,10 +256,69 @@ class AbbrevDef(BaseModel):
     nickname: bool | None = None
 
 
+class PolymerUnit(BaseModel):
+    """A repeat unit: SMILES with two `*`, the first the head (drawn on the left), the second the tail.
+    `label`: a block's subscript (block copolymers only)."""
+    model_config = ConfigDict(extra="forbid")
+    smiles: str
+    label: int | str | None = None
+
+
+BLOCK_LABELS = "lmn"  # default block subscripts, the last block's n (polymer_x1.0: m, n)
+
+
+class Polymer(BaseModel):
+    """A polymer drawn with repeat-unit brackets (polymer.py, style-spec.md §17). `start` / `end`: end
+    groups, SMILES with one `*` (the bond to the chain); without one the chain end is a dangling bond.
+    kind homo: one unit; random: one bracket pair round all units, a slash across each bond between
+    them, `ratio` (e.g. "70:30") centered below; block: one bracket pair per unit, `label` per unit.
+    `label`: the subscript of homo and random (n, x, 10, n-1; letters are set italic)."""
+    model_config = ConfigDict(extra="forbid")
+    units: list[PolymerUnit] = Field(min_length=1)
+    start: str | None = None
+    end: str | None = None
+    kind: Literal["homo", "random", "block"] = "homo"
+    label: int | str | None = None
+    ratio: str | None = None
+
+    @field_validator("units", mode="before")
+    @classmethod
+    def _unit_strings(cls, v):
+        return [{"smiles": u} if isinstance(u, str) else u for u in v] if isinstance(v, list) else v
+
+    @model_validator(mode="after")
+    def _kind(self):
+        n = len(self.units)
+        if self.kind == "homo" and n != 1:
+            raise ValueError(f"polymer: kind homo takes one unit ({n} given); use kind random or block for a copolymer")
+        if self.kind != "homo" and n < 2:
+            raise ValueError(f"polymer: kind {self.kind} needs two or more units")
+        if self.ratio is not None and self.kind != "random":
+            raise ValueError("polymer: ratio is drawn under a random copolymer only (kind: random)")
+        if self.kind == "block":
+            if self.label is not None:
+                raise ValueError("polymer: a block copolymer's subscripts go on its units (units: [{smiles, label}])")
+        elif any(u.label is not None for u in self.units):
+            raise ValueError("polymer: unit labels are for block copolymers; use polymer.label")
+        if self.kind == "block" and n > len(BLOCK_LABELS) and any(u.label is None for u in self.units):
+            raise ValueError(f"polymer: more than {len(BLOCK_LABELS)} blocks: give each unit a label")
+        return self
+
+    def labels(self) -> list[str]:
+        """The subscript of each bracket pair, left to right."""
+        if self.kind != "block":
+            return [str(self.label) if self.label is not None else "n"]
+        default = BLOCK_LABELS[len(BLOCK_LABELS) - len(self.units):]
+        return [str(u.label) if u.label is not None else default[k] for k, u in enumerate(self.units)]
+
+
 class Species(BaseModel):
     model_config = ConfigDict(extra="forbid")
     smiles: str | None = None
     molfile: str | None = None
+    polymer: Polymer | None = None  # in place of smiles / molfile: repeat units in brackets (style-spec.md §17)
+    chain_ends: list[int] = Field(default_factory=list)  # atom maps of [*:k] atoms drawn as wavy chain ends
+    bond_lengths: dict[str, float] = Field(default_factory=dict)  # "m-n" (atom maps) -> x bond_length (acyclic bonds)
     orientation: Orientation | None = None
     kekule: list[str] | None = None  # "m=n" atom-map pairs that are double bonds
     # explicit labels on terminal carbons (CH3): atom ids are atom-map numbers if set, else 1-based atom indices.
@@ -279,9 +339,27 @@ class Species(BaseModel):
 
     @model_validator(mode="after")
     def _one_source(self):
-        if (self.smiles is None) == (self.molfile is None):
-            raise ValueError("give exactly one of smiles or molfile")
+        if sum(x is not None for x in (self.smiles, self.molfile, self.polymer)) != 1:
+            raise ValueError("give exactly one of smiles, molfile or polymer")
+        if self.polymer is not None:
+            clash = [k for k, on in (("kekule", bool(self.kekule)), ("orientation", self.orientation is not None),
+                                     ("lewis", self.lewis not in (None, False)), ("chair", self.chair not in (None, False)),
+                                     ("align_to", self.align_to is not None)) if on]
+            if clash:
+                raise ValueError(f"polymer can't be combined with {', '.join(clash)} (a polymer is laid out along "
+                                 "its backbone, head to tail left to right)")
         return self
+
+    @field_validator("bond_lengths")
+    @classmethod
+    def _bond_lengths(cls, v):
+        for p, k in v.items():
+            parts = str(p).split("-")
+            if len(parts) != 2 or not all(x.strip().isdigit() for x in parts):
+                raise ValueError(f"bond_lengths key {p!r} must look like '1-2' (the atom-map numbers of a bond)")
+            if not 0.5 <= k <= 5:
+                raise ValueError(f"bond_lengths {p}: {k} is not a factor of the bond length between 0.5 and 5")
+        return v
 
     @model_validator(mode="after")
     def _lewis(self):
@@ -372,6 +450,7 @@ class Step(BaseModel):
     arrows: list[CurvedArrow] = Field(default_factory=list)  # M3 curved arrows, drawn on the reactants
     omit: list[str] = Field(default_factory=list)  # products the bookkeeping uses but the drawing leaves out
     over: list[str] | None = None  # reactants drawn above the arrow (default: a later mechanism step's added ones)
+    coefficients: dict[str, int | str] = Field(default_factory=dict)  # reactant -> text drawn before it ("n"; richtext)
 
     @model_validator(mode="before")
     @classmethod
@@ -399,6 +478,9 @@ class Step(BaseModel):
             raise ValueError(f"omit: {', '.join(bad)} not in this step's `to` {self.products}")
         if self.omit and not self.drawn_products:
             raise ValueError("omit: every product is omitted; at least one product must stay drawn")
+        bad = [n for n in self.coefficients if n not in self.sources]
+        if bad:
+            raise ValueError(f"coefficients: {', '.join(bad)} not in this step's `from` {self.sources}")
         if self.over is not None and not self.arrows:
             raise ValueError("over: reactants go over the arrow only in a mechanism step (one with curved `arrows`); "
                              "write a reagent with no arrows as text (above: ...)")
@@ -866,11 +948,14 @@ def resolve_molfile(ref: str, base_dir: Path) -> Path:
 def _parsed(sp: Species, base_dir: Path, name: str = ""):
     """(mol, from a molfile). Atoms in the species' triplet: carry chem.TRIPLET_PROP."""
     try:
-        if sp.smiles is not None:
+        if sp.polymer is not None:
+            mol, from_file = polymer.assemble(sp.polymer), False
+        elif sp.smiles is not None:
             mol, from_file = chem.parse_smiles(sp.smiles, sp.kekule), False
         else:
             mol, from_file = chem.parse_molfile(resolve_molfile(sp.molfile, base_dir).read_text(), sp.kekule), True
         mark_triplets(mol, sp.triplet)
+        mark_chain_ends(mol, sp.chain_ends)
     except ValueError as e:
         raise ValueError(f"species {name}: {e}" if name else str(e)) from None
     return mol, from_file
@@ -895,6 +980,19 @@ def mark_triplets(mol: Chem.Mol, ids: list[int | str]) -> None:
             raise ValueError(f"triplet: atom {x} ({a.GetSymbol()}) has {a.GetNumRadicalElectrons()} unpaired "
                              "electrons; triplet is for carbenes/nitrenes written [C] / [CH2] / [N]")
         a.SetIntProp(chem.TRIPLET_PROP, 1)
+
+
+def mark_chain_ends(mol: Chem.Mol, maps: list[int]) -> None:
+    """Set chem.POLY_END "wavy" on the [*:k] atoms `maps` names (each a '*' with one bond)."""
+    by_map = {a.GetAtomMapNum(): a for a in mol.GetAtoms() if a.GetAtomMapNum()}
+    for k in maps:
+        a = by_map.get(k)
+        if a is None:
+            raise ValueError(f"chain_ends: no atom has map number {k}")
+        if a.GetAtomicNum() != 0 or a.GetDegree() != 1:
+            raise ValueError(f"chain_ends: atom {k} must be a '*' with one bond ([*:{k}]), not {a.GetSymbol()} "
+                             f"with {a.GetDegree()}")
+        a.SetProp(chem.POLY_END, "wavy")
 
 
 def parsed_species(spec: Spec, base_dir: Path) -> dict[str, Chem.Mol]:
@@ -960,8 +1058,31 @@ def _for_display(spec: Spec, name: str, mol: chem.Molecule, lewis: bool = False)
     if lewis:
         return with_spin(spec, name, with_charges(spec, name, relabel(spec, mol)))
     sp = spec.species[name]
-    return with_front(name, sp, with_spin(spec, name, with_charges(
-        spec, name, relabel(spec, chem.show_carbons(mol, sp.show_carbons)))))
+    return with_geometry(spec, name, with_front(name, sp, with_spin(spec, name, with_charges(
+        spec, name, relabel(spec, chem.show_carbons(mol, sp.show_carbons))))))
+
+
+def with_geometry(spec: Spec, name: str, mol: chem.Molecule) -> chem.Molecule:
+    """The species' bond_lengths (polymer.stretch_bond), then a polymer's brackets and stretched
+    crossing bonds (polymer.finish), on a copy."""
+    sp = spec.species[name]
+    if not sp.bond_lengths and sp.polymer is None:
+        return mol
+    preset = load_preset(spec.preset)
+    mol = copy.deepcopy(mol)
+    by_map = {a.map: a.idx for a in mol.atoms if a.map}
+    for key, factor in sp.bond_lengths.items():
+        a, b = (int(x) for x in str(key).split("-"))
+        missing = [m for m in (a, b) if m not in by_map]
+        if missing:
+            raise ValueError(f"species {name}: bond_lengths {key}: no atom has map number {missing[0]}")
+        try:
+            polymer.stretch_bond(mol, by_map[a], by_map[b], factor, preset.lengths.bond_length)
+        except ValueError as e:
+            raise ValueError(f"species {name}: bond_lengths {key}: {e}") from None
+    if sp.polymer is not None:
+        polymer.finish(mol, sp.polymer, preset)
+    return mol
 
 
 def molecules(spec: Spec, base_dir: Path) -> list[chem.Molecule]:
@@ -980,7 +1101,14 @@ def molecules(spec: Spec, base_dir: Path) -> list[chem.Molecule]:
                 raise ValueError(f"species {name}: {e}") from None
             out.append(_for_display(spec, name, mol, lewis=True))
             continue
-        if sp.smiles is not None:
+        if sp.polymer is not None or (sp.chain_ends and sp.smiles is not None and sp.chair is None):
+            mol, _ = _parsed(sp, base_dir, name)  # chain ends marked on the parsed atoms
+            try:
+                mol = chem.prepare(mol, name, bl, sp.abbreviate, False, "auto" if o.rotate is None else o.rotate,
+                                   o.flip_h, o.flip_v, registry=spec.registry).molecule()
+            except ValueError as e:
+                raise ValueError(f"species {name}: {e}") from None
+        elif sp.smiles is not None:
             rot = "auto" if o.rotate is None else o.rotate
             try:
                 mol = chem.from_smiles(sp.smiles, name, bl, sp.kekule, rot, o.flip_h, o.flip_v, sp.abbreviate,

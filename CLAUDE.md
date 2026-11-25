@@ -51,8 +51,8 @@ they disagree, `style-spec.md` (the ChemDraw references) wins.
 - `uv run python scripts/measure_refs.py [--summary | --json out.json] [names]` measures ChemDraw exports.
   The command line and `mr.<name>` re-exports are in `measure_refs.py`; the methods are in `scripts/chemdraw_refs/`
   (`core` model and loaders, `measurements`, `clip`, `scheme`, `mech`, `labels`, `cdxml`, `chair`, `arcs`).
-- Examples are grouped by milestone: `examples/m1/` … `examples/m6/` (file names keep the `mN_` prefix).
-- The CDXML export tests are `tests/test_cdxml_{species,scheme,mech,resonance,abbrev,cycle}.py`, sharing `tests/cdxml_helpers.py`.
+- Examples are grouped by milestone: `examples/m1/` … `examples/m7/` (m7: polymers; file names keep the `mN_` prefix).
+- The CDXML export tests are `tests/test_cdxml_{species,scheme,mech,resonance,abbrev,cycle,polymer}.py`, sharing `tests/cdxml_helpers.py`.
 - `uv run python scripts/compare_fonts.py` compares Helvetica with the Heros fallback (advances, kerning).
 - `uv run python scripts/check_rasterizer.py` is the rasterizer/font acceptance test.
 - `uv run python scripts/measure_refs.py --fit-clip` refits the bond-to-label clip model (style-spec.md §2.1).
@@ -83,10 +83,10 @@ they disagree, `style-spec.md` (the ChemDraw references) wins.
 - `uv run python scripts/measure_refs.py --cdxml-symbols` prints the charge-symbol boxes per reference (style-spec.md §13),
   and on mech_basic_x* the LonePair / Electron boxes and each fragment box's reach beyond its dots (§13.2).
 - `uv run python scripts/measure_refs.py --cdxml-scheme` prints the CDXML caption, arrow, bracket and step conventions per scheme reference, resonance_x* included (style-spec.md §13.1, §13.3).
-- `uv run python scripts/cdxml_gate.py [--phase 2|3|4a|4b|4c|5|6] [--diff]` writes the CDXML gate files to `build/cdxml_gate/`
+- `uv run python scripts/cdxml_gate.py [--phase 2|3|4a|4b|4c|5|6|7] [--diff]` writes the CDXML gate files to `build/cdxml_gate/`
   (`phase2/` for schemes, `phase3/` for mechanisms, `phase4a/` for abbreviations, resonance and wrap, `phase4c/` for general
   abbreviations (generated fragments, ring NTs, text labels), `phase4b/` for
-  charges and Lewis, `phase5/` for chairs and crossings, `phase6/` for catalytic cycles); `--diff` compares ChemDraw's re-saves (`reference_renders/resaves/phase<N>/`, phase 1 for the default) with them (style-spec.md §13–§13.4, §15.3, gate).
+  charges and Lewis, `phase5/` for chairs and crossings, `phase6/` for catalytic cycles, `phase7/` for polymers); `--diff` compares ChemDraw's re-saves (`reference_renders/resaves/phase<N>/`, phase 1 for the default) with them (style-spec.md §13–§13.4, §15.3, gate).
   `--lewis-draft` writes `build/cdxml_gate/lewis_draft/charges_lewis_draft_x*.cdxml`, the draft the user edited into
   the charges_lewis_x* reference (never overwrites).
 - `uv run python scripts/measure_refs.py --arc` prints arcs_x*'s arc arrows: circle, sweep, notch and head on the chord, ChemDraw's cubics (style-spec.md §15.1).
@@ -94,6 +94,8 @@ they disagree, `style-spec.md` (the ChemDraw references) wins.
 - `uv run python scripts/measure_refs.py --chair` prints chair_x*'s templates, axial and equatorial bonds per vertex, and the chairs' crossings (style-spec.md §14.1).
 - `uv run python scripts/measure_refs.py --crossing` prints every crossing's front bond (by Z) and the rear bond's cut ends (style-spec.md §14.2).
 - `uv run python scripts/measure_refs.py --nh` prints nh_x*'s NH labels: open direction, H beside / above / below, line pitch, CDXML `<t>` (style-spec.md §2).
+- `uv run python scripts/measure_refs.py --polymer` prints polymer_x1.0's brackets (gaps, lip, crossing bonds and where
+  they are crossed), subscripts, the slash, the ratio, the wavy chain end and the coefficient (style-spec.md §17).
 - `uv run python scripts/measure_refs.py --charges-lewis` prints charges_lewis_x*'s circled signs, symbol sizes per box,
   two-electron radicals and label texts (style-spec.md §2.2, §13.4).
 - `uv run python scripts/validate.py [--suggest] spec.yaml` checks schema, chemistry, electron bookkeeping, scheme

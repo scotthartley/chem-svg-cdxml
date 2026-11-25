@@ -789,3 +789,34 @@ removed renders pixel-identical to the approved `m4_nitration_x1.0`. Inbox triag
   `<curve>` with no size and draws 8 x 2.5 x 6.75 x LineWidth (17.28 x 5.40 x 14.58, the probe's and mech_basic_x*'s 4.81 x 1.50 x 4.06). HeadSize,
   HeadCenterSize and HeadWidth on a `<curve>` are in the DTD but ChemDraw ignores them (user check of m3_sn2 and m3_radical_initiation with them set on one
   arrow each: every head the same). So a `<curve>` can't take the arc tool's narrower head.
+
+## 2026-11-25 (polymers, polymer_x1.0)
+
+- **The reference showed a different random copolymer than planned.** The plan put x and y under each
+  unit; polymer_x1.0 has one ratio ("70:30") centered under the brackets. The reference wins (CLAUDE.md),
+  so `ratio:` replaced per-unit labels.
+- **ChemDraw's polymer brackets are "Multiple Group", not SRU**, with RepeatCount 1 and the subscript in a
+  `parameterizedBracketLabel` objecttag marked Visible="no" that ChemDraw still draws. A "10" is both
+  RepeatCount 10 and the label. Objecttag ids are 1 and 2 in every bracket, so the id-uniqueness check skips them.
+- **A wavy bond is a node, not a bond style:** an ExternalConnectionPoint with ExternalConnectionType Wavy, the
+  bond to it plain, the squiggle drawn across its end. RDKit reads that node back as a carbon.
+- **"Stretch every crossing bond" was wrong.** In the reference only bonds whose bracket would otherwise hit the
+  pendant are 2 x (28.8 at 15°, rise kept); the others stay 14.4 with the bracket at the midpoint. The rule
+  is a clearance test (`min_gap_x`), with the by-eye gaps rounded (2.97 kept -> 2.5).
+- **CoordGen's coordMap doesn't hold a zigzag** (it returned 1.0 Å bonds and moved the pins); RDKit's own
+  depictor with `coordMap` holds it exactly at 1.5 Å. Pinning the backbone was what put PMMA's ester below
+  the chain; CoordGen alone laid it along the chain, into the bracket.
+- **A by-eye reference still has exact parts.** The lip (0.0726 x bar), the stretch (2.000 x), the wave
+  (0.972 / 0.50 / 17.0) and the subscript size (0.75 x LabelSize) are ChemDraw's; only placements were rounded.
+- **`*` is R to the electron bookkeeping.** Valence 0 left a chain end with a −1 formal charge after a
+  fishhook step; `Model.charge` now gives `*` no charge.
+
+
+## 2026-11-25: polymer pendants on the 30° grid
+
+User review of the first m7 renders: RDKit's depictor round a pinned backbone (coordMap) gives the
+pendants' esters skewed angles, and turning a branch rigidly (the upright rule) keeps them. Pendants
+and end groups are now placed by rule (polymer._tree_layout: 120° zigzag, larger branch continuing,
+fourth bond between parent and main, sp straight, rings rigid), with RDKit's layout only as the clash
+fallback. Chain-end species (~~CH₂–CH(Ph)•) take the same layout, as the reference draws them, so a
+propagation scheme's reactants hang their Ph down like the product's.

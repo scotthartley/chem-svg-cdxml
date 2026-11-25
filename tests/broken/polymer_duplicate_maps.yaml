@@ -1,0 +1,3 @@
+# expect: atom maps must be unique across the start, units and end
+species:
+  p: {polymer: {start: "[CH3:1]*", units: ["*[CH2:1]C(*)c1ccccc1"]}}

@@ -33,6 +33,7 @@ align: auto                # or false: every species on its own layout
 | `steps[].stages` | list of ≥ 1 strings | Numbered stages, left-justified: the first ⌈n/2⌉ above, the rest below (2 → "1." / "2."; 3 → "1.", "2." / "3."). Exclusive with above/below. |
 | `steps[].arrow_type` | `forward` (default) \| `equilibrium` \| `equilibrium_products` \| `equilibrium_reactants` | The step's arrow: → , balanced ⇌, or unbalanced ⇌ with the long shaft pointing to the favored side (products: right; reactants: left). Equilibrium conditions sit above and below the outer shafts, centered on the arrow (style-spec.md §3.6). Not on resonance steps. Works with `stages` and curved `arrows` (a reversible proton transfer). |
 | `arrow_head` | `standard` \| `large` | Head of every reaction, equilibrium and ↔ arrow. Default: the preset's (`large` at ×1.0, `standard` at ×0.8 and ×0.6; style-spec.md §3.1). `standard` at ×1.0 matches ChemDraw's default head. Curved arrows are unaffected. |
+| `steps[].coefficients` | map: reactant → text | Drawn before that reactant, its ink centered on the arrow axis (`{styrene: n}` for n styrene → polystyrene; richtext, so `"*n*"` is italic; style-spec.md §17). A free caption in the CDXML. |
 | `numbers.<name>` | int or string | Bold compound number under the species, on one shared baseline. |
 | `species.<name>.abbreviate` | list | Collapse these terminal groups to labels: any key of the registry (`src/chem_svg_cdxml/data/abbreviations.yaml`: groups Me, Et, *i*-Pr, *t*-Bu, Ph, Bn, Cy, Mes, Ac, Bz, Piv, Boc, Cbz, Fmoc, Ts, Ms, Tf, TMS, TES, TBS, TIPS, TBDPS, MOM, MEM, SEM, THP, PMB, …; formulas OMe, OAc, OTf, OTs, NHBoc, NMe2, N3, NO2, CO2Me, CO2*t*-Bu, CHO, CF3, CN, B(OH)2, Bpin, SnBu3, …; ligands PPh3, PMe3, PCy3, P(*t*-Bu)3, P(*o*-tol)3, bonded to the metal, `<-` included) or of the spec's `abbreviations:`. A group whose bond leaves to the right is set right-justified in reversed text (MeO, MeO₂C, TfO, BocHN, (HO)₂B, Me₃P; one-token names such as Boc, *t*-Bu, N₃ keep their text). A **group** collapsed on a heteroatom merges into its label (composition: TBS on O → OTBS, Ts on a ring N → NTs with Ts beside, above or below N, Bu ×3 on Sn → SnBu₃); a d-block metal keeps its groups. |
 | `species.<name>.align` | bool (default true) | A product takes the orientation of the species it is drawn from (of several sources, the one it shares the largest unchanged part with). Shared atoms: atom maps (≥ 2 common maps, plus the unmapped atoms around them), else the maximum common substructure. **Pin**: when ≥ 3 connected shared atoms keep their neighbor count, those keep the reference's coordinates exactly; with no such group, all shared atoms do (a trigonal center turning tetrahedral). **Orient**: if pinning would bend an sp atom, stretch a bond or crowd an acyclic atom's bonds, the species gets its own layout, turned (or mirrored) the way its shared atoms point in the reference and snapped to the 30° grid. `false` = own layout, auto-oriented. Molfile species keep their layout unless `align_to` is set. |
@@ -287,8 +288,38 @@ species:
 | `species.<name>.chair` | `true` \| `{ring, flip, axial, equatorial, start}` | Draw the six-membered ring as a chair (below). SMILES only; not with `lewis`, `molfile` or `orientation`. Atoms are atom-map numbers. |
 | `species.<name>.front` | list of `"m-n"` (atom-map numbers of a bond) | Where two bonds cross at equal depth, draw these whole and cut the other (default: the later bond in the SMILES). A chair sets its own front/back from depth. |
 
-Give exactly one of `smiles` or `molfile`. Without `steps`, several species are placed left to
+| `species.<name>.polymer` | `{units, start, end, kind, label, ratio}` | A polymer in repeat-unit brackets, in place of `smiles` / `molfile` (below). |
+| `species.<name>.chain_ends` | list of atom-map numbers | Draw these `[*:k]` atoms (one bond each) as wavy chain ends: a squiggle across the bond's end (style-spec.md §17). Electron bookkeeping treats `*` as R. |
+| `species.<name>.bond_lengths` | map `"m-n"` → factor | Make that acyclic bond factor x the bond length (0.5–5), along its own direction; the side with fewer atoms moves. A ring bond is an error. |
+
+Give exactly one of `smiles`, `molfile` or `polymer`. Without `steps`, several species are placed left to
 right with `scheme.plus_gap` between their ink boxes.
+
+### Polymers (`polymer`)
+
+```yaml
+species:
+  ps:      {polymer: {units: ["*CC(*)c1ccccc1"]}}                       # –[CH2–CH(Ph)]n–, bare ends
+  ps_ends: {polymer: {start: "N#CC(C)(C)*", units: ["*CC(*)c1ccccc1"], end: "Br*"}}
+  ps_10:   {polymer: {units: ["*CC(*)c1ccccc1"], label: 10}}            # also x, n-1 (drawn n−1)
+  random:  {polymer: {kind: random, units: ["*CC(C)(*)C(=O)OC", "*CC(C)(*)C(=O)OCC"], ratio: "70:30"}}
+  block:   {polymer: {kind: block, units: [{smiles: "*CC(*)c1ccccc1", label: m}, "*CC(C)(*)C(=O)OC"], end: "C*"}}
+  chain:   {smiles: "[*:1]C[CH]c1ccccc1", chain_ends: [1], abbreviate: [Ph]}   # ~~CH2–CH(Ph)•
+steps:
+  - {from: styrene, to: ps, coefficients: {styrene: n}}
+```
+
+- `units`: SMILES with two `*`, the first the head (drawn on the left), the second the tail; a string
+  or `{smiles, label}` (label: block copolymers only). Atom maps must be unique across start, units and end.
+- `start` / `end`: an end group, SMILES with one `*` (its bond to the chain). Without one, the chain end is
+  a bare bond (a carbon in the CDXML, as ChemDraw draws it).
+- `kind`: `homo` (default, one unit), `random` (one bracket pair round all units, a slash across each bond
+  between them, optional `ratio` caption centered below) or `block` (a bracket pair per unit; default
+  subscripts m, n or l, m, n).
+- `label`: the subscript of `homo` / `random` (default n). Letters are set italic, digits and signs regular.
+- The backbone is laid out horizontally, head left, pendants below; crossing bonds are stretched where a
+  bracket would crowd the unit (style-spec.md §17). Not with `kekule`, `orientation`, `lewis`, `chair`,
+  `align_to`; a polymer aligns to nothing. Example: `examples/m7/`.
 
 ### Chairs (`chair`)
 

@@ -703,9 +703,9 @@ Rules (M4; unmeasured, user decisions 2026-10-25, flagged at review):
 29. ~~**Further group abbreviations** (§3.5).~~ **Resolved (abbrev_2_x\*, 2026-11-03):** about 30
     more groups and formulas in both justifications; labels are now rules (registry, reversal,
     anchor, composition), so a label without a reference is drawn and exported too.
-30. **Repeat-unit brackets** ([ ]ₙ for an oligomer or polymer; inbox 2026-10-30): not drawn. Needs
-    a reference (polymer_x0.6 / 0.8 / 1.0): brackets across the two bonds at several angles, the
-    subscript n's size and place, and the CDXML objects ChemDraw writes for them.
+30. ~~**Repeat-unit brackets**~~ **Resolved (polymer_x1.0, 2026-11-25):** §17. Open within it:
+    no polymer_x0.8 / x0.6 (the polymer keys there are acs1996's x k, `derived:`); the style probe has
+    no polymer specimen, so a generated preset derives them too; the phase 7 CDXML gate awaits ChemDraw's re-saves.
 
 31. **dppf above Pd** (§3.5, ligands_x1.0): ChemDraw stops the bond below dppf's p descenders,
     1.9 pt beyond our anchor-glyph clip, and draws no bond at ×0.8 / ×0.6; Lₙ above Pd (its
@@ -1364,7 +1364,7 @@ the derived ones under `derived:`.
 |---|---|
 | Settings (CDXML root) | bond length, line width, bold width, margin, hash spacing, bond spacing, chain angle, label and caption size, font; ring inset (spacing x tan 30) |
 | Probe (a specimen, the ACS methods) | hash thickness, wedge end, charge bars (ChemDraw's as drawn, not k-scaled as in the ACS family: user decision 2026-11-06), curved-arrow heads, dot radius and spacing, reaction heads (standard and large), shaft, outline, equilibrium offsets, bracket stroke and LipSize, NH and tail pitches, symbol boxes |
-| Derived from acs1996, unmeasured | placement defaults (x k on the 0.5 pt grid), chair vertices (x k), `ratios.*`, bracket lip (x k; drawn at 0.0726 x the bar's height, lessons.md), `lewis.bond_length` (its rule), lone-pair and electron box reach (dot radius + 0.137 / + 0.067), circled signs (box 0.75 x LabelSize, ring 0.4 x LineWidth + 4/9 x box: a sign drawn fresh, with the probe's own ring as a check), sub-line text pitch (x LabelSize / 10) |
+| Derived from acs1996, unmeasured | placement defaults (x k on the 0.5 pt grid), chair vertices (x k), `ratios.*`, bracket lip (x k; drawn at 0.0726 x the bar's height, lessons.md), `lewis.bond_length` (its rule), lone-pair and electron box reach (dot radius + 0.137 / + 0.067), circled signs (box 0.75 x LabelSize, ring 0.4 x LineWidth + 4/9 x box: a sign drawn fresh, with the probe's own ring as a check), sub-line text pitch (x LabelSize / 10), every `polymer.*` key (§17: placement x k on the 0.5 pt grid, the wave x k, the subscript x LabelSize / 10, lip ratio, stretch and slash angle copied; the probe has no polymer specimen) |
 
 **A sign's size is its box, and the box has two values.** ChemDraw's tool draws a sign or radical at box dx 0.75 x LabelSize and a lone pair at half that, and
 applying a style rewrites the sign and radical boxes to 0.075 x LabelSize². They agree at 10 pt only: at 8 pt 6.0 against 4.8, at 18 pt 13.5 against 24.3, and
@@ -1406,3 +1406,89 @@ LineWidth + 4/9 x box dx, the probe's ring = 0.4 x LineWidth + 4/9 x its box dx,
 `cdxml.resonance_box_pad`, 0.18 against 0.67, not drawn); the measuring methods on the references, each role from its own file (0.1 pt; miss:
 `charge.bar_length`, where ChemDraw's 2.733 / 1.798 stand against the k-scaled 3.148 / 2.361 of the user decision of 2026-10-24); and real
 probes in `reference_renders/probes/` (x0.8 from one ChemDraw round, 2026-11-06, same misses; x0.6 when saved). A generated preset renders and exports every spec kind.
+
+## 17. Polymers (source: polymer_x1.0, ChemDraw 26.1.0.6801; `measure_refs.py --polymer`)
+
+polymer_x1.0 holds polystyrene with dangling ends and with end groups (NC–C(CH₃)₂ … Br),
+poly(p-phenylene), PMMA, a random copolymer (one bracket pair, a slash across the bond between the units,
+"70:30" below), a block copolymer (a bracket pair per block, one bond crossing both), the subscripts n, x,
+10 and n−1, a wavy chain end (~~CH₂–CH(Ph)•) and the scheme n styrene → polystyrene. The user placed the
+brackets by eye, so their positions give round placement defaults; the lip rule, the wave and the CDXML
+objects are ChemDraw's own and exact. One reference at ×1.0: ×0.8 and ×0.6 take acs1996's values x k
+(§16 showed the ACS scales follow k), listed under `derived:` in those presets.
+
+| Key (`polymer.`) | ×1.0 | ×0.8 / ×0.6 | Measured (polymer_x1.0) |
+|---|---|---|---|
+| lip_per_height | 0.0726 | same | lip / bar 0.0726–0.0731 (n=20); ChemDraw's rule for LipSize 60, as resonance_x* |
+| crossing_stretch | 2.0 | same | stretched crossing bonds and the random copolymer's slashed bond 2.000 x bond (n=8), rise kept (15°) |
+| min_gap_x | 2.5 | 2.0 / 1.5 | brackets at an unstretched bond's midpoint kept gaps down to 2.97 (PMMA's C=O, random's left) |
+| gap_x | 6.0 | 5.0 / 3.5 | beside a stretched bond: 5.79 / 5.31 / 4.06 (PS, random, PMMA); = bracket.gap_x |
+| gap_above, gap_below | 2.0 | 1.5 / 1.0 | by eye: −1.25…6.96 above, −1.04…8.51 below (PS's brackets stop 1.0 above its ring); = bracket.gap_* |
+| block_gap | 17.0 | 13.5 / 10.0 | ']' to '[' on the block junction 16.70 |
+| label_size | 7.5 | 6.0 / 4.5 | the subscript's `<s size>` 7.5 = 0.75 x LabelSize |
+| label_dx, label_drop | 2.0, 2.0 | 1.5 / 1.0 | subscript origin 2.02 (n=6) / 2.52 (n=5) right of ']', baseline 2.00–2.01 below its bottom |
+| ratio_drop | 11.5 | 9.0 / 7.0 | "70:30" baseline 11.55 below the brackets, centered on them (−0.87, by eye) |
+| slash_length, slash_angle | 14.0, 75° | 11.0 / 8.5, 75° | 14.17 long, 74.8° clockwise from its bond (59.8° from horizontal), on the bond's midpoint (0.501) |
+| coefficient_gap | 9.5 | 7.5 / 5.5 | n's ink to styrene's 9.65; n's ink centered on the arrow axis (0.01); roman, caption size |
+| wave_length, wave_half_period, wave_amplitude | 17.0, 0.972, 0.5 | x k | ChemDraw's squiggle: 17.01 long across the bond end, half-ellipses 0.9723 apart, 0.50 high, 17.5 of them; stroke LineWidth |
+
+**Layout** (`polymer.py`). The units join head (first `*`) to tail (second `*`). An acyclic backbone is
+pinned to a horizontal 120° zigzag whose lower vertices carry the pendants. A backbone atom's one pendant
+points straight down; of two, the larger points down and the smaller straight up, between the backbone
+bonds at 60° to each (PMMA's CO₂Me down, CH₃ up, as drawn in the reference). Off the backbone every branch
+zigzags at 120° on the 30° grid: the larger branch continues the zigzag, a carbonyl's chain heads toward
+the tail (the reference's esters: C=O down-left, O down-right, CH₃ straight down), a fourth bond sits
+between the parent bond and the main one at 60° to each, sp atoms run straight, and rings keep RDKit's
+shape, turned so the bond to them bisects their outside angle. A start or end group continues the
+zigzag (AIBN's nitrile; its methyls up and down as an upright pair). Copolymer units may meet before
+their junction bond is stretched; any other clash falls back to RDKit's layout round the pinned zigzag.
+A backbone through a ring (poly(p-phenylene)) is laid out freely and turned to
+its principal axis. Then, in pt with the labels known:
+- a bracket crosses its crossing bond at the midpoint (0.44–0.52 in the reference, unstretched 14.4) if
+  that clears the enclosed ink by `min_gap_x`; otherwise the bond becomes `crossing_stretch` x long with its
+  rise kept and the bracket goes `gap_x` beyond the ink (PS's right bond, 28.8 at 15°, as the reference);
+  an end group's other bonds keep `min_gap_x` from the bracket too;
+- a random copolymer's bonds between units are `crossing_stretch` x long, slashed at the middle; one
+  bracket pair holds all units and `ratio` is centered `ratio_drop` below;
+- block brackets on one junction bond are `block_gap` apart (wider if the left subscript needs it);
+- every bracket of a polymer spans the enclosed ink (and crossing points) plus `gap_above` / `gap_below`;
+- the subscript's letters are italic, digits and signs regular (n−1: italic n, regular −1), at
+  `label_dx` / `label_drop` from the ']' bottom corner.
+
+A bare chain end (no start or end group) is a bond to nowhere; `chain_ends: [k]` draws a `[*:k]`'s end as the
+wave, across the bond and centered on its end. A species with one wavy end is drawn as the reference's
+~~CH₂–CH(Ph)•: the end on the left, the longest acyclic chain from it on the zigzag with pendants below, and
+a ring or label at the far end hanging straight down. If it would meet the pendant before it
+(~~CH₂CH(Ph)CH₂CH(Ph)•), the bond leaving that pendant's atom (CH(Ph)–CH₂) is 2 x long with its rise kept, as a stretched crossing bond
+(`polymer.CHAIN_STRETCH` = `crossing_stretch`); failing that, the zigzag continues. It aligns to nothing; an explicit `orientation` keeps the
+ordinary layout. `bond_lengths: {"m-n": f}` stretches any acyclic bond to f x the
+bond length, the smaller side moving. A step's `coefficients: {species: n}` sets n before that reactant.
+The electron bookkeeping treats `*` as R: neutral, with no electrons of its own.
+
+**Not measured, chosen:** the zigzag pinning, the upright pendant rule and the branch zigzag (the reference's
+look and 120° angles, not measured); bracket spans shared by all pairs of a polymer (the reference's two blocks differ by 0.6 pt).
+
+### 17.1 CDXML (gate phase 7: `cdxml_gate.py --phase 7`)
+
+As polymer_x1.0: per pair, the ']' `<graphic GraphicType="Bracket" BracketType="Square" LipSize="60"
+BracketUsage="MultipleGroup">` holding two `<objecttag>`s (ids 1 and 2 in every bracket): "bracketusage"
+(the repeat count as text at p 0 0, "1" for a symbol) and "parameterizedBracketLabel" (Visible no,
+PositioningType offset, PositioningOffset from the bar's top, its `<t>` with Helvetica Oblique face 2 for
+letters), written top first; then the '[' (bottom first). After the `<scheme>`s, a `<bracketedgroup
+BracketUsage="MultipleGroup" RepeatCount>` per pair with the enclosed atoms' node ids and a
+`<bracketattachment GraphicID>` per bracket holding `<crossingbond BondID InnerAtomID>`; a block junction
+bond is a crossing bond of both groups. ChemDraw writes RepeatCount 1 for n and 10 for 10. A bare chain end
+is a plain carbon node (as ChemDraw's); a wavy one `NodeType="ExternalConnectionPoint"
+ExternalConnectionType="Wavy" ExternalConnectionNum`. The slash is a `<curve>` inside the fragment with
+CurvePoints p0 p0 p0 p1 p1 p1 and ArrowheadType Solid. The ratio and the coefficient are free captions; the
+step cites only the fragment. The fragment's BoundingBox leaves the brackets out (polymer_x1.0's).
+
+Gate (`cdxml_gate.py --phase 7 --diff`): passed (the user's ChemDraw 26.1 re-saves of 2026-11-25 in
+`reference_renders/resaves/phase7/`). All four files pair every node (95, 34, 18, 4). ChemDraw keeps every
+bracket graphic, objecttag, `<bracketedgroup>`, crossing bond, wavy ECP and the slash curve as written,
+and changes in them only number formatting ("2.00 57.00" -> "2 57") and the hidden label's box (italic
+right edge +0.05). The rest is what earlier phases already showed: AS / BS / AtomID and
+BondCircularOrdering added, `Warning` on the free captions (n, 70:30), the arrow box 0.24 taller. New:
+a fragment with a wavy end gets a box up to 0.48 larger at the squiggle's end (ChemDraw's own squiggle
+bounds; ours is the drawn ink). It is not displayed and ChemDraw recomputes it, so we leave it as is.
+

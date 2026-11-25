@@ -1,0 +1,20 @@
+# M7 polymers (style-spec.md §17), the cases of polymer_x1.0: homopolymers with dangling ends and with
+# end groups, a ring backbone, a random and a block copolymer, other subscripts.
+preset: acs1996
+species:
+  ps_ends:
+    polymer: {start: "N#CC(C)(C)*", units: ["*CC(*)c1ccccc1"], end: "Br*"}
+  ppp:
+    polymer: {units: ["*c1ccc(*)cc1"]}
+  pmma:
+    polymer: {units: ["*CC(C)(*)C(=O)OC"]}
+  random:
+    polymer: {kind: random, units: ["*CC(C)(*)C(=O)OC", "*CC(C)(*)C(=O)OCC"], ratio: "70:30"}
+  block:
+    polymer: {kind: block, units: ["*CC(C)(*)C(=O)OC", "*CC(C)(*)C(=O)OCC"], end: "C*"}
+  ps_x:
+    polymer: {units: ["*CC(*)c1ccccc1"], label: x}
+  ps_10:
+    polymer: {units: ["*CC(*)c1ccccc1"], label: 10}
+  ps_n1:
+    polymer: {units: ["*CC(*)c1ccccc1"], label: n-1}

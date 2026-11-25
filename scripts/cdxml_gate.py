@@ -99,6 +99,16 @@ do the equilibrium halves point their barbs outward, are the entering tails plai
 dragging an arc's end keep it an arc? --diff reports phase 2's items: the <step>s, and each
 <arrow> and <graphic> (paired by Head3D / BoundingBox) with what ChemDraw rewrote.
 
+Phase 7 (--phase 7, style-spec.md §17; files in build/cdxml_gate/phase7/): render.py --cdxml's output
+for the polymer examples (m7_*). Brackets as polymer_x1.0's: a ']' <graphic> with BracketUsage
+MultipleGroup, its repeat count and subscript in objecttags, a '[', and a <bracketedgroup> with the
+enclosed atoms and crossing bonds; bare chain ends as carbons, wavy ends as ExternalConnectionPoint
+nodes, a random copolymer's slash as a <curve> in its fragment. By hand in ChemDraw, besides the
+re-saves (CDXML and SVG): does each bracket pair show its subscript (n, m, x, 10, n−1) where our SVG
+has it, does ChemDraw treat the pair as one bracketed group (select one bracket, move an atom inside),
+is the 10 a repeat count (Analysis / formula), and is the wavy end drawn as ours? --diff reports
+phase 2's items and the bracket objects (polymer_diff).
+
 Usage: uv run python scripts/cdxml_gate.py [--phase N]          # write the gate files
        uv run python scripts/cdxml_gate.py --lewis-draft        # the Lewis reference draft
        uv run python scripts/cdxml_gate.py [--phase N] --diff   # after the ChemDraw re-saves
@@ -145,7 +155,9 @@ PHASE4B_SPECS = ["examples/m1/m1_charges_x1.0.yaml", "examples/m1/m1_lewis_x1.0.
 PHASE5_REFS = ["chair_x1.0"]
 PHASE5_SPECS = ["examples/m1/m1_chair_x1.0.yaml"]
 PHASE6_SPECS = ["examples/m6/m6_suzuki_cycle_x1.0.yaml", "examples/m6/m6_enamine_cycle_x1.0.yaml"]
-PHASES = {"2": (PHASE2_REFS, PHASE2_SPECS), "3": (PHASE3_REFS, PHASE3_SPECS), "4a": (PHASE4A_REFS, PHASE4A_SPECS),
+PHASE7_SPECS = ["examples/m7/m7_polymers_x1.0.yaml", "examples/m7/m7_chain_end_x1.0.yaml",
+                "examples/m7/m7_scheme_x1.0.yaml", "examples/m7/m7_propagation_x1.0.yaml"]
+PHASES = {"7": ([], PHASE7_SPECS), "2": (PHASE2_REFS, PHASE2_SPECS), "3": (PHASE3_REFS, PHASE3_SPECS), "4a": (PHASE4A_REFS, PHASE4A_SPECS),
           "4c": (PHASE4C_REFS, PHASE4C_SPECS), "4b": ([], PHASE4B_SPECS), "5": (PHASE5_REFS, PHASE5_SPECS), "6": ([], PHASE6_SPECS)}
 PAIR_TOL = 0.05  # pt: node positions should survive a re-save unchanged
 NUM_TOL = 0.005
@@ -919,6 +931,48 @@ def crossing_diff(ours_root, theirs_root) -> list[str]:
     return lines
 
 
+def polymer_diff(ours, theirs) -> list[str]:
+    """Bracket <graphic>s (in order) with their objecttags, <bracketedgroup>s with their attachments,
+    and wavy ExternalConnectionPoint nodes: what ChemDraw's re-save changed (style-spec.md §17)."""
+    out = []
+
+    def brackets(root):
+        return [g for g in root.iter("graphic") if g.get("GraphicType") == "Bracket"]
+
+    def tags(g):
+        return {t.get("Name"): ({k: v for k, v in t.attrib.items() if k != "id"},
+                                {k: v for k, v in t.find("t").attrib.items()} if t.find("t") is not None else {},
+                                [(s.text, s.get("font"), s.get("face"), s.get("size")) for s in t.iter("s")])
+                for t in g.findall("objecttag")}
+    a, b = brackets(ours), brackets(theirs)
+    if len(a) != len(b):
+        out.append(f"  bracket graphics: {len(a)} -> {len(b)}")
+    for k, (g, h) in enumerate(zip(a, b)):
+        for key in sorted(set(g.keys()) | set(h.keys()) - {"id", "Z"}):
+            if key not in ("id", "Z") and g.get(key) != h.get(key):
+                out.append(f"  bracket {k}: {key} {g.get(key)} -> {h.get(key)}")
+        if tags(g) != tags(h):
+            out.append(f"  bracket {k}: objecttags {tags(g)} -> {tags(h)}")
+    ga, gb = list(ours.iter("bracketedgroup")), list(theirs.iter("bracketedgroup"))
+    if len(ga) != len(gb):
+        out.append(f"  bracketedgroups: {len(ga)} -> {len(gb)}")
+    for k, (g, h) in enumerate(zip(ga, gb)):
+        for key in ("BracketUsage", "RepeatCount"):
+            if g.get(key) != h.get(key):
+                out.append(f"  bracketedgroup {k}: {key} {g.get(key)} -> {h.get(key)}")
+        na, nb = len(g.get("BracketedObjectIDs", "").split()), len(h.get("BracketedObjectIDs", "").split())
+        if na != nb:
+            out.append(f"  bracketedgroup {k}: {na} -> {nb} enclosed objects")
+        if len(g.findall("bracketattachment")) != len(h.findall("bracketattachment")):
+            out.append(f"  bracketedgroup {k}: attachments {len(g.findall('bracketattachment'))} -> "
+                       f"{len(h.findall('bracketattachment'))}")
+    wa = [(n.get("NodeType"), n.get("ExternalConnectionType")) for n in ours.iter("n") if n.get("ExternalConnectionType")]
+    wb = [(n.get("NodeType"), n.get("ExternalConnectionType")) for n in theirs.iter("n") if n.get("ExternalConnectionType")]
+    if wa != wb:
+        out.append(f"  chain-end nodes: {wa} -> {wb}")
+    return out or ["  (no change)"]
+
+
 def diff(phase: str = "1") -> int:
     found = False
     out = out_dir(phase)
@@ -948,6 +1002,10 @@ def diff(phase: str = "1") -> int:
             if phase == "4c":
                 print(f"{path.stem}: two-bond and text labels")
                 for line in label_kind_diff(ours, theirs):
+                    print(line)
+            if phase == "7":
+                print(f"{path.stem}: bracket objects (ours -> ChemDraw's re-save)")
+                for line in polymer_diff(ours, theirs):
                     print(line)
             if phase == "5":
                 print(f"{path.stem}: crossings (front bond by Z; ours -> ChemDraw's re-save)")
@@ -980,10 +1038,10 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--diff", action="store_true", help="compare ChemDraw's re-saves with our exports")
     ap.add_argument("--lewis-draft", action="store_true", help="write the Lewis reference draft (phase 4b)")
-    ap.add_argument("--phase", choices=("1", "2", "3", "4a", "4b", "4c", "5", "6"), default="1",
+    ap.add_argument("--phase", choices=("1", "2", "3", "4a", "4b", "4c", "5", "6", "7"), default="1",
                     help="1: M1 species; 2: M2 schemes; 3: M3 mechanisms; 4a: abbreviations, resonance, wrap; "
                          "4c: general abbreviations; "
-                         "4b: charges, Lewis; 5: chairs; 6: catalytic cycles")
+                         "4b: charges, Lewis; 5: chairs; 6: catalytic cycles; 7: polymers")
     args = ap.parse_args(argv)
     if args.lewis_draft:
         for p in lewis_draft():

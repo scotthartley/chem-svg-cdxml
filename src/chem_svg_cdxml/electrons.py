@@ -75,6 +75,8 @@ class Model:
 
     def charge(self, k: Key) -> int:
         a = self.atoms[k]
+        if a.element == "*":  # a chain end or attachment point stands for R: neutral, no electrons of its own
+            return 0
         return valence_electrons(Chem.Atom(a.element)) - a.n - self.bond_electrons(k) // 2
 
     def label(self, m: int) -> str:

@@ -1,6 +1,6 @@
 ---
 name: chem-svg-cdxml
-description: Draw chemical structures, Lewis structures, reaction schemes, and arrow-pushing mechanisms in the ChemDraw ACS Document 1996 style as editable SVG or CDXML, with a PNG preview Claude inspects before delivering. Use when the user asks to draw a molecule, a Lewis structure, a reaction scheme, a mechanism with curved arrows, resonance structures, or a catalytic cycle.
+description: Draw chemical structures, Lewis structures, reaction schemes, and arrow-pushing mechanisms in the ChemDraw ACS Document 1996 style as editable SVG or CDXML, with a PNG preview Claude inspects before delivering. Use when the user asks to draw a molecule, a Lewis structure, a reaction scheme, a mechanism with curved arrows, resonance structures, polymers (repeat-unit brackets, copolymers), or a catalytic cycle.
 ---
 
 # chem-svg-cdxml
@@ -39,6 +39,8 @@ If the Read tool refuses `<repo>` files (outside the working directory, symlink 
      (bond lines), or `lewis: {electrons: formal_charge | oxidation_state}`; see `references/scheme-schema.md`.
    - Chairs: `chair: true` draws a single six-membered sp³ ring as a chair, axial/equatorial from the SMILES
      stereo (`chair: {flip: true}`, `{axial: [maps]}`, `{start: map}`); see `references/scheme-schema.md`.
+   - Polymers: `polymer: {units: ["*CC(*)c1ccccc1"], start, end, kind: homo|random|block, label, ratio}`;
+     wavy ends `chain_ends: [map]`; `coefficients: {styrene: n}` on a step. See the schema (Polymers).
    - Charges: `charges: {circled: true}` (spec) or `circled_charges` (species) circles ±1 signs;
      `charge_labels: {1: "+3"}` (species, by atom map) draws a text, display only.
    - Abbreviations: `abbreviate: [OTf, Boc, t-Bu, TBS, …]` (registry `src/chem_svg_cdxml/data/abbreviations.yaml`);

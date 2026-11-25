@@ -81,8 +81,9 @@ def _check_structure(text: str) -> None:
     root = etree.fromstring(text.encode(), PARSER)
     assert dtd_errors(root) == []
     # object ids; font ids are their own namespace (clearance_x1.0 has font 21 and bond 21)
-    els = {el.get("id"): el for el in root.find("page").iter() if el.get("id")}
-    ids = [el.get("id") for el in root.find("page").iter() if el.get("id")]
+    # an <objecttag>'s id is local to its bracket <graphic> (1, 2 in every one: polymer_x1.0)
+    els = {el.get("id"): el for el in root.find("page").iter() if el.get("id") and el.tag != "objecttag"}
+    ids = [el.get("id") for el in root.find("page").iter() if el.get("id") and el.tag != "objecttag"]
     assert len(ids) == len(set(ids)), "duplicate ids"
     nodes = {n.get("id") for n in root.iter("n")}
     for b in root.iter("b"):
@@ -98,7 +99,7 @@ def _check_structure(text: str) -> None:
             a = els.get(g.get("SupersededBy"))
             assert a is not None and a.tag == "arrow" and a.get("Z") == g.get("Z")
     page = root.find("page")  # the references' page order
-    order = ["fragment", "t", "graphic", "curve", "scheme", "arrow"]
+    order = ["fragment", "t", "graphic", "curve", "scheme", "bracketedgroup", "arrow"]
     tags = [order.index(el.tag) for el in page]
     assert tags == sorted(tags)
 
@@ -444,6 +445,20 @@ def _expand_aliases(m: Chem.Mol) -> Chem.Mol:
     return m
 
 
+def _ends_as_written(sp) -> str:
+    """A polymer or chain-end species as its CDXML reads back: a bare chain end is a carbon (as
+    polymer_x1.0's), and RDKit reads a wavy ExternalConnectionPoint as one too (style-spec.md §17)."""
+    from chem_svg_cdxml import polymer
+    m = Chem.RWMol(polymer.assemble(sp.polymer) if sp.polymer is not None else Chem.MolFromSmiles(sp.smiles))
+    for a in m.GetAtoms():
+        a.SetAtomMapNum(0)
+        if a.GetAtomicNum() == 0:
+            a.SetAtomicNum(6)
+            a.SetNoImplicit(False)
+    Chem.SanitizeMol(m)
+    return Chem.MolToSmiles(m)
+
+
 def _spec_smiles(spec_path) -> dict[str, str]:
     """name -> canonical SMILES (no maps) of each species as the spec gives it, abbreviations
     expanded. A chair's stereo is in its geometry, which ChemDraw doesn't read either (chair_x*:
@@ -451,6 +466,9 @@ def _spec_smiles(spec_path) -> dict[str, str]:
     spec = load_spec(spec_path)
     out = {}
     for name, sp in spec.species.items():
+        if sp.polymer is not None or sp.chain_ends:
+            out[name] = _ends_as_written(sp)
+            continue
         m = (Chem.MolFromSmiles(sp.smiles) if sp.smiles
              else _expand_aliases(Chem.MolFromMolFile(str(resolve_molfile(sp.molfile, spec_path.parent)))))
         for a in m.GetAtoms():

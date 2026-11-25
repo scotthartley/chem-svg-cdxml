@@ -1,0 +1,3 @@
+# expect: it needs two '*' (head, then tail)
+species:
+  p: {polymer: {units: ["*CCc1ccccc1"]}}

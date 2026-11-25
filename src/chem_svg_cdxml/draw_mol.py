@@ -1456,7 +1456,14 @@ class Drawer:
                                                   for p in ds.dots])
                  for k, kind, src in (("shared", "bonding-pairs", lambda ds: f"bond:{self.mol.bonds[ds.bond].id}"),
                                       ("assigned", "bond-electrons", lambda ds: f"atom:{self.mol.atoms[ds.atom].id}"))]
-        return Group(f"species-{name}", [g for g in (bonds, labels, charges, *dots) if g.children])
+        if any(a.end == "wavy" for a in self.mol.atoms):  # wavy chain ends (polymer_x1.0, style-spec.md §17)
+            from .polymer import wavy_ends
+            bonds.children += wavy_ends(self.mol, self.preset)
+        extra = []
+        if self.mol.polymer is not None:  # brackets, subscripts, slashes (polymer.py)
+            from .polymer import draw_marks
+            extra.append(draw_marks(self.mol, self.preset, name))
+        return Group(f"species-{name}", [g for g in (bonds, labels, charges, *dots, *extra) if g.children])
 
 
 CHARGE_TEXT = re.compile(r"^([+−-]?)(\d*)([+−-]?)$")

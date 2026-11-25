@@ -1,0 +1,7 @@
+# M7: n styrene -> polystyrene (polymer_x1.0), the coefficient before the monomer.
+preset: acs1996
+species:
+  styrene: {smiles: "C=Cc1ccccc1"}
+  ps: {polymer: {units: ["*CC(*)c1ccccc1"]}}
+steps:
+  - {from: styrene, to: ps, coefficients: {styrene: n}}

@@ -46,6 +46,17 @@ placement:
   - cycle.label_gap
   - cycle.label_clear
   - cycle.label_pair_clear
+  - polymer.min_gap_x
+  - polymer.gap_x
+  - polymer.gap_above
+  - polymer.gap_below
+  - polymer.block_gap
+  - polymer.label_dx
+  - polymer.label_drop
+  - polymer.ratio_drop
+  - polymer.slash_length
+  - polymer.slash_angle
+  - polymer.coefficient_gap
 derived:
   - bracket.gap_above
   - bracket.gap_below
@@ -86,6 +97,23 @@ derived:
   - lengths.label_outline_offset_y
   - lewis.bond_length
   - lone_pair.gap
+  - polymer.block_gap
+  - polymer.coefficient_gap
+  - polymer.crossing_stretch
+  - polymer.gap_above
+  - polymer.gap_below
+  - polymer.gap_x
+  - polymer.label_drop
+  - polymer.label_dx
+  - polymer.label_size
+  - polymer.lip_per_height
+  - polymer.min_gap_x
+  - polymer.ratio_drop
+  - polymer.slash_angle
+  - polymer.slash_length
+  - polymer.wave_amplitude
+  - polymer.wave_half_period
+  - polymer.wave_length
   - radical.distance
   - ratios.arrow_back_control_per_half_width
   - ratios.crossing_clearance_per_margin
@@ -223,6 +251,25 @@ bracket:
 resonance:
   arrow_length: 57.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
   arrow_gap: 15.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+
+polymer:
+  lip_per_height: 0.0726  # derived: derived from acs1996 (not scaled at any ACS scale), unmeasured
+  min_gap_x: 5.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  gap_x: 12.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  gap_above: 4.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  gap_below: 4.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  crossing_stretch: 2.0  # derived: derived from acs1996 (not scaled at any ACS scale), unmeasured
+  block_gap: 33.5  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  label_size: 13.5  # derived: derived from acs1996 x 1.800 (LabelSize), unmeasured
+  label_dx: 4.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  label_drop: 4.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  ratio_drop: 22.5  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  slash_length: 27.5  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  slash_angle: 75.0  # derived: derived from acs1996 (dimensionless placement default), unmeasured
+  coefficient_gap: 18.5  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured
+  wave_length: 33.469  # derived: derived from acs1996 x 1.969, unmeasured
+  wave_half_period: 1.914  # derived: derived from acs1996 x 1.969, unmeasured
+  wave_amplitude: 0.984  # derived: derived from acs1996 x 1.969, unmeasured
 
 scheme:
   arrow_min_length: 79.0  # derived: derived from acs1996 x 1.969, on the 0.5 pt grid (placement default), unmeasured

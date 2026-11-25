@@ -342,6 +342,15 @@ oblique ends margin_width beyond it (`draw_mol.Drawer.crossings`). Both match Ch
 0.1 pt on the reference's templates. The CDXML export writes bond Z rear-first; its ChemDraw gate
 (`cdxml_gate.py --phase 5`) passed (re-saves of 2026-10-29; closed by the user 2026-11-05;
 details in style-spec.md §14.2). Not yet: fused chairs (decalins, steroids), boats.
+
+Polymers (2026-11-25, `references/style-spec.md` §17, from the user's polymer_x1.0 reference):
+`polymer:` species draw repeat units in square brackets with a subscript (homopolymers with bare
+ends or end groups, random copolymers with a slashed bond and a ratio, block copolymers), with
+the crossing bonds stretched where a bracket would crowd the unit (`polymer.py`); `chain_ends`
+draws wavy ends, `bond_lengths` stretches any acyclic bond, and `coefficients` sets n before a
+reactant. The CDXML writes ChemDraw's bracketed groups (`<bracketedgroup>`, crossing bonds,
+parameterized labels); its gate (`cdxml_gate.py --phase 7`) awaits re-saves. ×0.8 / ×0.6 values
+are acs1996's x k (no references); new styles derive them too (no probe specimen).
 ---
 
 ## 11. Sources

@@ -142,6 +142,28 @@ class Bracket(_Section):
     gap_below: float
 
 
+class Polymer(_Section):
+    """Polymer brackets, slashed bonds, wavy chain ends and coefficients (style-spec.md §17; polymer_x1.0).
+    Pt unless noted; the brackets' stroke is bracket.stroke_width, the slash's and the wave's lengths.line_width."""
+    lip_per_height: float  # a bracket's lip = this x its bar's height (ChemDraw's LipSize 60)
+    min_gap_x: float  # content ink -> bracket at an unstretched crossing bond's midpoint; below it the bond is stretched
+    gap_x: float  # content ink -> bracket beside a stretched crossing bond
+    gap_above: float
+    gap_below: float
+    crossing_stretch: float  # x bond_length: a stretched crossing bond and a random copolymer's slashed bond
+    block_gap: float  # ']' to '[' on a block junction bond
+    label_size: float  # the subscript (n, m, 10, n-1)
+    label_dx: float  # ']' -> subscript origin
+    label_drop: float  # ']' bottom -> subscript baseline
+    ratio_drop: float  # brackets' bottom -> ratio caption baseline (random copolymers)
+    slash_length: float
+    slash_angle: float  # degrees, clockwise from the slashed bond
+    coefficient_gap: float  # a step reactant's coefficient ink -> its species ink
+    wave_length: float  # wavy chain end: the squiggle across the bond end
+    wave_half_period: float
+    wave_amplitude: float
+
+
 class Resonance(_Section):
     arrow_length: float
     arrow_gap: float
@@ -222,6 +244,7 @@ class Preset(_Section):
     lewis: Lewis
     bracket: Bracket
     resonance: Resonance
+    polymer: Polymer
     scheme: Scheme
     cycle: Cycle
     chair: Chair

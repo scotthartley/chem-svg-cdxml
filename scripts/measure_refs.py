@@ -26,6 +26,7 @@ Usage:
     uv run python scripts/measure_refs.py --crossing      # bond crossings: front by Z, rear cuts (§14.2)
     uv run python scripts/measure_refs.py --arc           # arc arrows: circle, sweep, head on the chord (§15.1)
     uv run python scripts/measure_refs.py --nh            # where an NH's H goes: beside, above, below (§2)
+    uv run python scripts/measure_refs.py --polymer       # polymer brackets, subscripts, slash, wavy end (§17)
 """
 
 from __future__ import annotations
@@ -50,6 +51,7 @@ from chemdraw_refs.cdxml import (
 )
 from chemdraw_refs.chair import CHAIR_REFS, chair_summary, crossing_summary
 from chemdraw_refs.arcs import ARC_EQ_REFS, ARC_REFS, arc_eq_summary, arc_summary
+from chemdraw_refs.polymer import POLYMER_REFS, polymer_summary
 
 # Re-export every module's names, helpers included: compare.py, cdxml_gate.py, cdxml_to_molfile.py
 # and the tests use `mr.<name>` (mr._caption_glyphs, mr._dot_sets, ...).
@@ -87,7 +89,11 @@ def main(argv=None) -> int:
     ap.add_argument("--arc", action="store_true", help="arc arrows: circle, sweep, head on the chord (§15.1)")
     ap.add_argument("--arc-eq", action="store_true", help="arc equilibrium arrows: shafts, butts, notches, tips (§15.1)")
     ap.add_argument("--nh", action="store_true", help="where an NH's H goes: beside, above, below (§2)")
+    ap.add_argument("--polymer", action="store_true", help="polymer brackets, subscripts, slash, wavy end (§17)")
     args = ap.parse_args(argv)
+    if args.polymer:
+        print(json.dumps({n: polymer_summary(n) for n in args.names or POLYMER_REFS}, indent=1, ensure_ascii=False))
+        return 0
     if args.nh:
         print(json.dumps({n: nh_summary(n) for n in args.names or NH_REFS}, indent=1, ensure_ascii=False))
         return 0

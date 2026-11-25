@@ -45,6 +45,9 @@ renders it, looks at the rendered image, fixes what it sees, and hands back `.sv
   with reagents and products entering and leaving on tails, step labels and center text.
 
   ![Suzuki coupling as a catalytic cycle: oxidative addition, transmetalation and reductive elimination around Pd(0)](docs/images/suzuki_cycle.png)
+- **Polymers:** repeat units in brackets with a subscript (n, x, 10, n−1), end groups or bare
+  chain ends, random copolymers (slashed bond, ratio) and block copolymers, wavy chain ends, and
+  "n monomer" coefficients in schemes; exported to ChemDraw as bracketed groups.
 - **Three sizes:** the ACS 1996 preset at 100 %, 80 % and 60 %. Bond lengths, line widths,
   double-bond spacing and label clearance are measured from ChemDraw exports and match them
   within 0.1 pt.

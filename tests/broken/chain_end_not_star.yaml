@@ -1,0 +1,3 @@
+# expect: chain_ends: atom 1 must be a '*' with one bond
+species:
+  c: {smiles: "[CH3:1]C[CH]c1ccccc1", chain_ends: [1]}

@@ -1,0 +1,4 @@
+# M7: a wavy chain end (polymer_x1.0): a growing polystyrene radical, ~~CH2-CH(Ph)•.
+preset: acs1996
+species:
+  chain: {smiles: "[*:1]C[CH]c1ccccc1", chain_ends: [1], abbreviate: [Ph]}

@@ -12,7 +12,7 @@ from chem_svg_cdxml.preset import available, load_preset
 PRESETS = Path(__file__).resolve().parents[1] / "presets"
 # dimensionless placement defaults (control offset / chord): the same in every preset
 RATIO_PLACEMENT = ("curved_arrow.curvature", "curved_arrow.loop_curvature", "cycle.tail_join_in", "cycle.tail_join_out",
-                   "cycle.tail_turn")  # dimensionless: the same at every preset
+                   "cycle.tail_turn", "polymer.slash_angle")  # dimensionless: the same at every preset
 
 
 def _flat(d, prefix=""):
@@ -83,7 +83,8 @@ def test_acs_presets_parse_and_scale():
         p = _load(name)
         assert p["scale"] == k
         assert all(p[x] == base[x] for x in lists)
-        flat = _flat({kk: v for kk, v in p.items() if kk not in lists})
+        # `derived`: values with no reference at this scale, acs1996's x k (the polymer keys, style-spec.md §17)
+        flat = _flat({kk: v for kk, v in p.items() if kk not in (*lists, "derived")})
         assert flat.keys() == flat_base.keys()
         for key, v0 in flat_base.items():
             v = flat[key]

@@ -1,0 +1,6 @@
+# expect: coefficients: ps not in this step's `from`
+species:
+  styrene: {smiles: "C=Cc1ccccc1"}
+  ps: {polymer: {units: ["*CC(*)c1ccccc1"]}}
+steps:
+  - {from: styrene, to: ps, coefficients: {ps: n}}

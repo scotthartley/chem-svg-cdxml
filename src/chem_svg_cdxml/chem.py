@@ -54,6 +54,8 @@ _RDKIT_DIR = {Chem.BondDir.BEGINWEDGE: "wedge", Chem.BondDir.BEGINDASH: "hash"}
 ABBREVIATIONS = {k: e.smiles for k, e in abbrev.default().entries.items() if e.smiles}
 ABBREVIATIONS_REVERSED = {k: abbrev.reverse(k) for k in ABBREVIATIONS}
 ABBREV_PROP = "_abbrevInfo"  # a collapsed dummy atom's abbrev.LabelInfo (JSON)
+POLY_SEG = "_polySeg"  # polymer.py: an atom's segment (0 start side, k unit k, n + 1 end side)
+POLY_END = "_polyEnd"  # polymer.py: a '*' drawn as a chain end, "dangling" or "wavy"
 # composition (§3.5): a heteroatom merges with its collapsed groups when it keeps this many other bonds
 COMPOSE_MAX_SKELETON = 2
 MCS_TIMEOUT = 2  # s
@@ -91,6 +93,8 @@ class Atom:
     singlet: bool = False  # a carbene / nitrene: RDKit's two radicals are this lone pair (nonbonding()); always drawn
     charge_label: str | None = None  # drawn charge text in place of `charge` (spec charge_labels: +3); display only
     z: float = 0.0  # depth, larger = nearer the viewer (chair.py); the nearer of two crossing bonds is drawn whole
+    seg: int | None = None  # polymers: 0 start side, k unit k, n + 1 end side (polymer.POLY_SEG)
+    end: str | None = None  # a '*' drawn as a chain end: "dangling" (bare bond end) | "wavy" (polymer.POLY_END)
 
     @property
     def p(self) -> Point:
@@ -124,6 +128,7 @@ class Molecule:
     lewis_lines: bool = False  # Lewis structure with bond lines instead of shared-pair dots
     circled_charges: bool = False  # ±1 signs drawn in a ring (spec charges.circled / circled_charges)
     front: list[int] = field(default_factory=list)  # bond indices drawn whole where they cross a bond at equal depth (spec front)
+    polymer: object | None = None  # polymer.PolymerMarks: brackets, subscripts, slashes (polymer.finish)
 
     def neighbors(self, i: int) -> list[tuple[int, Bond]]:
         return [(b.other(i), b) for b in self.bonds if i in (b.a, b.b)]
@@ -463,13 +468,18 @@ def to_molecule(mol: Chem.Mol, name: str, bond_length: float, scale: float | Non
         element = info.element if info and a.GetAtomicNum() == 0 else a.GetSymbol()
         if info is not None and info.kind == "text":  # no chemistry: drawn on its stand-in, which keeps its element
             info = replace(info, element=element)
+        end = a.GetProp(POLY_END) if a.HasProp(POLY_END) else None
+        if end:  # a chain end: drawn as an unlabeled bond end, written as ChemDraw's (a carbon, or a wavy ECP)
+            atoms.append(Atom(i, str(mp) if mp else str(i + 1), "C", pts[i][0], pts[i][1], map=mp, end=end,
+                              seg=a.GetIntProp(POLY_SEG) if a.HasProp(POLY_SEG) else None, z=(depth or {}).get(i, 0.0)))
+            continue
         lp, rad = nonbonding(a)
         if key:  # a label stands for its whole group: RDKit's radicals on a template's Sn (SnBu3,
             rad = 0  # one drawn bond) are not electrons to draw, nor a carbene's pair
         atoms.append(Atom(i, str(mp) if mp else str(i + 1), element, pts[i][0], pts[i][1],
                           a.GetFormalCharge(), 0 if key else a.GetTotalNumHs(includeNeighbors=False), mp,
                           show, key, info, rad, 0 if key else lp, singlet=not key and rad != a.GetNumRadicalElectrons(),
-                          z=(depth or {}).get(i, 0.0)))
+                          z=(depth or {}).get(i, 0.0), seg=a.GetIntProp(POLY_SEG) if a.HasProp(POLY_SEG) else None))
     bonds = []
     for b in mol.GetBonds():
         order = _ORDER.get(b.GetBondType())
@@ -669,6 +679,7 @@ def condense(mol: Chem.Mol, labels: list[str] | None, name: str = "",
         dummy.SetProp("atomLabel", sg.GetProp("LABEL"))
         dummy.SetProp(ABBREV_PROP, abbrev.info(sg.GetProp("LABEL"), reg).to_prop())
         dummy.SetAtomMapNum(mol.GetAtomWithIdx(attach).GetAtomMapNum())  # aligned species keep the label in place
+        _keep_seg(mol.GetAtomWithIdx(attach), dummy)
         rw.ReplaceAtom(attach, dummy)
         drop += [i for i in group if i != attach]
     for i in sorted(drop, reverse=True):
@@ -676,6 +687,12 @@ def condense(mol: Chem.Mol, labels: list[str] | None, name: str = "",
     out = rw.GetMol()
     Chem.SanitizeMol(out, _SANITIZE)
     return compose(out, reg)
+
+
+def _keep_seg(src: Chem.Atom, dummy: Chem.Atom) -> None:
+    """A collapsed label stays in its polymer segment."""
+    if src.HasProp(POLY_SEG):
+        dummy.SetIntProp(POLY_SEG, src.GetIntProp(POLY_SEG))
 
 
 def _composable(a: Chem.Atom) -> bool:
@@ -720,6 +737,7 @@ def compose(mol: Chem.Mol, reg: abbrev.Registry | None = None) -> Chem.Mol:
         dummy.SetProp("atomLabel", key)
         dummy.SetProp(ABBREV_PROP, info.to_prop())
         dummy.SetAtomMapNum(a.GetAtomMapNum())
+        _keep_seg(a, dummy)
         rw.ReplaceAtom(a.GetIdx(), dummy)
         drop += [g.GetIdx() for g in groups]
     if not drop:
@@ -1262,6 +1280,15 @@ def prepare(mol: Chem.Mol, name: str, bond_length: float, abbreviate: list[str] 
     species is laid out by chair.layout and aligns to nothing; nothing aligns to a chair either
     (its pseudo-3D coordinates would bend a flat drawing)."""
     mol = condense(mol, abbreviate, name, registry)
+    if mol.GetNumAtoms() and mol.GetAtomWithIdx(0).HasProp(POLY_SEG):  # a polymer: its own backbone layout, aligned to nothing
+        from . import polymer
+        polymer.layout(mol)
+        return Prepared(mol, name, bond_length, layout_scale(mol, bond_length))
+    if chair is None and rotate_deg in (None, "auto") and not (flip_h or flip_v) \
+            and any(a.HasProp(POLY_END) for a in mol.GetAtoms()):
+        from . import polymer  # a chain end: drawn as a growing chain, aligned to nothing
+        if polymer.chain_layout(mol):
+            return Prepared(mol, name, bond_length, layout_scale(mol, bond_length))
     if chair is not None:
         from . import chair as chair_mod
         m, z, pl = chair_mod.layout(mol, chair.templates, bond_length, chair.ring, chair.flip,

@@ -62,6 +62,7 @@ def elements(lay: SchemeLayout) -> list[tuple[str, tuple]]:
             for k, ln in enumerate(getattr(st, side), 1):
                 out.append((f"conditions-step-{st.n}-{side}-{k}", ln.ink()))
     out += [(f"number-{n}", union_box(r.bbox() for r in runs)) for n, runs in lay.numbers.items()]
+    out += [(f"coefficient-{k}", ln.ink()) for k, ln in enumerate(lay.coefficients, 1)]
     for res in lay.resonance:
         out += [(g.id, g.bbox()) for _, _, g in res.arrows]
         for g in res.group.children:
@@ -113,9 +114,23 @@ def check_labels(name: str, group: Group, mol: Molecule) -> list[str]:
     segs = [(a, b, hw, src, atoms(src)) for a, b, hw, src in pt.bonds]
     for k, (a, b, hw, src, at) in enumerate(segs):
         for c, d, hw2, src2, at2 in segs[k + 1:]:
+            if _polymer_crossing(src, src2) or _polymer_crossing(src2, src):
+                continue
             if src2 != src and at.isdisjoint(at2) and segment_distance(a, b, c, d) < hw + hw2 - LABEL_TOL:
                 problems.append(f"species-{name}: {src} crosses {src2} without a gap")
     return list(dict.fromkeys(problems + check_overlaid(name, mol)))
+
+
+def _polymer_crossing(mark: str, bond: str) -> bool:
+    """A polymer bracket on one of its crossing bonds, a slash on its bond, or two pieces of one
+    bracket (polymer.draw_marks sources: polymer-bracket:<bond ids>, polymer-slash:<bond id>).
+    Anything else a bracket or slash touches is a clash (style-spec.md §17)."""
+    if not mark.startswith(("polymer-bracket:", "polymer-slash:")):
+        return False
+    if bond == mark:
+        return True
+    allowed = set(mark.split(":", 1)[1].split(","))
+    return bond.startswith("bond:") and set(bond.split(":", 1)[1].split(",")) <= allowed
 
 
 def check_overlaid(name: str, mol: Molecule) -> list[str]:

@@ -1,0 +1,13 @@
+# M7: radical propagation, a wavy chain end adding to styrene (fishhook arrows).
+preset: acs1996
+species:
+  chain:   {smiles: "[*:1][CH2:2][CH:3]c1ccccc1", chain_ends: [1]}
+  styrene: {smiles: "[CH2:4]=[CH:5]c1ccccc1", orientation: {rotate: -120, flip_h: true}}  # Ph down, as the chain's; the vinyl toward it
+  longer:  {smiles: "[*:1][CH2:2][CH:3](c1ccccc1)[CH2:4][CH:5]c1ccccc1", chain_ends: [1]}
+steps:
+  - from: [chain, styrene]
+    to: longer
+    arrows:
+      - {type: fishhook, from: "electron(3)", to: "between(3,4)"}
+      - {type: fishhook, from: "bond(4=5)", to: "between(3,4)"}
+      - {type: fishhook, from: "bond(4=5)", to: "atom(5)"}

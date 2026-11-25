@@ -1,0 +1,3 @@
+# expect: kind homo takes one unit
+species:
+  p: {polymer: {units: ["*CC(*)c1ccccc1", "*CC(*)C"]}}

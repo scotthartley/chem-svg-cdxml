@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE CDXML SYSTEM "https://static.chemistry.revvitycloud.com/cdxml/CDXML.dtd">
+<CDXML CreationProgram="chem-svg-cdxml 0.4.0" Name="m7_scheme_x1.0.cdxml" BoundingBox="2.00 2.30 185.15 59.60" WindowPosition="0 0" WindowSize="0 0" FractionalWidths="yes" InterpretChemically="yes" ShowAtomQuery="yes" ShowAtomStereo="no" ShowAtomEnhancedStereo="yes" ShowAtomNumber="no" ShowResidueID="no" ShowBondQuery="yes" ShowBondRxn="yes" ShowBondStereo="no" ShowTerminalCarbonLabels="no" ShowNonTerminalCarbonLabels="no" HideImplicitHydrogens="no" Magnification="250" LabelFont="21" LabelSize="10" LabelFace="96" CaptionFont="21" CaptionSize="10" HashSpacing="2.50" MarginWidth="1.60" LineWidth="0.60" BoldWidth="2" BondLength="14.40" BondSpacing="18" ChainAngle="120" LabelJustification="Auto" CaptionJustification="Left" AminoAcidTermini="HOH" ShowSequenceTermini="yes" ShowSequenceBonds="yes" ShowSequenceUnlinkedBranches="no" ShowPrimeLabels="no" ResidueWrapCount="40" PrintMargins="36 36 36 36" MacPrintInfo="0003000000480048000000000300024CFFF4FFF4030C02580367052803FB0002000000480048000000000300024C000100000064000000010001010100000001270F000100010000000000000000000000000002001901900000000000400000000000000000000100000000000000000000000000000000" ChemPropName="" ChemPropFormula="Chemical formula: " ChemPropExactMass="Exact mass: " ChemPropMolWt="Molecular weight: " ChemPropMOverZ="m/z: " ChemPropAnalysis="Elemental analysis: " ChemPropBoilingPt="Boiling point: " ChemPropMeltingPt="Melting point: " ChemPropCritTemp="Critical temp: " ChemPropCritPres="Critical pres: " ChemPropCritVol="Critical vol: " ChemPropGibbs="Gibbs energy: " ChemPropLogP="Log P: " ChemPropMR="MR: " ChemPropHenry="Henry's law: " ChemPropEForm="Heat of form: " ChemProptPSA="tPSA: " ChemPropID="" ChemPropFragmentLabel="" color="0" bgcolor="1" RxnAutonumberStart="1" RxnAutonumberConditions="no" RxnAutonumberStyle="Roman" RxnAutonumberFormat="(#)">
+  <colortable>
+    <color r="1" g="1" b="1"/>
+    <color r="0" g="0" b="0"/>
+    <color r="1" g="0" b="0"/>
+    <color r="1" g="1" b="0"/>
+    <color r="0" g="1" b="0"/>
+    <color r="0" g="1" b="1"/>
+    <color r="0" g="0" b="1"/>
+    <color r="1" g="0" b="1"/>
+  </colortable>
+  <fonttable>
+    <font id="21" charset="x-mac-roman" name="Helvetica"/>
+    <font id="307" charset="x-mac-roman" name="Helvetica Oblique"/>
+    <font id="310" charset="x-mac-roman" name="Helvetica Bold"/>
+  </fonttable>
+  <page id="1" BoundingBox="0 0 540 720" HeaderPosition="36" FooterPosition="36" PrintTrimMarks="yes" HeightPages="1" WidthPages="1">
+    <fragment id="2" BoundingBox="15.76 26.15 66.09 55.65" Z="17">
+      <n id="3" p="15.91 48.10" Z="1"/>
+      <n id="4" p="28.38 55.30" Z="2"/>
+      <n id="5" p="40.85 48.10" Z="3"/>
+      <n id="6" p="53.32 55.30" Z="4"/>
+      <n id="7" p="65.79 48.10" Z="5"/>
+      <n id="8" p="65.79 33.70" Z="6"/>
+      <n id="9" p="53.32 26.50" Z="7"/>
+      <n id="10" p="40.85 33.70" Z="8"/>
+      <b id="11" Z="9" B="3" E="4" Order="2"/>
+      <b id="12" Z="10" B="4" E="5"/>
+      <b id="13" Z="11" B="5" E="6" Order="2"/>
+      <b id="14" Z="12" B="6" E="7"/>
+      <b id="15" Z="13" B="7" E="8" Order="2"/>
+      <b id="16" Z="14" B="8" E="9"/>
+      <b id="17" Z="15" B="9" E="10" Order="2"/>
+      <b id="18" Z="16" B="10" E="5"/>
+    </fragment>
+    <fragment id="19" BoundingBox="132.09 4.55 185.15 55.65" Z="38">
+      <n id="20" p="132.24 12.10" Z="18"/>
+      <n id="21" p="144.71 4.90" Z="19"/>
+      <n id="22" p="157.19 12.10" Z="20"/>
+      <n id="23" p="185.07 4.90" Z="21"/>
+      <n id="24" p="157.19 26.50" Z="22"/>
+      <n id="25" p="144.71 33.70" Z="23"/>
+      <n id="26" p="144.71 48.10" Z="24"/>
+      <n id="27" p="157.19 55.30" Z="25"/>
+      <n id="28" p="169.66 48.10" Z="26"/>
+      <n id="29" p="169.66 33.70" Z="27"/>
+      <b id="30" Z="28" B="20" E="21"/>
+      <b id="31" Z="29" B="21" E="22"/>
+      <b id="32" Z="30" B="22" E="23"/>
+      <b id="33" Z="31" B="22" E="24"/>
+      <b id="34" Z="32" B="24" E="25" Order="2"/>
+      <b id="35" Z="33" B="25" E="26"/>
+      <b id="36" Z="34" B="26" E="27" Order="2"/>
+      <b id="37" Z="35" B="27" E="28"/>
+      <b id="38" Z="36" B="28" E="29" Order="2"/>
+      <b id="39" Z="37" B="29" E="24"/>
+    </fragment>
+    <t id="47" p="1.36 43.58" BoundingBox="2.00 38.22 6.26 43.58" Z="41" LineHeight="auto">
+      <s font="21" size="10" color="0">n</s>
+    </t>
+    <graphic id="48" SupersededBy="49" BoundingBox="119.09 40.90 79.09 40.90" Z="42" GraphicType="Line" ArrowType="FullHead" HeadSize="1500"/>
+    <graphic id="40" BoundingBox="175.96 2.60 175.96 57.60" Z="39" GraphicType="Bracket" BracketType="Square" LipSize="60" BracketUsage="MultipleGroup">
+      <objecttag id="1" TagType="Unknown" Name="bracketusage">
+        <t p="0 0" BoundingBox="0.72 -5.22 2.66 0.00" IgnoreWarnings="yes" CaptionLineHeight="variable">
+          <s font="21" size="7.5" color="0">1</s>
+        </t>
+      </objecttag>
+      <objecttag id="2" TagType="Unknown" Visible="no" PositioningType="offset" PositioningOffset="2.00 57.00" Name="parameterizedBracketLabel">
+        <t p="177.96 59.60" BoundingBox="178.44 55.59 182.24 59.60" Visible="no" CaptionLineHeight="variable">
+          <s font="307" size="7.5" color="0" face="2">n</s>
+        </t>
+      </objecttag>
+    </graphic>
+    <graphic id="41" BoundingBox="138.48 57.60 138.48 2.60" Z="40" GraphicType="Bracket" BracketType="Square" LipSize="60"/>
+    <scheme id="50">
+      <step id="51" ReactionStepReactants="2" ReactionStepProducts="19" ReactionStepArrows="48"/>
+    </scheme>
+    <bracketedgroup id="42" BracketedObjectIDs="21 22 24 25 26 27 28 29" BracketUsage="MultipleGroup" RepeatCount="1">
+      <bracketattachment id="43" GraphicID="41">
+        <crossingbond id="44" BondID="30" InnerAtomID="21"/>
+      </bracketattachment>
+      <bracketattachment id="45" GraphicID="40">
+        <crossingbond id="46" BondID="32" InnerAtomID="22"/>
+      </bracketattachment>
+    </bracketedgroup>
+    <arrow id="49" BoundingBox="79.09 38.15 119.09 43.15" Z="42" FillType="None" ArrowheadHead="Full" ArrowheadType="Solid" HeadSize="1500" ArrowheadCenterSize="1313" ArrowheadWidth="375" Head3D="119.09 40.90 0" Tail3D="79.09 40.90 0" Center3D="99.09 40.90 0" MajorAxisEnd3D="139.09 40.90 0" MinorAxisEnd3D="99.09 80.90 0"/>
+  </page>
+</CDXML>

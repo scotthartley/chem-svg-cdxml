@@ -59,6 +59,8 @@ assumed_exempt:
   - lengths.label_outline_offset_y
   - charge.digit_scale             # unmeasured ratio (= ratios.superscript_scale), the same at every preset
 # Auto- or hand-placed by ChemDraw and context-dependent; starting defaults, not k-scaled.
+  - polymer.lip_per_height
+  - polymer.crossing_stretch
 approx:
   - text.line_pitch_sub_upper       # fitted from one pitch per preset (style-spec.md §3, Open 9)
   - text.line_pitch_sub_lower
@@ -105,6 +107,17 @@ placement:
   - cycle.label_gap
   - cycle.label_clear
   - cycle.label_pair_clear
+  - polymer.min_gap_x
+  - polymer.gap_x
+  - polymer.gap_above
+  - polymer.gap_below
+  - polymer.block_gap
+  - polymer.label_dx
+  - polymer.label_drop
+  - polymer.ratio_drop
+  - polymer.slash_length
+  - polymer.slash_angle
+  - polymer.coefficient_gap
 
 lengths:
   bond_length: 14.40                # m1_set_x1.0: CDXML atom distances, median 14.399 (n=32)
@@ -216,6 +229,25 @@ bracket:                            # resonance_x1.0
 resonance:                          # resonance_x1.0 (measure_refs.py --resonance); round defaults, see `placement`
   arrow_length: 29.0                # placement default (user decision 2026-10-25); double-headed arrow tip to tip; measured 28.80 (= 2 bond lengths)
   arrow_gap: 7.5                    # placement default (user decision 2026-10-25); contributor ink (incl. charges) <-> arrow tip; measured 7.682 (n=4, 7.68-7.68)
+
+polymer:                            # polymer_x1.0 (measure_refs.py --polymer); brackets drawn by eye there: round defaults, see `placement`
+  lip_per_height: 0.0726            # polymer_x1.0: lip / bar height 0.0726-0.0731 (n=20 brackets); ChemDraw's own rule for LipSize 60 (resonance_x* too)
+  min_gap_x: 2.5                    # placement default: below this, content ink -> bracket at an unstretched crossing bond's midpoint, the bond is stretched; measured polymer_x1.0 smallest kept 2.97 (PMMA's C=O, random's left)
+  gap_x: 6.0                        # placement default (= bracket.gap_x): content ink -> bracket stroke center beside a stretched crossing bond; measured polymer_x1.0 5.79 / 5.31 / 4.06 (PS, random, PMMA)
+  gap_above: 2.0                    # placement default (= bracket.gap_above): bracket top above the enclosed ink; measured polymer_x1.0 -1.25 to 6.96 (drawn by eye)
+  gap_below: 2.0                    # placement default (= bracket.gap_below): bracket bottom below the enclosed ink; measured polymer_x1.0 -1.04 to 2.20 (drawn by eye)
+  crossing_stretch: 2.0             # polymer_x1.0: a stretched crossing bond (and a random copolymer's slashed bond) is 2 x bond_length, 28.79-28.80 (n=5), its rise kept (15 deg)
+  block_gap: 17.0                   # placement default: ']' to '[' (stroke centers) on a block junction bond; measured polymer_x1.0 16.70
+  label_size: 7.5                   # polymer_x1.0: subscript n, m, x, 10, n-1 <s size> 7.5 (= 0.75 x LabelSize); letters italic (Helvetica Oblique), digits and signs regular
+  label_dx: 2.0                     # placement default: ']' stroke center -> subscript origin; measured polymer_x1.0 2.02 (n=6) / 2.52 (n=5)
+  label_drop: 2.0                   # placement default: ']' bottom (stroke center) -> subscript baseline; measured polymer_x1.0 2.00-2.01 (n=11)
+  ratio_drop: 11.5                  # placement default: brackets' bottom -> a random copolymer's ratio caption baseline (centered on the brackets); measured polymer_x1.0 11.55 (70:30)
+  slash_length: 14.0                # placement default: the slash across a random copolymer's unit bond, centered on it; measured polymer_x1.0 14.17
+  slash_angle: 75.0                 # placement default, degrees: the slash turned this far clockwise from its bond; measured polymer_x1.0 74.8 (60 from horizontal on a bond rising 15)
+  coefficient_gap: 9.5              # placement default: a reactant's coefficient ink (n) -> its species ink; the coefficient centered on the arrow axis; measured polymer_x1.0 9.65
+  wave_length: 17.0                 # polymer_x1.0: a wavy chain end, ChemDraw's (ExternalConnectionType Wavy): squiggle across the bond end, centered on it, 17.01 long
+  wave_half_period: 0.972           # polymer_x1.0: alternate half-circles, 0.972 apart along the squiggle (n=17)
+  wave_amplitude: 0.5               # polymer_x1.0: the half-circles' height, 0.50
 
 scheme:                             # hand-placed in the references (measure_refs.py --scheme); round defaults, see `placement`
   arrow_min_length: 40.0            # placement default (user decision 2026-10-24); measured scheme_multi_x1.0 shortest arrow (PCC / CH2Cl2) 39.5; range 39.5-112.5

@@ -59,6 +59,8 @@ assumed_exempt:
   - lengths.label_outline_offset_y
   - charge.digit_scale             # unmeasured ratio (= ratios.superscript_scale), the same at every preset
 # Auto- or hand-placed by ChemDraw and context-dependent; starting defaults, not k-scaled.
+  - polymer.lip_per_height
+  - polymer.crossing_stretch
 approx:
   - text.line_pitch_sub_upper       # fitted from one pitch per preset (style-spec.md §3, Open 9)
   - text.line_pitch_sub_lower
@@ -105,6 +107,37 @@ placement:
   - cycle.label_gap
   - cycle.label_clear
   - cycle.label_pair_clear
+  - polymer.min_gap_x
+  - polymer.gap_x
+  - polymer.gap_above
+  - polymer.gap_below
+  - polymer.block_gap
+  - polymer.label_dx
+  - polymer.label_drop
+  - polymer.ratio_drop
+  - polymer.slash_length
+  - polymer.slash_angle
+  - polymer.coefficient_gap
+
+# No polymer_x0.8 / x0.6 reference: the polymer keys are acs1996's x k (style-spec.md §17).
+derived:
+  - polymer.lip_per_height
+  - polymer.min_gap_x
+  - polymer.gap_x
+  - polymer.gap_above
+  - polymer.gap_below
+  - polymer.crossing_stretch
+  - polymer.block_gap
+  - polymer.label_size
+  - polymer.label_dx
+  - polymer.label_drop
+  - polymer.ratio_drop
+  - polymer.slash_length
+  - polymer.slash_angle
+  - polymer.coefficient_gap
+  - polymer.wave_length
+  - polymer.wave_half_period
+  - polymer.wave_amplitude
 
 lengths:
   bond_length: 8.64                 # m1_set_x0.6: CDXML atom distances, median 8.640 (n=32)
@@ -216,6 +249,25 @@ bracket:                            # resonance_x0.6
 resonance:                          # resonance_x0.6 (measure_refs.py --resonance); round defaults, see `placement`
   arrow_length: 17.5                # placement default (user decision 2026-10-25); double-headed arrow tip to tip; measured 17.28 (= 2 bond lengths)
   arrow_gap: 4.5                    # placement default (user decision 2026-10-25); contributor ink (incl. charges) <-> arrow tip; measured 4.548 (n=4, 3.94-4.61)
+
+polymer:                            # polymer_x1.0 (measure_refs.py --polymer); brackets drawn by eye there: round defaults, see `placement`; derived from acs1996 x 0.6 (no polymer_x0.6 reference)
+  lip_per_height: 0.0726            # derived x 0.6 from acs1996 0.0726 (not scaled)
+  min_gap_x: 1.5                    # derived x 0.6 from acs1996 2.5, on the 0.5 pt grid
+  gap_x: 3.5                        # derived x 0.6 from acs1996 6.0, on the 0.5 pt grid
+  gap_above: 1.0                    # derived x 0.6 from acs1996 2.0, on the 0.5 pt grid
+  gap_below: 1.0                    # derived x 0.6 from acs1996 2.0, on the 0.5 pt grid
+  crossing_stretch: 2.0             # derived x 0.6 from acs1996 2.0 (not scaled)
+  block_gap: 10.0                   # derived x 0.6 from acs1996 17.0, on the 0.5 pt grid
+  label_size: 4.5                   # derived x 0.6 from acs1996 7.5
+  label_dx: 1.0                     # derived x 0.6 from acs1996 2.0, on the 0.5 pt grid
+  label_drop: 1.0                   # derived x 0.6 from acs1996 2.0, on the 0.5 pt grid
+  ratio_drop: 7.0                   # derived x 0.6 from acs1996 11.5, on the 0.5 pt grid
+  slash_length: 8.5                 # derived x 0.6 from acs1996 14.0, on the 0.5 pt grid
+  slash_angle: 75.0                 # derived x 0.6 from acs1996 75.0 (not scaled)
+  coefficient_gap: 5.5              # derived x 0.6 from acs1996 9.5, on the 0.5 pt grid
+  wave_length: 10.2                 # derived x 0.6 from acs1996 17.0
+  wave_half_period: 0.583           # derived x 0.6 from acs1996 0.972
+  wave_amplitude: 0.3               # derived x 0.6 from acs1996 0.5
 
 scheme:                             # hand-placed in the references (measure_refs.py --scheme); round defaults, see `placement`
   arrow_min_length: 23.5            # placement default (user decision 2026-10-24); measured scheme_multi_x0.6 shortest arrow (PCC / CH2Cl2) 23.72

@@ -156,6 +156,7 @@ from .brackets import square_bracket
 from .abbrev import LabelInfo
 from .chem import Molecule
 from .draw_mol import Drawer, label_info
+from .fontmetrics import load_face
 from .geometry import Point, add, arc_point, arc_segments, mul, shift_box, sub, union_box, unit
 from .placed import Placed
 from .mechanism import curved_arrow, fishhook_side
@@ -447,6 +448,7 @@ class _Writer:
         frag = etree.SubElement(page, "fragment", {"id": self.ids.new()})
         node_ids, label_boxes = {}, []
         outer_nodes = []  # (node, atom idx): labels with two or more bonds get BondOrdering
+        wavy = 0
         for a in mol.atoms:
             x, y = a.x + off[0], a.y + off[1]
             node_ids[a.idx] = nid = self.ids.new()
@@ -479,6 +481,11 @@ class _Writer:
                 if len(ecps) > 1:
                     outer_nodes.append((n, a.idx))
                 label_boxes.append(self.label(n, lab, a.abbrev, off, tpl.get("IsNickname"), markup=info.text))
+                continue
+            if a.end == "wavy":  # ChemDraw's wavy chain end (polymer_x1.0, style-spec.md §17)
+                wavy += 1
+                etree.SubElement(frag, "n", {**attrs, "NodeType": "ExternalConnectionPoint",
+                                             "ExternalConnectionType": "Wavy", "ExternalConnectionNum": str(wavy)})
                 continue
             if a.element != "C":
                 attrs["Element"] = str(_PT.GetAtomicNumber(a.element))
@@ -515,10 +522,17 @@ class _Writer:
             if d.charge_sign(a.idx) is not None:
                 self.charge(frag, d, a, off, node_ids[a.idx])
         dot_boxes = self.dots(frag, mol, d, off, node_ids)
+        if mol.polymer is not None:  # a random copolymer's slashes: <curve>s in the fragment (polymer_x1.0)
+            for _, a, b in mol.polymer.slashes:
+                p0, p1 = add(a, off), add(b, off)
+                etree.SubElement(frag, "curve", {"id": self.ids.new(), "Z": self.ids.next_z(), "ArrowheadType": "Solid",
+                                                 "CurvePoints": pts(*p0, *p0, *p0, *p1, *p1, *p1)})
+        self.frag_ids = (node_ids, bond_ids)
         # ChemDraw's fragment box: the drawn ink (strokes, second lines, signs), the stored label
         # boxes, and each dot center plus cdxml.*_box_reach
         drawn = Group("ink", [g for g in d.draw(mol.name).children
-                              if not g.id.endswith(("-labels", "-lone-pairs", "-radicals", "-bonding-pairs", "-bond-electrons"))])
+                              if not g.id.endswith(("-labels", "-lone-pairs", "-radicals", "-bonding-pairs", "-bond-electrons",
+                                                    "-polymer"))])
         b = drawn.ink_bbox()
         box = union_box(([shift_box(b, off)] if b else [])
                         + label_boxes + dot_boxes)
@@ -891,6 +905,70 @@ class _Writer:
             "GraphicType": "Bracket", "BracketType": "Square", "LipSize": str(self.preset.cdxml.bracket_lip_size)})
         return square_bracket(x, top, bottom, br.side, self.preset).ink_bbox()
 
+    # ------------------------------------------------------------------ polymers
+
+    def _label_s(self, parent, runs: list[richtext.Run], size: float) -> None:
+        for r in runs:
+            attrs = {"font": self.caption_fonts["italic" if r.style == "italic" else "regular"], "size": f"{size:g}",
+                     "color": self.root.get("color", "0")}
+            if r.style == "italic":
+                attrs["face"] = "2"
+            etree.SubElement(parent, "s", attrs).text = r.text
+
+    def polymer(self, page, mol: Molecule, off: Point) -> tuple[list[tuple], list[etree._Element]]:
+        """A polymer's brackets as ChemDraw's (polymer_x1.0, style-spec.md §17): per pair, the
+        ']' <graphic> with BracketUsage MultipleGroup, its repeat count in the "bracketusage" tag and
+        the subscript in "parameterizedBracketLabel" (offset from the bar's top), then the '['; a
+        <bracketedgroup> with the enclosed atoms and each crossing bond, returned to be written
+        after the schemes; the ratio as a caption. Uses the ids of the fragment written last."""
+        from .polymer import bracket_lip, label_runs, ratio_line, subscript_line
+
+        node_ids, bond_ids = self.frag_ids
+        marks, size = mol.polymer, self.preset.polymer.label_size
+        face = load_face("Regular")
+        boxes, groups = [], []
+        for pr in marks.pairs:
+            top, bottom = pr.top + off[1], pr.bottom + off[1]
+            xl, xr = pr.x[0] + off[0], pr.x[1] + off[0]
+            count = pr.label if pr.label.isdigit() else "1"
+            gr = etree.SubElement(page, "graphic", {
+                "id": self.ids.new(), "BoundingBox": pts(xr, top, xr, bottom), "Z": self.ids.next_z(),
+                "GraphicType": "Bracket", "BracketType": "Square", "LipSize": str(self.preset.cdxml.bracket_lip_size),
+                "BracketUsage": "MultipleGroup"})
+            tag = etree.SubElement(gr, "objecttag", {"id": "1", "TagType": "Unknown", "Name": "bracketusage"})
+            ink = face.text_ink_bounds(count, size)
+            tt = etree.SubElement(tag, "t", {"p": "0 0", "BoundingBox": pts(ink[0], -ink[3], ink[2], -ink[1]),
+                                             "IgnoreWarnings": "yes", "CaptionLineHeight": "variable"})
+            self._label_s(tt, [richtext.Run(count)], size)
+            ln = subscript_line(pr, self.preset)
+            ox, oy = pr.label_origin[0] + off[0], pr.label_origin[1] + off[1]
+            tag = etree.SubElement(gr, "objecttag", {"id": "2", "TagType": "Unknown", "Visible": "no",
+                                                     "PositioningType": "offset",
+                                                     "PositioningOffset": pts(ox - xr, oy - top),
+                                                     "Name": "parameterizedBracketLabel"})
+            lbox = shift_box(ln.ink(), off)
+            tt = etree.SubElement(tag, "t", {"p": pts(ox, oy), "BoundingBox": pts(*lbox), "Visible": "no",
+                                             "CaptionLineHeight": "variable"})
+            self._label_s(tt, label_runs(pr.label), size)
+            gl = etree.SubElement(page, "graphic", {
+                "id": self.ids.new(), "BoundingBox": pts(xl, bottom, xl, top), "Z": self.ids.next_z(),
+                "GraphicType": "Bracket", "BracketType": "Square", "LipSize": str(self.preset.cdxml.bracket_lip_size)})
+            lip = bracket_lip(pr.top, pr.bottom, self.preset)
+            boxes += [square_bracket(x, top, bottom, side, self.preset, lip=lip).ink_bbox()
+                      for x, side in ((xl, "left"), (xr, "right"))] + [lbox]
+            bg = etree.Element("bracketedgroup", {"id": self.ids.new(),
+                                                  "BracketedObjectIDs": " ".join(node_ids[i] for i in pr.atoms),
+                                                  "BracketUsage": "MultipleGroup", "RepeatCount": count})
+            for g, (bi, inner) in zip((gl, gr), pr.crossing):
+                att = etree.SubElement(bg, "bracketattachment", {"id": self.ids.new(), "GraphicID": g.get("id")})
+                etree.SubElement(att, "crossingbond", {"id": self.ids.new(), "BondID": bond_ids[bi],
+                                                       "InnerAtomID": node_ids[inner]})
+            groups.append(bg)
+        if marks.ratio:
+            _, b = self.caption(page, CdxText([ratio_line(marks, self.preset)]), off)
+            boxes.append(b)
+        return boxes, groups
+
     # ------------------------------------------------------------------ curved arrows
 
     def curve(self, page, c: CdxCurve, off: Point) -> tuple:
@@ -960,10 +1038,19 @@ def to_cdxml(scheme: CdxScheme | list[tuple[Molecule, Drawer, Point]], preset_na
     page = root.find("page")
     page.set("id", w.ids.new())
     frag_ids, boxes = [], []
+    polymer_graphics, bracketed = [], []
     for mol, d, off in scheme.species:
         boxes.append(w.fragment(page, mol, d, off))
         frag_ids.append(page[-1].get("id"))
+        if mol.polymer is not None:  # brackets after the fragments and captions, as polymer_x1.0 has them
+            holder = etree.Element("holder")
+            b, groups = w.polymer(holder, mol, off)
+            boxes += b
+            polymer_graphics += list(holder)
+            bracketed += groups
     page.extend(w.digit_texts)
+    page.extend(el for el in polymer_graphics if el.tag == "t")  # ratio captions
+    polymer_graphics = [el for el in polymer_graphics if el.tag != "t"]
     text_ids = []  # per CdxText, its <t> ids
     for t in scheme.texts:
         written = w.captions(page, t, scheme.offset)
@@ -981,6 +1068,7 @@ def to_cdxml(scheme: CdxScheme | list[tuple[Molecule, Drawer, Point]], preset_na
         arc_ids.append(gid)
         arrows.append(el)
         boxes.append(b)
+    page.extend(polymer_graphics)
     for br in scheme.brackets:
         boxes.append(w.bracket(page, br, scheme.offset))
     for c in scheme.curves:
@@ -1000,6 +1088,7 @@ def to_cdxml(scheme: CdxScheme | list[tuple[Molecule, Drawer, Point]], preset_na
                 if ids:
                     attrs[key] = " ".join(ids)
             etree.SubElement(sch, "step", attrs)
+    page.extend(bracketed)
     page.extend(arrows)
     box = union_box(boxes) if boxes else (0.0, 0.0, 0.0, 0.0)
     # CreationProgram, Name and BoundingBox first, as ChemDraw orders them
@@ -1043,6 +1132,8 @@ def scheme_records(lay: SchemeLayout, spec: Spec, svg_offset: Point = (0.0, 0.0)
     out = species_records(list(lay.species.values()), svg_offset)
     for run in lay.pluses:
         out.texts.append(CdxText([_line([run], [richtext.Run("+")])]))
+    for ln in lay.coefficients:  # a free caption, not in the step (polymer_x1.0's n)
+        out.texts.append(CdxText([_line(ln.runs, ln.parts)]))
     by_n = {st.n: st for st in lay.steps}
     by_res = {res.n: res for res in lay.resonance}
     for i, st in enumerate(spec.steps, 1):

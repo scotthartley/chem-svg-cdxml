@@ -42,7 +42,7 @@ FRESH_SIGN_BOX, RESTYLED_SIGN_BOX = 0.75, 0.075
 ROLES = ("settings", "stereo", "charges", "circled", "mech", "arrows", "large", "equilibrium", "brackets", "nh", "tail")
 # dimensionless placement defaults: not scaled
 UNSCALED_PLACEMENT = ("curved_arrow.curvature", "curved_arrow.loop_curvature", "cycle.tail_join_in", "cycle.tail_join_out",
-                      "cycle.tail_turn")
+                      "cycle.tail_turn", "polymer.slash_angle")
 # Choices, not measurements: value when new_preset.py isn't given one (None: acs1996's). Large heads are a
 # user decision for acs1996 alone, so the default is ChemDraw's own head.
 OPTIONS = {"text.number_weight": None, "arrow.default_head": "standard", "scheme.wrap_width": None}
@@ -62,12 +62,13 @@ PROBE_KEYS = ("lengths.hash_line_width", "lengths.wedge_wide_end", "charge.bar_l
 # carried over unchanged, unmeasured: dimensionless, or constant in pt at every ACS scale
 COPIED_PREFIXES = ("ratios.",)
 COPIED = ("lengths.label_outline_offset_x", "lengths.label_outline_offset_y", "charge.digit_scale", "text.line_pitch_extra",
-          "cdxml.arrow_box_pad", "cdxml.resonance_box_pad", "chair.axial_up", "chair.equatorial_deg", "chair.heteroatom_vertex")
+          "cdxml.arrow_box_pad", "cdxml.resonance_box_pad", "chair.axial_up", "chair.equatorial_deg", "chair.heteroatom_vertex",
+          "polymer.lip_per_height", "polymer.crossing_stretch")
 # acs1996 x k, 3 decimals. ChemDraw draws a bracket's lip at 0.0726 x its bar's height, whatever the style (resonance_x*,
 # gate re-saves): a probe's lip would report the probe's bracket, so the default keeps acs1996's proportion to the bond.
-SCALED = ("bracket.lip_length",)
+SCALED = ("bracket.lip_length", "polymer.wave_length", "polymer.wave_half_period", "polymer.wave_amplitude")
 # acs1996 x LabelSize / its LabelSize: a text pitch follows the text, not the bonds
-SCALED_BY_LABEL = ("text.line_pitch_sub_upper", "text.line_pitch_sub_lower")
+SCALED_BY_LABEL = ("text.line_pitch_sub_upper", "text.line_pitch_sub_lower", "polymer.label_size")
 
 
 class MissingSpecimen(ValueError):
