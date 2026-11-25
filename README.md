@@ -148,10 +148,36 @@ fragments. So a generated preset is a close starting point, not the 0.1 pt match
 value came from, and the build's report shows how far each is from ACS. It works with Helvetica only so far. One generated style ships: `presentation_x1.0` (LineWidth 2.16, 18 pt labels, wrapping at 900 pt).
 See [`references/style-spec.md`](references/style-spec.md) §16, which also lists the checks for a new style after the build.
 
-A style can also stay in your project instead of the repo: `build --out-dir styles` writes `styles/mystyle.yaml` with its
-CDXML header in `styles/cdxml/`, and a spec uses it with `preset: styles/mystyle.yaml`. Shared abbreviations
-(`abbreviations: groups.yaml`), structures drawn in ChemDraw (`molfile: structures/core.mol`) and your own batch scripts
-work the same way; see [`references/extending.md`](references/extending.md).
+## Your own resources in a project
+
+Anything you reuse across figures can live in the project folder, next to your specs, instead of
+in the skill's repository. It is then yours alone, and updating the skill (`git pull`) leaves it
+alone:
+
+```
+my-project/
+  .claude/skills/chem-svg-cdxml   # the link from the installation
+  groups.yaml                     # your abbreviations
+  structures/core.mol             # structures drawn in ChemDraw, saved as molfiles
+  styles/mystyle.yaml             # your own style (CDXML header in styles/cdxml/)
+  scripts/make_series.py          # your own scripts
+  figures/fig1.yaml               # specs
+```
+
+- **Abbreviations:** `abbreviations: ../groups.yaml` in a spec (or a list of files). The
+  entries add to the built-in groups, or replace the ones with the same name.
+- **Structures:** `molfile: ../structures/core.mol` as a species. The layout and wedges are kept,
+  scaled to the preset's bond length.
+- **Styles:** `preset: ../styles/mystyle.yaml`. `new_preset.py build --out-dir styles` writes one
+  there (see "Adding a style").
+- **Scripts:** for example, one that writes and renders a spec for every compound in a series. It
+  runs in the skill's environment with `uv run --project ~/tools/chem-svg-cdxml python
+  scripts/make_series.py` and uses the skill's public Python calls (`build_figure`, `to_svg`,
+  `rasterize`, `Figure.cdxml`).
+
+Paths in a spec are relative to the spec's own folder. You can ask Claude to set these up ("save
+these abbreviations for the project", "write a script that draws the whole ester series"). The
+details, with a sample script, are in [`references/extending.md`](references/extending.md).
 
 ## Limits
 
